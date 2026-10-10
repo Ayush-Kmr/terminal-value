@@ -229,9 +229,29 @@ def document_card(spec: dict, cfg: dict, out: Path) -> Path:
     img, d = _canvas(pal)
     d.rectangle([MARGIN, 150, W - MARGIN, H - 190], fill=pal["surface"])
 
-    f = _font(cfg, "mono", 32)
     body = str(spec.get("headline", ""))
     highlight = str(spec.get("value", "")).strip()
+
+    # A short excerpt is set large and centred; a few words of 32px type in
+    # the corner of an empty panel reads as a rendering fault.
+    if len(body) < 90:
+        fb = _font(cfg, "display", 84)
+        lines = textwrap.wrap(body.upper(), 22)[:4]
+        y = (150 + H - 190) / 2 - len(lines) * 52 - (40 if highlight else 0)
+        d.rectangle([MARGIN + 70, y - 6, MARGIN + 78, y + len(lines) * 104 - 20],
+                    fill=pal["accent"])
+        for line in lines:
+            d.text((MARGIN + 120, y), line, font=fb, fill=pal["ink"])
+            y += 104
+        if highlight and highlight.lower() not in body.lower():
+            d.text((MARGIN + 120, y + 20), highlight, font=_font(cfg, "mono", 44),
+                   fill=pal["accent"])
+        _caption(d, pal, cfg, spec.get("caption", ""))
+        img = _grain(img, cfg.get("grain", 0.035))
+        img.save(out)
+        return out
+
+    f = _font(cfg, "mono", 32)
     y = 220
     for line in textwrap.wrap(body, 62)[:14]:
         is_hit = highlight and highlight.lower() in line.lower()
