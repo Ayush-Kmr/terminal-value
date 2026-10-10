@@ -17,8 +17,32 @@ from .config import env
 
 log = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-2.0-flash"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+# Rolling aliases, not pinned versions: providers retire dated model names
+# every few months and a retired name is a 404 that stops the whole pipeline.
+GEMINI_MODEL = "gemini-flash-latest"
+# Groq has no alias, so pick the best available model at call time.
+GROQ_PREFERRED = ("llama-3.3-70b-versatile", "llama-4", "llama-3", "llama", "qwen", "gpt-oss")
+GROQ_EXCLUDE = ("guard", "whisper", "tts", "vision", "prompt-guard", "safeguard")
+_groq_model: str | None = None
+
+
+def groq_model(client) -> str:
+    """First available chat model matching the preference order; cached."""
+    global _groq_model
+    if _groq_model:
+        return _groq_model
+    ids = [m.id for m in client.models.list().data
+           if not any(x in m.id.lower() for x in GROQ_EXCLUDE)]
+    for want in GROQ_PREFERRED:
+        # Within a family prefer the largest, e.g. 70b over 8b.
+        family = sorted((i for i in ids if want in i.lower()),
+                        key=lambda i: ("70b" in i or "120b" in i or "versatile" in i, i),
+                        reverse=True)
+        if family:
+            _groq_model = family[0]
+            log.info("Groq model: %s", _groq_model)
+            return _groq_model
+    raise RuntimeError(f"No usable Groq chat model among: {ids}")
 
 
 def _gemini(prompt: str, system: str | None, temperature: float) -> str:
@@ -41,7 +65,8 @@ def _groq(prompt: str, system: str | None, temperature: float) -> str:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
     resp = client.chat.completions.create(
-        model=GROQ_MODEL, messages=messages, temperature=temperature, max_tokens=8000
+        model=groq_model(client), messages=messages, temperature=temperature,
+        max_tokens=8000
     )
     return resp.choices[0].message.content
 

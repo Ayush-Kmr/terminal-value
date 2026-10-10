@@ -77,7 +77,8 @@ def _gemini():
 
 @check("Groq (generate)")
 def _groq():
-    return "replied: " + llm._groq("Reply with the single word: ready", None, 0).strip()[:40]
+    reply = llm._groq("Reply with the single word: ready", None, 0).strip()[:40]
+    return f"model {llm._groq_model} replied: {reply}"
 
 
 @check("Cloudflare FLUX")
