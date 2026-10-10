@@ -139,7 +139,9 @@ gates:
   topic_approval: true         # gate 1: you approve the company + angle
   final_review: true           # gate 2: you watch the cut before it goes out
   channel: telegram
-  timeout_hours: 20            # no answer -> pipeline holds, never auto-publishes
+  timeout_hours: 2             # per gate. A GitHub job is killed at 6h, so two gates
+                               # plus the render must fit inside that. No answer ->
+                               # pipeline holds, never auto-publishes
   on_timeout: hold
 
 # ---------- upload ----------

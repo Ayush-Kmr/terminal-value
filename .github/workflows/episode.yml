@@ -47,10 +47,13 @@ jobs:
           YT_REFRESH_TOKEN:    ${{ secrets.YT_REFRESH_TOKEN }}
           TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          TOPIC:               ${{ inputs.topic }}
+          NO_UPLOAD:           ${{ inputs.no_upload }}
         run: |
-          python main.py \
-            ${{ inputs.topic && format('--topic "{0}"', inputs.topic) || '' }} \
-            ${{ inputs.no_upload && '--no-upload' || '' }}
+          args=()
+          [ -n "$TOPIC" ] && args+=(--topic "$TOPIC")
+          [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
+          python main.py "${args[@]}"
 
       - name: Upload artifacts
         if: always()
@@ -62,6 +65,7 @@ jobs:
             output/**/thumbnail.jpg
             output/**/metadata.json
             output/**/script.json
+            output/**/research.json
             output/**/shorts/*.mp4
           retention-days: 14
 

@@ -98,7 +98,10 @@ def main() -> int:
             channelId=ch["id"],
             body={"timing": {"type": "offsetFromStart", "offsetMs": 0},
                   "position": {"type": "corner", "cornerPosition": "bottomRight"}},
-            media_body=MediaFileUpload(str(BRAND / "watermark.png"), mimetype="image/png"),
+            # resumable: the client library's simple-upload path crashes on
+            # this endpoint ("range() arg 3 must not be zero").
+            media_body=MediaFileUpload(str(BRAND / "watermark.png"), mimetype="image/png",
+                                       resumable=True),
         ).execute()
         print("OK   video watermark (entire video)")
     except Exception as exc:  # noqa: BLE001
