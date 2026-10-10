@@ -94,15 +94,23 @@ def main() -> int:
 
     # ---- watermark -------------------------------------------------------
     try:
-        yt.watermarks().set(
-            channelId=ch["id"],
-            body={"timing": {"type": "offsetFromStart", "offsetMs": 0},
-                  "position": {"type": "corner", "cornerPosition": "bottomRight"}},
-            # resumable: the client library's simple-upload path crashes on
-            # this endpoint ("range() arg 3 must not be zero").
-            media_body=MediaFileUpload(str(BRAND / "watermark.png"), mimetype="image/png",
-                                       resumable=True),
-        ).execute()
+        # Raw multipart request: the client library's upload path crashes on
+        # this endpoint ("range() arg 3 must not be zero").
+        import json
+        import requests
+        meta = {"timing": {"type": "offsetFromStart", "offsetMs": 0},
+                "position": {"type": "corner", "cornerPosition": "bottomRight"}}
+        r = requests.post(
+            "https://www.googleapis.com/upload/youtube/v3/watermarks/set",
+            params={"channelId": ch["id"], "uploadType": "multipart"},
+            headers={"Authorization": f"Bearer {yt._http.credentials.token}"},
+            files={"metadata": (None, json.dumps(meta), "application/json"),
+                   "media": ("watermark.png", (BRAND / "watermark.png").read_bytes(),
+                             "image/png")},
+            timeout=60,
+        )
+        if r.status_code >= 300:
+            raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
         print("OK   video watermark (entire video)")
     except Exception as exc:  # noqa: BLE001
         failures += 1
