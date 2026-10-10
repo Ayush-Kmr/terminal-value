@@ -2,8 +2,9 @@ name: Episode
 
 on:
   schedule:
-    # Every day 10:30 UTC = 16:00 IST. Picks the day's top story, produces it
-    # (about 30 minutes) and schedules it for 19:00 IST, the evening peak.
+    # Every day 10:30 UTC = 16:00 IST. One long video on the day's top story
+    # (published 19:00 IST) plus two Shorts cut from it (20:30 and 08:00 IST).
+    # Narration is the owner's cloned voice, generated on the runner.
     - cron: "30 10 * * *"
   workflow_dispatch:
     inputs:
@@ -15,6 +16,11 @@ on:
         type: choice
         options: [IN, US, CN, RU, WORLD]
         default: IN
+      kind:
+        description: "auto = follow config.yaml (a long video plus two Shorts)"
+        type: choice
+        options: [auto, long, shorts]
+        default: auto
       publish:
         description: "now = public as soon as it uploads; slot = next 19:00 IST"
         type: choice
@@ -35,7 +41,7 @@ permissions:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 330
     steps:
       - uses: actions/checkout@v4
 
@@ -48,6 +54,24 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu
 
       - run: pip install -r requirements.txt
+
+      # The cloned-voice model lives in its own environment (older torch/numpy).
+      - name: Cache voice environment and model
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv-voice
+            ~/.cache/huggingface
+            ~/.pkuseg
+          key: voice-${{ runner.os }}-${{ hashFiles('requirements-voice.txt') }}
+
+      - name: Install cloned-voice model
+        run: |
+          if [ ! -x .venv-voice/bin/python ]; then
+            python -m venv .venv-voice
+            .venv-voice/bin/pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+            .venv-voice/bin/pip install -q -r requirements-voice.txt
+          fi
 
       - name: Produce episode
         env:
@@ -71,11 +95,13 @@ jobs:
           TELEGRAM_CHAT_ID:          ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC:                     ${{ inputs.topic }}
           REGION:                    ${{ inputs.region }}
+          KIND:                      ${{ inputs.kind }}
           PUBLISH:                   ${{ inputs.publish }}
           NO_UPLOAD:                 ${{ inputs.no_upload }}
         run: |
           args=()
           [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-IN}")
+          [ -n "$KIND" ] && args+=(--kind "$KIND")
           [ "$PUBLISH" = "now" ] && args+=(--publish now)
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"

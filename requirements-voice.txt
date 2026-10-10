@@ -1,0 +1,3 @@
+# The cloned-voice model, installed into .venv-voice (see scripts/clone_tts.py).
+chatterbox-tts==0.1.7
+setuptools<81        # the model's watermarker still imports pkg_resources

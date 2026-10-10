@@ -21,7 +21,7 @@ as YouTube Shorts. They must not overlap.
 A good Short moment:
 - Makes sense with zero context from the rest of the video
 - Contains one surprising, specific fact
-- Runs 25-55 seconds (add up the shot durations)
+- Runs {lo}-{hi} seconds (add up the shot durations)
 - Ends on something that makes the viewer want the full video
 
 Shots (index, duration, narration):
@@ -35,12 +35,14 @@ Return a JSON array of objects:
   why        - one sentence"""
 
 
-def pick_moments(script_shots: list[dict], n: int = 2) -> list[dict]:
+def pick_moments(script_shots: list[dict], n: int = 2, target: int = 30) -> list[dict]:
     lines = "\n".join(
         f"{s['index']}\t{s.get('duration',5):.1f}s\t{(s.get('narration') or '')[:140]}"
         for s in script_shots
     )
-    return llm.json_call(PICK_PROMPT.format(n=n, shots=lines), temperature=0.6)
+    return llm.json_call(
+        PICK_PROMPT.format(n=n, shots=lines, lo=max(target - 8, 12), hi=target + 6),
+        temperature=0.6)
 
 
 def _offset(shots: list[dict], index: int) -> float:
@@ -77,7 +79,7 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
 
 
 def cut(cfg: Config, source: Path, shots: list[dict], moment: dict,
-        out: Path, title: str) -> Path:
+        out: Path, title: str, max_seconds: float = 58.0) -> Path:
     """9:16 with the full 16:9 frame in the middle over a blurred fill, so no
     on-screen text is cropped away. Headline above. Hard cap 58 seconds."""
     last = max(s["index"] for s in shots)
@@ -85,7 +87,7 @@ def cut(cfg: Config, source: Path, shots: list[dict], moment: dict,
     last_i = max(first_i, min(int(moment["end_index"]), last))
     start = _offset(shots, first_i)
     end = _offset(shots, last_i + 1)
-    duration = min(max(end - start, 12.0), 58.0)
+    duration = min(max(end - start, 12.0), max_seconds, 58.0)
 
     plate = _headline_plate(cfg, title, out.with_suffix(".png"))
     vf = (
@@ -110,7 +112,8 @@ def cut(cfg: Config, source: Path, shots: list[dict], moment: dict,
 def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
               company: str, n: int = 2, language: str = "en",
               long_url: str = "") -> list[dict]:
-    moments = [m for m in pick_moments(shots, n) if isinstance(m, dict)][:n]
+    target = int(cfg.get_path("format.short.target_seconds", 30))
+    moments = [m for m in pick_moments(shots, n, target) if isinstance(m, dict)][:n]
     outdir = workdir / "shorts"
     outdir.mkdir(parents=True, exist_ok=True)
     more = long_url or cfg.get_path("channel.url", "")
@@ -118,7 +121,8 @@ def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
     for i, m in enumerate(moments):
         try:
             headline = latin_only(m.get("hook_text", "")) or latin_only(company) or "EXPLAINED"
-            path = cut(cfg, source, shots, m, outdir / f"short_{i+1}.mp4", headline)
+            path = cut(cfg, source, shots, m, outdir / f"short_{i+1}.mp4", headline,
+                       max_seconds=target + 12)
             title = (m.get("title") or headline).strip()[:90]
             built.append({
                 "path": str(path),
@@ -132,3 +136,17 @@ def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
         except Exception as exc:  # noqa: BLE001
             log.warning("Short %d failed: %s", i + 1, exc)
     return built
+
+
+def standalone(cfg: Config, video: Path, shots: list[dict], workdir: Path,
+               headline: str, title: str, language: str = "en") -> dict:
+    """A Short that is its own story rather than a cut: reframe the whole
+    rendered clip to 9:16."""
+    last = max(s["index"] for s in shots)
+    out = cut(cfg, video, shots, {"start_index": 0, "end_index": last},
+              workdir / "short.mp4", latin_only(headline) or "EXPLAINED")
+    return {
+        "path": str(out),
+        "title": f"{title.strip()[:90]} #shorts",
+        "description": f"{cfg.get_path('channel.disclosure', '').strip()}\n\n#shorts",
+    }

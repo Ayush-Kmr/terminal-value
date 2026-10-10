@@ -24,13 +24,20 @@ it today even though it sits fourth.
 | `PIXABAY_API_KEY` | <https://pixabay.com/api/docs/> | stock imagery |
 | `PEXELS_API_KEY` | <https://www.pexels.com/api/> | stock video (new keys are sometimes paused — skip if so) |
 
-## 3. The voice (15 min) — the one paid piece
+## 3. The voice — your own, cloned (free)
 
-1. ElevenLabs → **Creator** plan, $22/mo.
-2. Voice Library. You are listening for: male or female, 35–55, mid-Atlantic or
-   British, *low* energy. Documentary narration fails when it sounds enthusiastic.
-   Audition each candidate on a paragraph about a bankruptcy, not on the demo text.
-3. Copy the voice ID into `ELEVENLABS_VOICE_ID`.
+Narration is spoken in your own voice by an open cloning model that runs on the
+build machine, so there is no per-character bill.
+
+1. Record about two minutes of yourself reading Hindi and English in a quiet room.
+2. Clean it and cut one 10-20 second clip per language into
+   `assets/voice/ref_hi.wav` and `assets/voice/ref_en.wav` (24 kHz mono).
+3. To run locally: `python3.12 -m venv .venv-voice`, then
+   `.venv-voice/bin/pip install -r requirements-voice.txt`. GitHub Actions does
+   this itself and caches it.
+
+ElevenLabs is still supported: set `voice.provider: elevenlabs` in `config.yaml`
+and put a voice ID in `ELEVENLABS_VOICE_ID` (Creator plan, $22/mo, for daily videos).
 
 Test it before committing — this voice is the channel's single most recognisable
 asset and changing it at episode 30 resets your audience's sense of who you are.

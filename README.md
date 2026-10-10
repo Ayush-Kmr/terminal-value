@@ -28,8 +28,8 @@ today's top trend, or type a story and choose its region.
    weighted highest. `trending.avoid` in `config.yaml` lists what it must skip.
 2. `src/research.py` builds a fact base from a search-grounded briefing and the
    day's headlines. The script may only use facts from it.
-3. `src/script.py` writes five sections; `src/voice.py` narrates each shot with
-   ElevenLabs; `src/assets.py` gathers a visual per shot (data cards, Wikimedia
+3. `src/script.py` writes five sections; `src/voice.py` narrates each shot in the
+   owner's cloned voice (an open model run by `scripts/clone_tts.py`); `src/assets.py` gathers a visual per shot (data cards, Wikimedia
    photos of real people and places, AI stills for mood).
 4. `src/render.py` assembles the video; `src/shorts.py` cuts two vertical Shorts.
 5. `src/upload.py` uploads everything. A Telegram message reports the result,
@@ -37,9 +37,11 @@ today's top trend, or type a story and choose its region.
 
 ## Things you will want to change
 
-- **Voices.** Add GitHub secrets `ELEVENLABS_VOICE_ID_IN`, `_US`, `_CN`, `_RU`,
-  `_WORLD` with ElevenLabs voice IDs to give each region its own narrator. Any
-  that is missing uses `ELEVENLABS_VOICE_ID`.
+- **Voice.** Narration is cloned from `assets/voice/ref_hi.wav` (Hindi) and
+  `ref_en.wav` (English), cut from the owner's own recording. Replace those two
+  clips (10-20 s of clean speech each) to change the narrator; tune delivery
+  under `voice.clone.settings` in `config.yaml`. Set `voice.provider: elevenlabs`
+  to use ElevenLabs instead (paid plan needed for daily videos).
 - **Tone.** `channel/voice.md` is pasted into every script prompt.
 - **Regions and priorities.** `trending.regions` in `config.yaml`.
 - **Review before publishing.** Set `gates.topic_approval` / `gates.final_review`

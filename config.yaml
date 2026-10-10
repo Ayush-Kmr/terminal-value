@@ -77,12 +77,14 @@ trending:
 format:
   kind: "news explainer video"     # how prompts describe the video
   long:
-    target_minutes: 6           # ~900 words; about 5,000 voice characters a day
+    days: []                    # long-video days. Empty = a long video every day
+    target_minutes: 5           # ~750 words; about 4,500 voice characters
     words_per_minute: 150
     publish_times: ["19:00"]    # IST. Evening is the daily viewing peak in India
   short:
-    per_day: 2
-    publish_times: ["08:00", "20:30"]   # IST. After the long, then next morning
+    per_day: 2                  # cut from the day's long video
+    target_seconds: 30
+    publish_times: ["08:00", "20:30"]   # IST
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.
@@ -138,15 +140,28 @@ visuals:
 
 # ---------- voice ----------
 voice:
-  provider: elevenlabs
-  model: eleven_multilingual_v2   # one model, speaks both Hindi and English
+  # clone      = the channel owner's own voice, cloned by an open model that
+  #              runs on the build machine. No per-character cost.
+  # elevenlabs = ElevenLabs API (needs a paid plan for daily videos).
+  provider: clone
+  pause_after_beat_ms: 650
+  clone:
+    # Cleaned clips cut from the owner's recording, one per narration language,
+    # so Hindi is cloned from Hindi speech and English from English.
+    references:
+      hi: assets/voice/ref_hi.wav
+      en: assets/voice/ref_en.wav
+    settings:
+      exaggeration: 0.5      # expressiveness. Higher is livelier but less stable
+      cfg_weight: 0.5        # lower = slower, more deliberate pacing
+      temperature: 0.7
+  # ElevenLabs only:
+  model: eleven_multilingual_v2
   stability: 0.45
   similarity_boost: 0.75
   style: 0.15
-  pause_after_beat_ms: 650
-  # A different narrator per region. Each value is the NAME of a GitHub secret
-  # holding an ElevenLabs voice ID. Any that is not set falls back to
-  # ELEVENLABS_VOICE_ID, so the pipeline runs with one voice until you add more.
+  # A different ElevenLabs narrator per region. Each value is the NAME of a
+  # GitHub secret holding a voice ID; unset ones fall back to ELEVENLABS_VOICE_ID.
   voices:
     IN: ELEVENLABS_VOICE_ID_IN      # Hindi narrator
     US: ELEVENLABS_VOICE_ID_US

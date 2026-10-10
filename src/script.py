@@ -83,18 +83,19 @@ Rules:
   shot a "prompt" as a fallback illustration."""
 
 
-def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en") -> dict[str, Any]:
+def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
+          beats: list[dict] | None = None, total_words: int | None = None) -> dict[str, Any]:
     import json as _json
 
     fb = factbase.to_dict() if hasattr(factbase, "to_dict") else factbase
     target_min = cfg.get_path("format.long.target_minutes", 12)
     wpm = cfg.get_path("format.long.words_per_minute", 150)
-    total_words = int(target_min * wpm)
+    total_words = total_words or int(target_min * wpm)
 
     voice_doc = read_channel_doc("voice.md")
     visual_doc = read_channel_doc("visual-identity.md")
 
-    beats_cfg = cfg.get_path("structure.beats", [])
+    beats_cfg = beats or cfg.get_path("structure.beats", [])
     out_beats: list[dict[str, Any]] = []
     said_so_far: list[str] = []
 

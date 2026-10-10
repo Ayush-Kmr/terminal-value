@@ -20,6 +20,7 @@ numpy>=2.0
 
 # --- audio ---
 mutagen>=1.47
+num2words>=0.5.13   # spells out figures for the cloned voice
 
 # --- youtube ---
 google-api-python-client>=2.140

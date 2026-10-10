@@ -134,31 +134,146 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     return meta
 
 
-def choose_story(cfg, args, do_gates: bool) -> dict | None:
-    """A story dict: topic, angle, region, language (+ research hints)."""
-    regions = {r["code"]: r for r in cfg.get_path("trending.regions", [])}
-    if args.topic:
-        region = (args.region or next(iter(regions), "IN")).upper()
-        return {
-            "topic": args.topic, "company": args.topic,
-            "angle": args.angle or f"What is happening with {args.topic}, and why does it matter?",
-            "region": region,
-            "language": args.language or regions.get(region, {}).get("language", "en"),
-            "search_query": args.topic, "wiki_title": "", "keywords": [args.topic],
-        }
+SHORT_BEAT = {
+    "id": "short",
+    "label": "Short",
+    "share": 1.0,
+    "intent": ("A complete {seconds}-second explainer of this one story for someone who has "
+               "not heard of it: the single most striking verified fact first, then what "
+               "happened, then why it matters. 4-6 shots. No greeting, no sign-off."),
+}
 
+
+def produce_short(cfg, story: dict, workdir: Path) -> dict:
+    """One standalone Short on one story: research -> ~30s script -> render."""
+    company, language = story["topic"], story.get("language", "en")
+    seconds = int(cfg.get_path("format.short.target_seconds", 30))
+    wpm = cfg.get_path("format.long.words_per_minute", 150)
+
+    fb = research.build_news(cfg, story)
+    warnings = research.validate_news(cfg, fb)
+    beat = {**SHORT_BEAT, "intent": SHORT_BEAT["intent"].format(seconds=seconds)}
+    sc = script_mod.write(cfg, fb, "", language, beats=[beat],
+                          total_words=int(seconds / 60 * wpm))
+    (workdir / "script.json").write_text(
+        json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
+    shot_list = voice.narrate_shots(cfg, script_mod.all_shots(sc), workdir,
+                                    story.get("region"), language)
+    assets.gather(cfg, shot_list, workdir, company)
+    clips = render.build_shot_clips(cfg, shot_list, workdir)
+    video = render.concat_with_audio(cfg, clips, shot_list, workdir, None)
+
+    best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
+    best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language)[0]
+    keywords = [str(k) for k in story.get("keywords", [])]
+    short = shorts.standalone(cfg, video, shot_list, workdir,
+                              best.get("thumb_text") or company, best["title"], language)
+    short["description"] = seo.description(
+        cfg, best.get("summary") or fb.summary, "",
+        [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
+        keywords or [company], language) + "\n#shorts"
+    short.update({"company": company, "tags": seo.tags(company, keywords, language),
+                  "language": language, "region": story.get("region"),
+                  "warnings": warnings, "angle": story.get("angle", "")})
+    (workdir / "metadata.json").write_text(
+        json.dumps(short, indent=2, ensure_ascii=False), encoding="utf-8")
+    return short
+
+
+def manual_story(cfg, args) -> dict:
+    regions = {r["code"]: r for r in cfg.get_path("trending.regions", [])}
+    region = (args.region or next(iter(regions), "IN")).upper()
+    return {
+        "topic": args.topic, "company": args.topic,
+        "angle": args.angle or f"What is happening with {args.topic}, and why does it matter?",
+        "region": region,
+        "language": args.language or regions.get(region, {}).get("language", "en"),
+        "search_query": args.topic, "wiki_title": "", "keywords": [args.topic],
+    }
+
+
+def candidates_for(cfg, args, n: int) -> list[dict]:
+    """Ranked stories: a manual topic, today's trends, or documentary topics."""
+    if args.topic:
+        return [manual_story(cfg, args)]
     if cfg.get_path("mode", "trending") == "trending":
         from src import trends
-        candidates = trends.pick(cfg, n=4)
-    else:
-        candidates = topics_or_die(cfg)
-        for c in candidates:
-            c.setdefault("topic", c.get("company"))
-            c.setdefault("language", cfg.get_path("channel.language", "en"))
+        return trends.pick(cfg, n=max(n, 4))
+    candidates = topics_or_die(cfg)
+    for c in candidates:
+        c.setdefault("topic", c.get("company"))
+        c.setdefault("language", cfg.get_path("channel.language", "en"))
+    return candidates
 
-    if do_gates and cfg.get_path("gates.topic_approval", False):
-        return gate.topic_gate(cfg, candidates)
-    return candidates[0]
+
+def todays_kind(cfg, args) -> str:
+    """'long' on a long-video day, otherwise 'shorts'."""
+    if args.kind != "auto":
+        return args.kind
+    tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
+    today = datetime.now(tz).strftime("%A").lower()
+    days = [d.lower() for d in cfg.get_path("format.long.days", [])]
+    return "long" if not days or today in days else "shorts"
+
+
+def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
+    yt_status = upload.status(video_id)
+    if wanted_public and yt_status.get("privacyStatus") != "public":
+        lines.append("⚠️ YouTube kept it PRIVATE (status: "
+                     f"{yt_status.get('privacyStatus')}). New API projects are locked to "
+                     "private until Google approves the API audit form.")
+    gate.notify("\n".join(lines), markdown=False)
+    log.info("YouTube status for %s: %s", video_id, yt_status)
+
+
+def run_shorts_day(cfg, args) -> int:
+    """No long video today: one standalone Short on each of the top stories."""
+    n = int(cfg.get_path("format.short.per_day", 2))
+    stories = candidates_for(cfg, args, n)[:n]
+    tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
+    times = upload.slots(cfg, "short", n)
+    st = state.load()
+    done, failures = [], []
+
+    for i, story in enumerate(stories):
+        company = story["topic"]
+        workdir = ROOT / "output" / f"{datetime.now():%Y-%m-%d}-short-{slug(company)}"
+        workdir.mkdir(parents=True, exist_ok=True)
+        log.info("Short %d/%d: %s [%s/%s]", i + 1, len(stories), company,
+                 story.get("region"), story.get("language"))
+        try:
+            short = produce_short(cfg, story, workdir)
+            if args.no_upload:
+                done.append(f"{company} (built, not uploaded)")
+                continue
+            now = args.publish == "now" and i == 0
+            when = None if now else times[i] if i < len(times) else None
+            sid = upload.upload(cfg, Path(short["path"]),
+                                {"title": short["title"][:100], "language": short["language"],
+                                 "description": short["description"], "tags": short["tags"]},
+                                privacy="public" if now else "private", publish_at=when)
+            state.record_episode(st, {
+                "company": company, "angle": short["angle"], "title": short["title"],
+                "region": short["region"], "language": short["language"],
+                "video_id": sid, "kind": "short", "warnings": short["warnings"],
+            })
+            state.save(st)
+            lines = [f"✅ Short: {short['title']}", f"https://youtu.be/{sid}",
+                     f"{short['region']} · {short['language']}",
+                     "Published now" if now else f"Goes public {when:%a %d %b %H:%M}"]
+            if short["warnings"]:
+                lines.append("Research warnings: " + "; ".join(short["warnings"]))
+            report(lines, sid, now)
+            done.append(company)
+        except Exception as exc:  # noqa: BLE001
+            log.exception("Short on %s failed", company)
+            failures.append(f"{company}: {type(exc).__name__}: {str(exc)[:200]}")
+
+    if failures:
+        raise RuntimeError(f"{len(failures)} of {len(stories)} Shorts failed — "
+                           + " | ".join(failures))
+    log.info("Shorts day done: %s", ", ".join(done))
+    return 0
 
 
 def run(args) -> int:
@@ -170,7 +285,13 @@ def run(args) -> int:
         print(path.read_text(encoding="utf-8"))
         return 0
 
-    story = choose_story(cfg, args, do_gates)
+    if todays_kind(cfg, args) == "shorts":
+        return run_shorts_day(cfg, args)
+
+    candidates = candidates_for(cfg, args, 4)
+    story = candidates[0]
+    if do_gates and cfg.get_path("gates.topic_approval", False):
+        story = gate.topic_gate(cfg, candidates)
     if story is None:
         log.info("No topic approved. Stopping — nothing produced.")
         return 0
@@ -235,27 +356,20 @@ def run(args) -> int:
     state.record_episode(st, {
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
-        "video_id": video_id, "short_ids": short_ids,
+        "video_id": video_id, "short_ids": short_ids, "kind": "long",
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })
     state.save(st)
 
-    yt_status = upload.status(video_id)
-    locked = decision == "publish" and yt_status.get("privacyStatus") != "public"
     lines = [
         f"✅ {meta['title']}",
         f"https://youtu.be/{video_id}",
         f"{meta['region']} · {meta['language']} · {meta['runtime']} · {len(short_ids)} Short(s) queued",
         (f"Goes public {publish_at:%a %d %b %H:%M}" if publish_at else "Published now"),
     ]
-    if locked:
-        lines.append("⚠️ YouTube kept it PRIVATE (status: "
-                     f"{yt_status.get('privacyStatus')}). New API projects are locked to "
-                     "private until Google approves the API audit form.")
     if meta["warnings"]:
         lines.append("Research warnings: " + "; ".join(meta["warnings"]))
-    gate.notify("\n".join(lines), markdown=False)
-    log.info("YouTube status for %s: %s", video_id, yt_status)
+    report(lines, video_id, decision == "publish")
     return 0
 
 
@@ -267,6 +381,8 @@ def main() -> int:
     ap.add_argument("--language", choices=["hi", "en"], help="override narration language")
     ap.add_argument("--publish", choices=["slot", "now"], default="slot",
                     help="slot: schedule for the next publish time; now: public immediately")
+    ap.add_argument("--kind", choices=["auto", "long", "shorts"], default="auto",
+                    help="auto: long on format.long.days, Shorts otherwise")
     ap.add_argument("--no-upload", action="store_true")
     ap.add_argument("--no-gates", action="store_true")
     ap.add_argument("--no-shorts", action="store_true")
