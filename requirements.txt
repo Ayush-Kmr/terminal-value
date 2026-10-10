@@ -1,0 +1,27 @@
+# --- core ---
+pyyaml>=6.0
+python-dotenv>=1.0
+requests>=2.32
+tenacity>=8.5
+
+# --- LLM ---
+google-generativeai>=0.8
+groq>=0.11
+
+# --- research ---
+wikipedia-api>=0.6
+beautifulsoup4>=4.12
+lxml>=5.2
+
+# --- visuals ---
+Pillow>=10.4
+matplotlib>=3.9
+numpy>=2.0
+
+# --- audio ---
+mutagen>=1.47
+
+# --- youtube ---
+google-api-python-client>=2.140
+google-auth-oauthlib>=1.2
+google-auth-httplib2>=0.2

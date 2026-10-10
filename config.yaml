@@ -1,0 +1,129 @@
+# ============================================================
+#  Channel configuration
+#  Everything that defines the show lives here.
+# ============================================================
+
+channel:
+  name: "Terminal Value"           # display name
+  handle: "@terminalvaluedoc"
+  channel_id: "UCm1uFmKTwjzhIAUeYC0NcZQ"
+  url: "https://www.youtube.com/@terminalvaluedoc"
+  tagline: "How companies actually die."
+  language: en
+  timezone: Asia/Kolkata
+
+# ---------- format ----------
+format:
+  long:
+    target_minutes: 12          # 12 min nearly halves the views needed for 4,000 watch hrs
+    min_minutes: 9
+    max_minutes: 15
+    words_per_minute: 150       # documentary narration pace, deliberately slow
+    publish_days: [tuesday, friday]
+    publish_time: "17:30"       # local; evening US morning / India evening overlap
+  short:
+    target_seconds: 48
+    per_day: 1
+    publish_time: "19:00"
+    cut_from_long: true         # Shorts are cut from the long video's best beats
+
+# ---------- the 6-beat documentary spine ----------
+# Each episode follows this structure but never the same phrasing.
+# This is what keeps the series recognisable without being "templated".
+structure:
+  beats:
+    - id: cold_open
+      share: 0.08
+      intent: "The single most surprising fact. No channel name, no intro. Start mid-collapse."
+    - id: the_rise
+      share: 0.22
+      intent: "Make the viewer believe in this company. They must want it to win."
+    - id: the_bet
+      share: 0.20
+      intent: "The decision that looked brilliant. Name the people. Name the number."
+    - id: the_crack
+      share: 0.20
+      intent: "First evidence it was wrong. The thing insiders saw before the market did."
+    - id: the_fall
+      share: 0.20
+      intent: "Collapse with specifics: dates, dollars, filings, layoffs."
+    - id: the_lesson
+      share: 0.10
+      intent: "The transferable business principle. This is the part that gets screenshotted."
+
+# ---------- visual system ----------
+# Motion graphics first. AI video is a garnish, not the meal.
+visuals:
+  resolution: [1920, 1080]
+  fps: 30
+  palette:
+    bg:      "#0E1116"
+    surface: "#161B22"
+    ink:     "#F2F4F7"
+    muted:   "#8B949E"
+    accent:  "#E8B931"        # one accent colour, used sparingly, is a brand
+    danger:  "#D1485A"
+  fonts:
+    display: "assets/fonts/Archivo-Black.ttf"
+    body:    "assets/fonts/Inter-Regular.ttf"
+    mono:    "assets/fonts/JetBrainsMono-Regular.ttf"
+  grain: 0.035                 # film grain overlay; makes stock + AI blend together
+  shot_seconds: [4, 9]         # min/max per shot. Under 4s reads as slop.
+  ai_video:
+    enabled: false             # OFF by default. 12 min of AI video costs $30-65.
+    max_seconds_per_episode: 30
+    provider: wan              # cheapest credible: ~$0.07/sec
+  mix_targets:                 # rough share of runtime per visual type
+    motion_graphics: 0.45      # charts, timelines, stat reveals, quote cards
+    archival_stock: 0.35       # Pexels/Pixabay/Wikimedia PD
+    ai_illustration: 0.20      # stills, Ken Burns. NOT generated video.
+
+# ---------- voice ----------
+voice:
+  provider: elevenlabs
+  model: eleven_multilingual_v2
+  stability: 0.45              # lower = more expressive; docs want some variance
+  similarity_boost: 0.75
+  style: 0.15
+  pause_after_beat_ms: 650
+
+# ---------- research ----------
+research:
+  min_sources: 5
+  require_primary: true        # at least one filing, transcript, or court document
+  banned_sole_source: [wikipedia]   # Wikipedia may start research, never finish it
+  source_priority:
+    - sec_filings
+    - court_records
+    - earnings_transcripts
+    - major_press
+    - books
+    - wikipedia
+
+# ---------- topic selection ----------
+topics:
+  competitors:                 # used for outlier detection, not imitation
+    - "@CompanyMan"
+    - "@ModernMBA"
+    - "@BusinessCasual"
+    - "@BrightSunFilms"
+  outlier_threshold: 2.5       # a video is an outlier at 2.5x ITS OWN channel median
+  cooldown_days: 365           # never repeat a company within a year
+  min_company_age_years: 5
+
+# ---------- human gates ----------
+gates:
+  topic_approval: true         # gate 1: you approve the company + angle
+  final_review: true           # gate 2: you watch the cut before it goes out
+  channel: telegram
+  timeout_hours: 20            # no answer -> pipeline holds, never auto-publishes
+  on_timeout: hold
+
+# ---------- upload ----------
+upload:
+  privacy_on_upload: private   # always private; gate 2 flips it to public/scheduled
+  category_id: 22              # People & Blogs; 27=Education also works
+  made_for_kids: false
+  synthetic_media_disclosure: true
+  default_playlist: "Rise & Fall"
+  max_uploads_per_day: 3       # each upload ~1600 of 10000 daily API units

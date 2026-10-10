@@ -1,0 +1,92 @@
+"""Narration via ElevenLabs, rendered per shot so audio and visuals stay locked.
+
+Per-shot rendering (rather than one long file) means a re-write of one sentence
+costs one API call, not a full re-render — and shot durations come straight from
+the audio rather than being guessed.
+"""
+from __future__ import annotations
+
+import logging
+import subprocess
+from pathlib import Path
+
+import requests
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+from .config import Config, env
+
+log = logging.getLogger(__name__)
+API = "https://api.elevenlabs.io/v1/text-to-speech"
+
+
+@retry(stop=stop_after_attempt(4), wait=wait_exponential(min=3, max=40))
+def _synthesise(text: str, out: Path, cfg: Config) -> None:
+    voice_id = env("ELEVENLABS_VOICE_ID", required=True)
+    resp = requests.post(
+        f"{API}/{voice_id}",
+        headers={
+            "xi-api-key": env("ELEVENLABS_API_KEY", required=True),
+            "Content-Type": "application/json",
+        },
+        json={
+            "text": text,
+            "model_id": cfg.get_path("voice.model", "eleven_multilingual_v2"),
+            "voice_settings": {
+                "stability": cfg.get_path("voice.stability", 0.45),
+                "similarity_boost": cfg.get_path("voice.similarity_boost", 0.75),
+                "style": cfg.get_path("voice.style", 0.15),
+                "use_speaker_boost": True,
+            },
+        },
+        timeout=120,
+    )
+    resp.raise_for_status()
+    out.write_bytes(resp.content)
+
+
+def duration(path: Path) -> float:
+    """Exact duration via ffprobe. Shot lengths derive from this."""
+    res = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+        capture_output=True, text=True, check=True,
+    )
+    return float(res.stdout.strip())
+
+
+def narrate_shots(cfg: Config, shots: list[dict], outdir: Path) -> list[dict]:
+    """Synthesise one audio file per shot; attach real durations."""
+    audio_dir = outdir / "audio"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+
+    min_s, max_s = cfg.get_path("visuals.shot_seconds", [4, 9])
+    hold_ms = cfg.get_path("voice.pause_after_beat_ms", 650)
+
+    for shot in shots:
+        text = (shot.get("narration") or "").strip()
+        path = audio_dir / f"shot_{shot['index']:03d}.mp3"
+        if not text:
+            shot["audio"] = None
+            shot["duration"] = float(min_s)
+            continue
+        if not path.exists():
+            _synthesise(text, path, cfg)
+        spoken = duration(path)
+
+        # Pad so no shot is shorter than the minimum; hold shots get silence after.
+        pad = hold_ms / 1000.0 if shot.get("emphasis") == "hold" else 0.25
+        shot["audio"] = str(path)
+        shot["spoken_duration"] = spoken
+        shot["duration"] = max(float(min_s), min(spoken + pad, float(max_s) + 3))
+        log.debug("shot %03d: %.2fs spoken, %.2fs on screen",
+                  shot["index"], spoken, shot["duration"])
+
+    total = sum(s["duration"] for s in shots)
+    log.info("Narration complete: %d shots, %.1f min", len(shots), total / 60)
+    return shots
+
+
+def estimate_cost(script_text: str) -> float:
+    """ElevenLabs bills per character. A 12-minute script is ~11k characters."""
+    chars = len(script_text)
+    return round(chars / 1_000_000 * 150, 3)   # ~$150/1M chars on Creator tier
