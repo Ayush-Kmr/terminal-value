@@ -10,7 +10,30 @@ channel:
   url: "https://www.youtube.com/@terminalvaluedoc"
   tagline: "How companies actually die."
   language: en
+  country: US                      # audience country shown on the About page
   timezone: Asia/Kolkata
+  # The About box. Applied by scripts/brand_channel.py. The first two lines
+  # are what search shows, so they carry the keywords.
+  about: |
+    Documentaries about how companies actually die.
+
+    Every episode takes one business, one decision, and one argument — then tests it against the primary record: SEC filings, court documents, earnings transcripts and contemporary reporting. No hot takes, no hindsight bias, no "little did they know."
+
+    New documentary every Tuesday and Friday.
+
+    Corrections and sources are listed in each video's description. If we get something wrong, tell us and we'll pin it.
+  keywords:
+    - business documentary
+    - company history
+    - corporate collapse
+    - bankruptcy
+    - business case study
+    - rise and fall
+    - business analysis
+    - corporate strategy
+    - business failure
+    - SEC filings
+    - company breakdown
 
 # ---------- format ----------
 format:

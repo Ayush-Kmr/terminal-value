@@ -1,0 +1,28 @@
+name: Brand channel
+
+# Applies assets/brand/ and the About text in config.yaml to the YouTube channel.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Show what would change without applying it"
+        type: boolean
+        default: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Apply branding
+        env:
+          YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python scripts/brand_channel.py ${{ inputs.dry_run && '--dry-run' || '' }}

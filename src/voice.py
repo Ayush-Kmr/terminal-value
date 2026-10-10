@@ -77,7 +77,9 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path) -> list[dict]:
         pad = hold_ms / 1000.0 if shot.get("emphasis") == "hold" else 0.25
         shot["audio"] = str(path)
         shot["spoken_duration"] = spoken
-        shot["duration"] = max(float(min_s), min(spoken + pad, float(max_s) + 3))
+        # Never shorter than the narration itself: a clipped shot lets its
+        # audio run on underneath the next shot's.
+        shot["duration"] = max(float(min_s), spoken + pad)
         log.debug("shot %03d: %.2fs spoken, %.2fs on screen",
                   shot["index"], spoken, shot["duration"])
 
