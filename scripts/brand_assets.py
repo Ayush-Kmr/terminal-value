@@ -89,7 +89,7 @@ def banner(cfg, pal) -> Path:
     d.rectangle([cx - 50, cy + 44, cx + 50, cy + 50], fill=pal["accent"])
     tracked(d, (cx, cy + 104), cfg["channel"]["tagline"].upper(),
             font(cfg, "mono", 34), pal["muted"], 5)
-    tracked(d, (cx, cy + 156), "NEW DOCUMENTARY  ·  TUESDAYS & FRIDAYS",
+    tracked(d, (cx, cy + 156), cfg["channel"].get("schedule_line", "").upper(),
             font(cfg, "mono", 26), pal["accent"], 4)
 
     img = grain(img, 0.022)

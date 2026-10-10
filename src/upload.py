@@ -41,32 +41,43 @@ def client():
     return build("youtube", "v3", credentials=creds, cache_discovery=False)
 
 
-def next_slot(cfg: Config, kind: str = "long") -> datetime:
-    """The next configured publish slot, in the channel's timezone."""
+def slots(cfg: Config, kind: str = "long", count: int = 1,
+          min_lead_minutes: int = 20) -> list[datetime]:
+    """The next `count` daily publish slots for this format, in channel time.
+    A slot closer than `min_lead_minutes` is skipped: YouTube needs time to
+    process the upload before a scheduled release."""
     tz = ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
     now = datetime.now(tz)
-    days = [d.lower() for d in cfg.get_path(f"format.{kind}.publish_days", ["tuesday"])]
-    hh, mm = (cfg.get_path(f"format.{kind}.publish_time", "17:30") + ":0").split(":")[:2]
-    names = ["monday", "tuesday", "wednesday", "thursday",
-             "friday", "saturday", "sunday"]
+    times = cfg.get_path(f"format.{kind}.publish_times") or ["19:00"]
+    out: list[datetime] = []
     for ahead in range(0, 8):
-        cand = (now + timedelta(days=ahead)).replace(
-            hour=int(hh), minute=int(mm), second=0, microsecond=0)
-        if names[cand.weekday()] in days and cand > now:
-            return cand
-    return now + timedelta(days=1)
+        for hhmm in sorted(times):
+            hh, mm = hhmm.split(":")[:2]
+            cand = (now + timedelta(days=ahead)).replace(
+                hour=int(hh), minute=int(mm), second=0, microsecond=0)
+            if cand > now + timedelta(minutes=min_lead_minutes):
+                out.append(cand)
+            if len(out) >= count:
+                return out
+    return out
+
+
+def next_slot(cfg: Config, kind: str = "long") -> datetime:
+    return slots(cfg, kind, 1)[0]
 
 
 def upload(cfg: Config, video: Path, meta: dict[str, Any],
            privacy: str = "private", publish_at: datetime | None = None) -> str:
     yt = client()
+    language = meta.get("language") or cfg.get_path("channel.language", "en")
     body: dict[str, Any] = {
         "snippet": {
             "title": meta["title"][:100],
             "description": meta.get("description", "")[:5000],
             "tags": meta.get("tags", [])[:60],
             "categoryId": str(cfg.get_path("upload.category_id", 22)),
-            "defaultLanguage": cfg.get_path("channel.language", "en"),
+            "defaultLanguage": language,
+            "defaultAudioLanguage": language,
         },
         "status": {
             "privacyStatus": privacy,
@@ -107,7 +118,7 @@ def upload_captions(video_id: str, srt: Path, language: str = "en") -> None:
         client().captions().insert(
             part="snippet",
             body={"snippet": {"videoId": video_id, "language": language,
-                              "name": "English", "isDraft": False}},
+                              "name": "", "isDraft": False}},
             media_body=MediaFileUpload(str(srt)),
         ).execute()
     except Exception as exc:  # noqa: BLE001
@@ -144,3 +155,15 @@ def add_to_playlist(video_id: str, playlist_title: str) -> None:
         ).execute()
     except Exception as exc:  # noqa: BLE001
         log.warning("Playlist add failed: %s", exc)
+
+
+def status(video_id: str) -> dict[str, Any]:
+    """What YouTube actually did with an upload: privacy, processing state and
+    any rejection. New API projects have uploads locked to private until
+    Google's API audit is passed, whatever was requested."""
+    try:
+        items = client().videos().list(part="status", id=video_id).execute().get("items", [])
+        return items[0]["status"] if items else {}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Status check failed: %s", exc)
+        return {}

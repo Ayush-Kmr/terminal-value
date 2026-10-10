@@ -54,9 +54,12 @@ def _cloudflare(prompt: str, dest: Path) -> Path | None:
     r = requests.post(
         f"https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/{MODEL}",
         headers={"Authorization": f"Bearer {token}"},
-        json={"prompt": f"{prompt}. {STYLE}", "negative_prompt": NEGATIVE},
+        # FLUX schnell takes a prompt only; extra fields are rejected.
+        json={"prompt": f"{prompt}. {STYLE}"[:2000]},
         timeout=90,
     )
+    if r.status_code >= 400:
+        log.warning("Cloudflare HTTP %s: %s", r.status_code, r.text[:200])
     r.raise_for_status()
     payload = r.json()
     image_b64 = payload.get("result", {}).get("image")
@@ -84,7 +87,7 @@ def _pollinations(prompt: str, dest: Path) -> Path | None:
 
 def generate(prompt: str, dest: Path) -> Path | None:
     clean = _sanitise(prompt)
-    for fn in (_cloudflare, _pollinations):
+    for fn in (_cloudflare,):
         try:
             result = fn(clean, dest)
             if result and dest.exists() and dest.stat().st_size > 10_000:

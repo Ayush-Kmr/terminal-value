@@ -210,3 +210,167 @@ def validate(cfg: Config, fb: FactBase) -> list[str]:
     for w in warnings:
         log.warning("RESEARCH: %s", w)
     return warnings
+
+
+# ================================================================= news mode
+# Trending stories have no filings. The fact base comes from what outlets have
+# already published: a search-grounded briefing plus the day's headlines.
+
+def grounded_briefing(topic: str, angle: str) -> tuple[str, list[Source]]:
+    """Ask Gemini to brief the story using live Google Search. Returns the
+    briefing text and the pages it was grounded on. Empty on any failure —
+    the caller falls back to headlines."""
+    import os
+
+    key = os.getenv("GEMINI_API_KEY")
+    if not key:
+        return "", []
+    prompt = (
+        f"Brief me on this news story as of today: {topic}\n"
+        f"The question to answer: {angle}\n\n"
+        "Search for current reporting. Write a factual briefing of about 500 words: "
+        "what happened and when (exact dates), who is involved (full names and roles), "
+        "the key numbers, the background needed to understand it, what each side says, "
+        "and what happens next. Only include what reputable outlets have reported. "
+        "Where reports conflict or something is unconfirmed, say so explicitly."
+    )
+    try:
+        r = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{llm.GEMINI_MODEL}:generateContent",
+            headers={"x-goog-api-key": key},
+            json={"contents": [{"parts": [{"text": prompt}]}],
+                  "tools": [{"google_search": {}}],
+                  "generationConfig": {"temperature": 0.2}},
+            timeout=120,
+        )
+        r.raise_for_status()
+        cand = r.json()["candidates"][0]
+        text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
+        chunks = cand.get("groundingMetadata", {}).get("groundingChunks", [])
+        sources, seen = [], set()
+        for c in chunks:
+            web = c.get("web") or {}
+            if web.get("uri") and web.get("title") not in seen:
+                seen.add(web.get("title"))
+                sources.append(Source(web.get("title", "Source"), web["uri"], "press"))
+        log.info("Grounded briefing: %d chars, %d sources", len(text), len(sources))
+        return text, sources
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Grounded briefing unavailable (%s); using headlines only", exc)
+        return "", []
+
+
+NEWS_EXTRACT_PROMPT = """You are a news researcher building a fact base for an
+explainer video. Today is {today}.
+
+Story: {topic}
+The question the video answers: {angle}
+
+Source material (a search-grounded briefing, today's headlines, background):
+---
+{material}
+---
+
+Extract ONLY what the source material supports. Never invent a number, a date,
+a name or a quote. If the material marks something as unconfirmed or disputed,
+set "needs_verification": true on that item. Do not add outside knowledge about
+recent events — your own memory of current affairs is out of date.
+
+Return JSON:
+{{
+  "summary": "<3 sentences: what happened, why it matters, what is still unknown>",
+  "facts": [
+    {{"claim": "...", "value": "<the number/date, if any>", "source_hint": "<outlet>", "needs_verification": false, "beat": "<{beat_ids}>"}}
+  ],
+  "timeline": [{{"year": "<date or year>", "event": "...", "significance": "..."}}],
+  "financials": [{{"metric": "...", "year": "...", "value": 0, "unit": "...", "source_hint": "..."}}],
+  "quotes": [{{"text": "<verbatim from the material, under 25 words>", "speaker": "...", "role": "...", "date": "...", "source_hint": "..."}}],
+  "people": [{{"name": "...", "role": "...", "why_they_matter": "..."}}],
+  "surprising_facts": ["<specific details from the material most viewers will not know>"]
+}}
+
+Aim for 15-25 facts and 5-10 timeline entries. Include "financials" only when
+the material gives a real series of numbers that would make an honest chart;
+otherwise return an empty list. Include quotes only if they appear verbatim."""
+
+
+def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
+    from datetime import datetime
+    from . import trends
+
+    topic, angle = story["topic"], story.get("angle", "")
+    log.info("Researching story: %s", topic)
+
+    briefing, sources = grounded_briefing(topic, angle)
+
+    query = (story.get("search_query") or topic) + " when:3d"
+    heads = trends.news_headlines("en-IN", "IN", query, limit=15)
+    if story.get("language") == "hi":
+        heads += trends.news_headlines("hi", "IN", story.get("search_query") or topic, limit=6)
+
+    material = ""
+    if briefing:
+        material += "BRIEFING (search-grounded):\n" + briefing
+    if story.get("why_trending"):
+        material += "\n\nWHY IT IS TRENDING:\n" + story["why_trending"]
+    if heads:
+        material += "\n\nHEADLINES FROM THE LAST 3 DAYS:\n" + "\n".join(
+            f"- {h['title']} ({h['source']}, {h['date'][:16]})" for h in heads)
+
+    wiki_src = None
+    if story.get("wiki_title"):
+        wiki_text, wiki_src = wikipedia_summary(story["wiki_title"])
+        if wiki_text:
+            material += ("\n\nBACKGROUND (encyclopedia; may predate this week's events):\n"
+                         + wiki_text[:6000])
+
+    if not briefing and len(heads) < 3:
+        raise RuntimeError(f"Not enough reporting found on {topic!r} to make a video")
+
+    beat_ids = "|".join(b["id"] for b in cfg.get_path("structure.beats", []))
+    data = llm.json_call(
+        NEWS_EXTRACT_PROMPT.format(
+            today=f"{datetime.now():%d %B %Y}", topic=topic, angle=angle,
+            material=material[:40000], beat_ids=beat_ids),
+        temperature=0.2,
+    )
+
+    fb = FactBase(company=topic, angle=angle)
+    fb.summary = data.get("summary", "")
+    fb.facts = data.get("facts", [])
+    fb.timeline = data.get("timeline", [])
+    fb.financials = data.get("financials", [])
+    fb.quotes = data.get("quotes", [])
+    fb.people = data.get("people", [])
+    first_beat = beat_ids.split("|")[0] if beat_ids else "hook"
+    for s in data.get("surprising_facts", []):
+        fb.facts.append({"claim": s, "beat": first_beat, "is_surprising": True})
+
+    # Publishers actually cited, deduplicated by outlet.
+    fb.sources = list(sources)
+    seen = {s.title for s in fb.sources}
+    for h in heads:
+        if h["source"] and h["source"] not in seen and len(fb.sources) < 12:
+            seen.add(h["source"])
+            fb.sources.append(Source(f"{h['source']}: {h['title']}", h["url"], "press",
+                                     h["date"][:16]))
+    if wiki_src:
+        fb.sources.append(wiki_src)
+    return fb
+
+
+def validate_news(cfg: Config, fb: FactBase) -> list[str]:
+    warnings: list[str] = []
+    outlets = [s for s in fb.sources
+               if (s.kind if isinstance(s, Source) else s.get("kind")) == "press"]
+    need = cfg.get_path("research.min_news_sources", 3)
+    if len(outlets) < need:
+        warnings.append(f"Only {len(outlets)} news sources (minimum {need}).")
+    unverified = [f for f in fb.facts if f.get("needs_verification")]
+    if fb.facts and len(unverified) > len(fb.facts) * 0.4:
+        warnings.append(f"{len(unverified)}/{len(fb.facts)} facts are unconfirmed.")
+    if len(fb.facts) < 8:
+        warnings.append(f"Thin research: only {len(fb.facts)} facts.")
+    for w in warnings:
+        log.warning("RESEARCH: %s", w)
+    return warnings

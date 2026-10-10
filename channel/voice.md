@@ -5,49 +5,46 @@ whether the channel reads as a point of view or as generated filler. Edit it oft
 
 ## Who is narrating
 
-Not a hype man. Not a teacher. Closer to a forensic accountant who happens to be
-a good storyteller — someone who has read the 10-K, found the line item everyone
-missed, and is genuinely a bit annoyed that nobody noticed.
+A calm, well-read explainer. Not a news anchor shouting a headline and not a
+teacher reading a textbook: someone who has read all the coverage so the viewer
+does not have to, and now tells them what actually matters in it.
 
-Dry. Specific. Occasionally funny, never jokey. The humour comes from
-understatement and from the absurdity of the facts themselves, never from a punchline.
+Plain. Specific. Never breathless. The viewer should feel smarter after six
+minutes, not more anxious.
 
 ## Rules
 
-1. **Numbers are the vocabulary.** Never "huge losses" — say "$1.7 billion written
-   off in a single quarter". Never "they expanded fast" — say "from 11 stores to
-   1,400 in six years".
-2. **Name people.** CEOs, CFOs, the board member who resigned. A company doesn't
-   make decisions; people do.
-3. **One contrarian claim per episode.** The thing most retellings get wrong.
-   State it plainly, then defend it with evidence. This is what makes the video
-   worth existing.
-4. **No rhetorical questions in the first 30 seconds.** "What if I told you..."
-   is the single most common tell of a generated script. Banned outright.
-5. **No stacked adjectives.** "Meteoric, unprecedented, staggering" — pick zero.
-6. **Short sentences for impact. Longer ones to carry an argument.** Vary it.
+1. **Numbers are the vocabulary.** Never "a huge amount" — say the amount.
+   Never "recently" — say the date.
+2. **Name people and say who they are.** "Sanjay Malhotra, the RBI governor",
+   not "officials".
+3. **Attribute.** Say who reported or said each important claim. If something is
+   not confirmed, say it is not confirmed. Never present a rumour as a fact.
+4. **Explain, do not take sides.** Where there are two positions, state both
+   fairly in one sentence each. No opinion on parties, religions or leaders.
+5. **Make it concrete for the viewer.** What does this change for someone with a
+   loan, a job, a visa application, a petrol bill?
+6. **No rhetorical questions in the first 30 seconds.** No "What if I told you".
+7. **No stacked adjectives.** "Massive, shocking, unprecedented" — pick zero.
+8. **Short sentences for impact. Longer ones to carry an explanation.** Vary it.
    Uniform sentence length is what makes narration sound synthetic.
-7. **Sympathy before autopsy.** The audience must want the company to survive
-   before you dissect it. If beat 2 doesn't make them root for it, rewrite beat 2.
-8. **Never moralise.** Don't tell the viewer the lesson until the final beat, and
-   even then state it once and stop.
+9. **No filler.** No greetings, no "in this video", no "like and subscribe",
+   no recap of what was just said.
 
 ## Banned phrases
 
-"little did they know" · "the rest is history" · "but there was a catch" ·
-"this is where things get interesting" · "buckle up" · "let that sink in" ·
-"a cautionary tale" · "game-changer" · "at the end of the day" ·
-"in today's video" · "without further ado" · any sentence beginning "Imagine"
+"little did they know" · "the rest is history" · "buckle up" · "let that sink in" ·
+"game-changer" · "at the end of the day" · "in today's video" · "without further ado" ·
+"only time will tell" · any sentence beginning "Imagine" ·
+"दोस्तों" · "नमस्कार" · "आज की इस वीडियो में" · "चलिए शुरू करते हैं"
 
-## Cold open template (structure, not wording)
+## Cold open (structure, not wording)
 
-A specific, verifiable, slightly absurd fact — stated flat, with a date and a
-number — followed by one sentence that reframes it as a question the episode
-will answer. Twenty seconds maximum. Then the title card.
+One specific, verified fact with a number or a date, stated flat. Then one
+sentence that turns it into the question the video answers. Twenty seconds maximum.
 
 ## The one thing
 
-Every episode should contain at least one fact that a viewer who already knows
-this company's story has not heard. If research can't surface one, the topic is
-wrong — kill it and pick another. This rule is what keeps the channel out of
-YouTube's "inauthentic content" bucket, and it is non-negotiable.
+Every video should contain at least one fact that someone who only read the
+headline does not know. If the research cannot surface one, the story is wrong
+for this channel.

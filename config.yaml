@@ -3,76 +3,111 @@
 #  Everything that defines the show lives here.
 # ============================================================
 
+# trending: pick the day's most-searched story and explain it (fully automatic)
+# documentary: the original business rise-and-fall format (src/topics.py)
+mode: trending
+
 channel:
   name: "Terminal Value"           # display name
   handle: "@terminalvaluedoc"
   channel_id: "UCm1uFmKTwjzhIAUeYC0NcZQ"
   url: "https://www.youtube.com/@terminalvaluedoc"
-  tagline: "How companies actually die."
-  language: en
-  country: US                      # audience country shown on the About page
+  tagline: "The story behind the headline."
+  schedule_line: "NEW VIDEO EVERY DAY"
+  language: hi                     # channel default; each video sets its own
+  country: IN                      # audience country shown on the About page
   timezone: Asia/Kolkata
   # The About box. Applied by scripts/brand_channel.py. The first two lines
   # are what search shows, so they carry the keywords.
   about: |
-    Documentaries about how companies actually die.
+    The story behind the headline, every day.
 
-    Every episode takes one business, one decision, and one argument — then tests it against the primary record: SEC filings, court documents, earnings transcripts and contemporary reporting. No hot takes, no hindsight bias, no "little did they know."
+    Each day we take the one story India and the world are searching for and explain it properly: what happened, how we got here, and what it means for you. India stories in Hindi, world stories in English.
 
-    New documentary every Tuesday and Friday.
+    New video every day at 7 PM IST, plus two Shorts.
 
-    Corrections and sources are listed in each video's description. If we get something wrong, tell us and we'll pin it.
+    Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments and we will correct it.
   keywords:
-    - business documentary
-    - company history
-    - corporate collapse
-    - bankruptcy
-    - business case study
-    - rise and fall
-    - business analysis
-    - corporate strategy
-    - business failure
-    - SEC filings
-    - company breakdown
+    - news explained
+    - hindi news
+    - current affairs
+    - trending news
+    - india news
+    - world news
+    - explained in hindi
+    - geopolitics
+    - business news
+    - daily news analysis
+  # Appended to every description. Keep it accurate: it tells viewers (and
+  # YouTube) how the video was made.
+  disclosure: >-
+    This video was produced with AI: the script was written and the narration
+    synthesised by AI from the published news reports listed above. Corrections
+    are welcome in the comments.
+
+# ---------- trending topic selection ----------
+trending:
+  cooldown_days: 10                # do not repeat a story within this window
+  # weight = priority. trends_geo = Google Trends country (not available for
+  # China). news = Google News edition, or a search query for that region.
+  regions:
+    - {code: IN, name: India, weight: 1.0, language: hi, trends_geo: IN,
+       news: {hl: en-IN, gl: IN}}
+    - {code: US, name: United States, weight: 0.8, language: en, trends_geo: US,
+       news: {hl: en-US, gl: US}}
+    - {code: CN, name: China, weight: 0.65, language: en,
+       news: {hl: en-IN, gl: IN, query: "China when:1d"}}
+    - {code: RU, name: Russia, weight: 0.65, language: en, trends_geo: RU,
+       news: {hl: en-IN, gl: IN, query: "Russia when:1d"}}
+    - {code: WORLD, name: Rest of world, weight: 0.5, language: en,
+       news: {hl: en-IN, gl: IN, query: "world news when:1d"}}
+  # Stories an unattended pipeline must not narrate. These are also the
+  # categories YouTube restricts ads on.
+  avoid:
+    - Deaths, accidents, disasters, attacks or crimes where victims are still being counted or named
+    - Accusations against a named individual that no court or regulator has ruled on
+    - Communal, caste or religious conflict
+    - An election in its voting or counting period, and opinion-poll or exit-poll claims
+    - Medical or health advice, including outbreaks and treatments
+    - Active military operations where the facts are contested between governments
+    - Sexual content, suicide or self-harm
+    - Pure celebrity gossip, film trailers, sports fixtures and match scores
 
 # ---------- format ----------
 format:
+  kind: "news explainer video"     # how prompts describe the video
   long:
-    target_minutes: 12          # 12 min nearly halves the views needed for 4,000 watch hrs
-    min_minutes: 9
-    max_minutes: 15
-    words_per_minute: 150       # documentary narration pace, deliberately slow
-    publish_days: [tuesday, friday]
-    publish_time: "17:30"       # local; evening US morning / India evening overlap
+    target_minutes: 6           # ~900 words; about 5,000 voice characters a day
+    words_per_minute: 150
+    publish_times: ["19:00"]    # IST. Evening is the daily viewing peak in India
   short:
-    target_seconds: 48
-    per_day: 1
-    publish_time: "19:00"
-    cut_from_long: true         # Shorts are cut from the long video's best beats
+    per_day: 2
+    publish_times: ["08:00", "20:30"]   # IST. After the long, then next morning
 
-# ---------- the 6-beat documentary spine ----------
-# Each episode follows this structure but never the same phrasing.
-# This is what keeps the series recognisable without being "templated".
+# ---------- the explainer spine ----------
+# Each video follows this structure but never the same phrasing.
 structure:
   beats:
-    - id: cold_open
+    - id: hook
+      label: "The story"
       share: 0.08
-      intent: "The single most surprising fact. No channel name, no intro. Start mid-collapse."
-    - id: the_rise
-      share: 0.22
-      intent: "Make the viewer believe in this company. They must want it to win."
-    - id: the_bet
+      intent: "The single most striking verified fact of the story. Start in the middle of the event. No greeting, no channel name."
+    - id: what_happened
+      label: "What happened"
+      share: 0.24
+      intent: "Exactly what happened, in order, with dates, names and numbers."
+    - id: background
+      label: "How we got here"
+      share: 0.24
+      intent: "The context a viewer needs to understand it. Only what the story depends on."
+    - id: stakes
+      label: "Why it matters"
+      share: 0.24
+      intent: "What this changes, and for whom. Make it concrete for an ordinary viewer in India: prices, jobs, money, travel, security."
+    - id: whats_next
+      label: "What happens next"
       share: 0.20
-      intent: "The decision that looked brilliant. Name the people. Name the number."
-    - id: the_crack
-      share: 0.20
-      intent: "First evidence it was wrong. The thing insiders saw before the market did."
-    - id: the_fall
-      share: 0.20
-      intent: "Collapse with specifics: dates, dollars, filings, layoffs."
-    - id: the_lesson
-      share: 0.10
-      intent: "The transferable business principle. This is the part that gets screenshotted."
+      intent: "What is confirmed to happen next, what is still unknown, and what to watch for. End on the open question, not on a moral. Do not ask for likes or subscriptions."
 
 # ---------- visual system ----------
 # Motion graphics first. AI video is a garnish, not the meal.
@@ -104,14 +139,24 @@ visuals:
 # ---------- voice ----------
 voice:
   provider: elevenlabs
-  model: eleven_multilingual_v2
-  stability: 0.45              # lower = more expressive; docs want some variance
+  model: eleven_multilingual_v2   # one model, speaks both Hindi and English
+  stability: 0.45
   similarity_boost: 0.75
   style: 0.15
   pause_after_beat_ms: 650
+  # A different narrator per region. Each value is the NAME of a GitHub secret
+  # holding an ElevenLabs voice ID. Any that is not set falls back to
+  # ELEVENLABS_VOICE_ID, so the pipeline runs with one voice until you add more.
+  voices:
+    IN: ELEVENLABS_VOICE_ID_IN      # Hindi narrator
+    US: ELEVENLABS_VOICE_ID_US
+    CN: ELEVENLABS_VOICE_ID_CN
+    RU: ELEVENLABS_VOICE_ID_RU
+    WORLD: ELEVENLABS_VOICE_ID_WORLD
 
 # ---------- research ----------
 research:
+  min_news_sources: 3          # trending mode: distinct outlets reporting the story
   min_sources: 5
   require_primary: true        # at least one filing, transcript, or court document
   banned_sole_source: [wikipedia]   # Wikipedia may start research, never finish it
@@ -135,20 +180,21 @@ topics:
   min_company_age_years: 5
 
 # ---------- human gates ----------
+# Both off: the pipeline picks, produces and publishes with nobody in the loop.
+# Turn either on to get Telegram approval buttons back. A run that fails or is
+# kept private by YouTube still reports to Telegram either way.
 gates:
-  topic_approval: true         # gate 1: you approve the company + angle
-  final_review: true           # gate 2: you watch the cut before it goes out
+  topic_approval: false
+  final_review: false
   channel: telegram
-  timeout_hours: 2             # per gate. A GitHub job is killed at 6h, so two gates
-                               # plus the render must fit inside that. No answer ->
-                               # pipeline holds, never auto-publishes
+  timeout_hours: 2             # per gate; a GitHub job is killed at 6h
   on_timeout: hold
 
 # ---------- upload ----------
 upload:
-  privacy_on_upload: private   # always private; gate 2 flips it to public/scheduled
-  category_id: 22              # People & Blogs; 27=Education also works
+  category_id: 25              # News & Politics
   made_for_kids: false
   synthetic_media_disclosure: true
-  default_playlist: "Rise & Fall"
-  max_uploads_per_day: 3       # each upload ~1600 of 10000 daily API units
+  playlists:                   # one playlist per narration language
+    hi: "हिंदी में — Explained"
+    en: "Explained in English"

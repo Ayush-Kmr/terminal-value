@@ -65,7 +65,7 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
     try:
         r = requests.get(
             "https://pixabay.com/api/",
-            params={"key": key, "q": query, "image_type": "photo",
+            params={"key": key, "q": query[:100], "image_type": "photo",
                     "orientation": "horizontal", "per_page": 5, "safesearch": "true"},
             timeout=30,
         )
@@ -77,6 +77,32 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
                         "licence": "pixabay", "url": hit.get("pageURL", "")}
     except Exception as exc:  # noqa: BLE001
         log.warning("Pixabay search failed for %r: %s", query, exc)
+    return None
+
+
+def pixabay_video(query: str, dest: Path) -> dict | None:
+    """Moving footage. Same key as Pixabay images."""
+    key = env("PIXABAY_API_KEY")
+    if not key:
+        return None
+    try:
+        r = requests.get(
+            "https://pixabay.com/api/videos/",
+            params={"key": key, "q": query[:100], "per_page": 5, "safesearch": "true"},
+            timeout=30,
+        )
+        r.raise_for_status()
+        for hit in r.json().get("hits", []):
+            files = hit.get("videos", {})
+            best = files.get("medium") or files.get("large") or files.get("small") or {}
+            if not best.get("url") or (best.get("width") or 0) < (best.get("height") or 0):
+                continue  # skip vertical clips
+            out = dest.with_suffix(".mp4")
+            if _download(best["url"], out):
+                return {"path": str(out), "kind": "video", "credit": hit.get("user", "Pixabay"),
+                        "licence": "pixabay", "url": hit.get("pageURL", "")}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Pixabay video search failed for %r: %s", query, exc)
     return None
 
 
@@ -103,7 +129,8 @@ def wikimedia_image(query: str, dest: Path) -> dict | None:
             if not any(safe in normalised for safe in SAFE_LICENCES):
                 continue  # drop share-alike / non-commercial
             url = info.get("thumburl") or info.get("url")
-            if not url:
+            # Commons also holds SVGs, PDFs, audio and video; stills only.
+            if not url or Path(url.split("?")[0]).suffix.lower() not in {".jpg", ".jpeg", ".png"}:
                 continue
             out = dest.with_suffix(Path(url).suffix or ".jpg")
             if _download(url, out):
@@ -118,10 +145,12 @@ def wikimedia_image(query: str, dest: Path) -> dict | None:
     return None
 
 
-def find(query: str, dest: Path, prefer_archival: bool = False) -> dict | None:
-    """Archival first for historical subjects, stock first for mood/texture."""
-    chain = ([wikimedia_image, pexels_video, pixabay_image] if prefer_archival
-             else [pexels_video, pixabay_image, wikimedia_image])
+def find(query: str, dest: Path, prefer_archival: bool = False,
+         allow_video: bool = True) -> dict | None:
+    """Archival first for real people and places, stock first for mood/texture."""
+    video = [pexels_video, pixabay_video] if allow_video else []
+    chain = ([wikimedia_image, *video, pixabay_image] if prefer_archival
+             else [*video, pixabay_image, wikimedia_image])
     for fn in chain:
         result = fn(query, dest)
         if result:

@@ -10,7 +10,7 @@ import logging
 from collections import Counter
 from pathlib import Path
 
-from .config import Config
+from .config import Config, latin_only
 from .visuals import ai_images, motion, stock
 
 log = logging.getLogger(__name__)
@@ -32,6 +32,23 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
         if dest.exists() or shot.get("asset"):
             continue
 
+        # On-screen text must be drawable. A card left with nothing to show
+        # becomes a still rather than an empty frame.
+        for key in ("headline", "value", "caption"):
+            if key in spec:
+                spec[key] = latin_only(spec.get(key))
+        if isinstance(spec.get("chart"), dict):
+            for key in ("title", "y_label"):
+                spec["chart"][key] = latin_only(spec["chart"].get(key, ""))
+        for ev in spec.get("events") or []:
+            if isinstance(ev, dict):
+                ev["event"] = latin_only(ev.get("event", ""))
+        shot["visual_spec"] = spec
+        has_text = bool(spec.get("value") or spec.get("headline")
+                        or spec.get("chart") or spec.get("events"))
+        if vtype in MOTION_TYPES and not has_text:
+            vtype = shot["visual_type"] = "ai_still"
+
         if vtype in MOTION_TYPES:
             try:
                 motion.render(shot, vis_cfg, dest)
@@ -41,9 +58,15 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
                 vtype = "ai_still"
 
         if vtype == "photo":
-            query = spec.get("search_terms") or f"{company} {spec.get('headline','')}"
-            found = stock.find(query, img_dir / f"shot_{shot['index']:03d}",
-                               prefer_archival=True)
+            base = img_dir / f"shot_{shot['index']:03d}"
+            # A named person or place comes from Wikimedia Commons or not at
+            # all: a generic stock photo passed off as a real person is a lie.
+            name = (spec.get("search_terms") or company).strip()
+            found = (stock.wikimedia_image(name, base)
+                     or stock.wikimedia_image(" ".join(name.split()[:3]), base))
+            if not found and spec.get("stock_terms"):
+                found = stock.find(spec["stock_terms"], base,
+                                   allow_video=shot["index"] % 2 == 0)
             if found:
                 shot["asset"] = found["path"]
                 credits.append(found)
@@ -51,7 +74,8 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
                 vtype = "ai_still"   # fall through
 
         if vtype == "ai_still" and not shot.get("asset"):
-            prompt = spec.get("prompt") or f"atmospheric scene evoking {company}"
+            prompt = (spec.get("prompt") or spec.get("stock_terms")
+                      or f"atmospheric scene evoking {company}")
             result = ai_images.generate(prompt, dest)
             if result:
                 shot["asset"] = str(result)

@@ -25,16 +25,18 @@ API = "https://api.telegram.org/bot{token}/{method}"
 
 def _call(method: str, **payload) -> dict:
     token = env("TELEGRAM_BOT_TOKEN", required=True)
+    payload = {k: v for k, v in payload.items() if v is not None}
     r = requests.post(API.format(token=token, method=method), json=payload, timeout=60)
     r.raise_for_status()
     return r.json()
 
 
-def _send(text: str, buttons: list[list[dict]] | None = None) -> int:
+def _send(text: str, buttons: list[list[dict]] | None = None,
+          markdown: bool = True) -> int:
     resp = _call(
         "sendMessage",
         chat_id=env("TELEGRAM_CHAT_ID", required=True),
-        text=text, parse_mode="Markdown",
+        text=text, parse_mode="Markdown" if markdown else None,
         reply_markup={"inline_keyboard": buttons} if buttons else None,
     )
     return resp["result"]["message_id"]
@@ -139,10 +141,10 @@ def review_gate(cfg: Config, video: Path, meta: dict, warnings: list[str]) -> st
     return choice
 
 
-def notify(text: str) -> None:
+def notify(text: str, markdown: bool = True) -> None:
     """Fire-and-forget status message. Never raises — a broken notifier must
     not take the pipeline down."""
     try:
-        _send(text)
+        _send(text, markdown=markdown)
     except Exception as exc:  # noqa: BLE001
         log.warning("Notify failed: %s", exc)

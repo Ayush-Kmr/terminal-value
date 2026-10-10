@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 
 import requests
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_exponential
 
 from .config import Config, env
 
@@ -19,9 +19,24 @@ log = logging.getLogger(__name__)
 API = "https://api.elevenlabs.io/v1/text-to-speech"
 
 
-@retry(stop=stop_after_attempt(4), wait=wait_exponential(min=3, max=40))
-def _synthesise(text: str, out: Path, cfg: Config) -> None:
-    voice_id = env("ELEVENLABS_VOICE_ID", required=True)
+class VoiceError(RuntimeError):
+    """A voice failure that a retry cannot fix."""
+
+
+@retry(stop=stop_after_attempt(4), wait=wait_exponential(min=3, max=40),
+       retry=retry_if_not_exception_type(VoiceError), reraise=True)
+def voice_id_for(cfg: Config, region: str | None, language: str | None) -> str:
+    """Region voice, else language voice, else the default. config.yaml maps
+    each to the NAME of an environment variable; unset ones fall through."""
+    voices = cfg.get_path("voice.voices", {}) or {}
+    for key in (region, language):
+        var = voices.get(key) if key else None
+        if var and env(var):
+            return env(var)
+    return env("ELEVENLABS_VOICE_ID", required=True)
+
+
+def _synthesise(text: str, out: Path, cfg: Config, voice_id: str) -> None:
     resp = requests.post(
         f"{API}/{voice_id}",
         headers={
@@ -40,6 +55,9 @@ def _synthesise(text: str, out: Path, cfg: Config) -> None:
         },
         timeout=120,
     )
+    if resp.status_code in (401, 402, 403, 422):
+        # Out of characters, bad key or bad voice: retrying will not help.
+        raise VoiceError(f"ElevenLabs HTTP {resp.status_code}: {resp.text[:300]}")
     resp.raise_for_status()
     out.write_bytes(resp.content)
 
@@ -54,8 +72,10 @@ def duration(path: Path) -> float:
     return float(res.stdout.strip())
 
 
-def narrate_shots(cfg: Config, shots: list[dict], outdir: Path) -> list[dict]:
+def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
+                  region: str | None = None, language: str | None = None) -> list[dict]:
     """Synthesise one audio file per shot; attach real durations."""
+    voice_id = voice_id_for(cfg, region, language)
     audio_dir = outdir / "audio"
     audio_dir.mkdir(parents=True, exist_ok=True)
 
@@ -70,7 +90,7 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path) -> list[dict]:
             shot["duration"] = float(min_s)
             continue
         if not path.exists():
-            _synthesise(text, path, cfg)
+            _synthesise(text, path, cfg, voice_id)
         spoken = duration(path)
 
         # Pad so no shot is shorter than the minimum; hold shots get silence after.

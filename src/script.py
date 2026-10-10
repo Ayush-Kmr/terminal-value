@@ -10,14 +10,17 @@ import logging
 from typing import Any
 
 from . import llm
-from .config import Config, read_channel_doc
+from .config import Config, language_rules, read_channel_doc
 
 log = logging.getLogger(__name__)
 
-BEAT_PROMPT = """Write beat "{beat_id}" of a business documentary.
+BEAT_PROMPT = """Write section "{beat_id}" of a {kind}.
 
-COMPANY: {company}
-EPISODE ARGUMENT: {angle}
+SUBJECT: {company}
+THE QUESTION THIS VIDEO ANSWERS: {angle}
+
+{language}
+
 THIS BEAT'S JOB: {intent}
 TARGET LENGTH: {words} words of narration (about {seconds} seconds spoken)
 
@@ -54,7 +57,9 @@ Return JSON:
          "value": "<the number for stat_reveal>",
          "caption": "<source caption, shown small>",
          "chart": {{"kind":"line|bar","title":"...","x":[...],"y":[...],"y_label":"..."}},
-         "search_terms": "<for photo: what archival/stock image to find>",
+         "events": [{{"year":"<date or year>","event":"<max 8 words>","pivotal":false}}],
+         "search_terms": "<for photo of a REAL named person, place or thing: just its name, 1-4 words, as on Wikipedia>",
+         "stock_terms": "<for photo of a generic scene: 2-4 plain words with NO proper names, e.g. 'stock exchange trading floor'>",
          "prompt": "<for ai_still: image prompt. NO logos, NO text, NO real faces>"
       }},
       "emphasis": "<normal|hold>"
@@ -67,10 +72,18 @@ Rules:
 - Every number spoken aloud should appear on screen in the same shot.
 - Use "hold" emphasis on at most two shots: a beat of silence after a number lands.
 - If a fact is marked needs_verification, either omit it or phrase it as attributed
-  ("according to the 2009 annual report") rather than stated as bare fact."""
+  ("according to Reuters", "the company says") rather than stated as bare fact.
+- Use ONLY the facts, numbers and quotes supplied above. Do not add events,
+  figures or names from memory: for current events your memory is out of date.
+- A chart needs at least three real data points from FINANCIAL DATA. A timeline
+  needs 3-6 "events". Use quote_card only for a supplied verbatim quote that is
+  in English. If you have neither data nor a quote, use photo or ai_still.
+- Every photo shot needs "search_terms" (a real, named subject) or
+  "stock_terms" (a generic scene), never a sentence. Also give every photo
+  shot a "prompt" as a fallback illustration."""
 
 
-def write(cfg: Config, factbase: Any, hook_text: str) -> dict[str, Any]:
+def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en") -> dict[str, Any]:
     import json as _json
 
     fb = factbase.to_dict() if hasattr(factbase, "to_dict") else factbase
@@ -91,7 +104,7 @@ def write(cfg: Config, factbase: Any, hook_text: str) -> dict[str, Any]:
         seconds = int(words / wpm * 60)
 
         # The cold open is already written and scored — don't regenerate it.
-        if bid == "cold_open" and hook_text:
+        if beat is beats_cfg[0] and hook_text:
             out_beats.append({
                 "id": bid,
                 "narration": hook_text,
@@ -105,6 +118,8 @@ def write(cfg: Config, factbase: Any, hook_text: str) -> dict[str, Any]:
         result = llm.json_call(
             BEAT_PROMPT.format(
                 beat_id=bid, company=fb["company"], angle=fb["angle"],
+                kind=cfg.get_path("format.kind", "documentary"),
+                language=language_rules(language),
                 intent=beat["intent"], words=words, seconds=seconds,
                 voice=voice_doc[:2500], visuals=visual_doc[:2000],
                 facts=_json.dumps(relevant[:18], indent=2),
@@ -114,6 +129,8 @@ def write(cfg: Config, factbase: Any, hook_text: str) -> dict[str, Any]:
             ),
             temperature=0.8,
         )
+        if not isinstance(result, dict) or not result.get("shots"):
+            raise RuntimeError(f"Beat {bid} came back without shots")
         result["id"] = bid
         out_beats.append(result)
         said_so_far.append(result.get("narration", ""))
@@ -134,15 +151,24 @@ def write(cfg: Config, factbase: Any, hook_text: str) -> dict[str, Any]:
 
 def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
     """The cold open gets a fixed, deliberately stark treatment."""
-    sentences = [s.strip() for s in hook.replace("\n", " ").split(".") if s.strip()]
+    import re
+
+    # Split on sentence ends (including the Hindi danda), keeping the mark.
+    sentences = [s.strip() for s in re.split(r"(?<=[.।?!])\s+", hook.replace("\n", " "))
+                 if s.strip()]
     shots = []
     for i, s in enumerate(sentences):
+        # The headline figure of the sentence, e.g. "$4.2", "37%", "1,400".
+        figures = re.findall(r"[$₹€£]?\d[\d,]*(?:\.\d+)?%?", s)
+        # Prefer the figure carrying a unit; a bare "7" is usually a date.
+        figures.sort(key=lambda f: (f[0] in "$₹€£" or f.endswith("%"), len(f)), reverse=True)
+        figure = figures[0].rstrip(",") if figures else ""
         shots.append({
-            "narration": s + ".",
-            "visual_type": "stat_reveal" if any(c.isdigit() for c in s) else "ai_still",
+            "narration": s,
+            "visual_type": "stat_reveal" if figure else "ai_still",
             "visual_spec": {
                 "headline": "",
-                "value": "".join(c for c in s if c.isdigit() or c in ".,$%") or "",
+                "value": figure,
                 "caption": "",
                 "prompt": (
                     f"Dark, grainy, cinematic still evoking {fb.get('company','a company')}'s "

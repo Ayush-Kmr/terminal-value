@@ -10,7 +10,7 @@ import re
 from typing import Any
 
 from . import llm
-from .config import read_channel_doc
+from .config import language_rules, read_channel_doc
 
 log = logging.getLogger(__name__)
 
@@ -22,10 +22,14 @@ BANNED = [
     "imagine a world", "have you ever wondered",
 ]
 
-GEN_PROMPT = """Write 5 completely different cold opens for a business documentary.
+GEN_PROMPT = """Write 5 completely different cold opens for a {kind}.
 
-Company: {company}
-Angle: {angle}
+Subject: {company}
+The question the video answers: {angle}
+
+{language}
+
+Use only the facts listed below. Do not add numbers, names or events from memory.
 Strongest surprising facts available:
 {facts}
 
@@ -37,7 +41,7 @@ Each cold open: 35-55 words, spoken aloud in about 15-20 seconds.
 Make the five genuinely different in STRATEGY, not just wording:
   1. Open on the single most absurd verifiable number.
   2. Open mid-scene on a specific day, with a specific person.
-  3. Open on the contradiction (what they said vs what the filing showed).
+  3. Open on the contradiction (what was said vs what the record shows).
   4. Open on the thing the viewer thinks they know, then undercut it.
   5. Open on the ending, then rewind.
 
@@ -45,13 +49,13 @@ Never begin with a rhetorical question. Never use: {banned}
 
 Return JSON array of objects: {{"strategy": "...", "text": "..."}}"""
 
-SCORE_PROMPT = """Score each cold open 0-100 for a business documentary audience.
+SCORE_PROMPT = """Score each cold open 0-100 for a YouTube explainer audience.
 
 Rubric:
   35  Curiosity gap — does the viewer now need the rest of the video?
   25  Specificity — real numbers, names, dates beat abstractions every time
   20  Pace — does it get to the point inside the first sentence?
-  15  Credibility — does it sound like someone who read the filings?
+  15  Credibility — does it sound like someone who read the source material?
    5  Freshness — does it avoid documentary cliché?
 
 Deduct 25 points for any rhetorical question. Deduct 20 for stacked adjectives.
@@ -89,13 +93,15 @@ def _penalty(text: str) -> tuple[int, list[str]]:
     return score, issues
 
 
-def generate_and_score(company: str, angle: str, facts: list[dict]) -> dict[str, Any]:
+def generate_and_score(company: str, angle: str, facts: list[dict],
+                       language: str = "en", kind: str = "documentary") -> dict[str, Any]:
     import json as _json
 
     top = [f for f in facts if f.get("is_surprising")][:6] or facts[:6]
     hooks = llm.json_call(
         GEN_PROMPT.format(
-            company=company, angle=angle,
+            company=company, angle=angle, kind=kind,
+            language=language_rules(language),
             facts="\n".join(f"- {f.get('claim','')} {f.get('value','')}" for f in top),
             voice=read_channel_doc("voice.md")[:1800],
             banned=", ".join(BANNED[:8]),
@@ -109,7 +115,10 @@ def generate_and_score(company: str, angle: str, facts: list[dict]) -> dict[str,
         )),
         temperature=0.2,
     )
-    score_by_idx = {s["index"]: s for s in scored}
+    hooks = [h for h in hooks if isinstance(h, dict) and h.get("text")]
+    if not hooks:
+        raise RuntimeError("Hook generator returned nothing usable")
+    score_by_idx = {s.get("index"): s for s in scored if isinstance(s, dict)}
 
     results = []
     for i, h in enumerate(hooks):

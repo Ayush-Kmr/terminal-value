@@ -2,23 +2,40 @@ name: Episode
 
 on:
   schedule:
-    # Mon and Thu 04:40 UTC = 10:10 IST. Produces a day ahead of the slot so
-    # there is time for the review gate before Tuesday/Friday publication.
-    - cron: "40 4 * * 1,4"
+    # Every day 10:30 UTC = 16:00 IST. Picks the day's top story, produces it
+    # (about 30 minutes) and schedules it for 19:00 IST, the evening peak.
+    - cron: "30 10 * * *"
   workflow_dispatch:
     inputs:
       topic:
-        description: "Company (leave blank to let the picker choose)"
+        description: "Story to cover (leave blank to pick today's top trend)"
         required: false
+      region:
+        description: "Region for a manual topic: IN = Hindi; US, CN, RU, WORLD = English"
+        type: choice
+        options: [IN, US, CN, RU, WORLD]
+        default: IN
+      publish:
+        description: "now = public as soon as it uploads; slot = next 19:00 IST"
+        type: choice
+        options: [now, slot]
+        default: now
       no_upload:
         description: "Build only, do not upload"
         type: boolean
         default: false
 
+concurrency:
+  group: episode
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
 jobs:
   produce:
     runs-on: ubuntu-latest
-    timeout-minutes: 330      # gates can wait on a human; see gates.timeout_hours
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -34,24 +51,32 @@ jobs:
 
       - name: Produce episode
         env:
-          GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
-          GROQ_API_KEY:        ${{ secrets.GROQ_API_KEY }}
-          ELEVENLABS_API_KEY:  ${{ secrets.ELEVENLABS_API_KEY }}
-          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
-          CF_ACCOUNT_ID:       ${{ secrets.CF_ACCOUNT_ID }}
-          CF_API_TOKEN:        ${{ secrets.CF_API_TOKEN }}
-          PEXELS_API_KEY:      ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY:     ${{ secrets.PIXABAY_API_KEY }}
-          YT_CLIENT_ID:        ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET:    ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN:    ${{ secrets.YT_REFRESH_TOKEN }}
-          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
-          TOPIC:               ${{ inputs.topic }}
-          NO_UPLOAD:           ${{ inputs.no_upload }}
+          GEMINI_API_KEY:            ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY:              ${{ secrets.GROQ_API_KEY }}
+          ELEVENLABS_API_KEY:        ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID:       ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_VOICE_ID_IN:    ${{ secrets.ELEVENLABS_VOICE_ID_IN }}
+          ELEVENLABS_VOICE_ID_US:    ${{ secrets.ELEVENLABS_VOICE_ID_US }}
+          ELEVENLABS_VOICE_ID_CN:    ${{ secrets.ELEVENLABS_VOICE_ID_CN }}
+          ELEVENLABS_VOICE_ID_RU:    ${{ secrets.ELEVENLABS_VOICE_ID_RU }}
+          ELEVENLABS_VOICE_ID_WORLD: ${{ secrets.ELEVENLABS_VOICE_ID_WORLD }}
+          CF_ACCOUNT_ID:             ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN:              ${{ secrets.CF_API_TOKEN }}
+          PEXELS_API_KEY:            ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:           ${{ secrets.PIXABAY_API_KEY }}
+          YT_CLIENT_ID:              ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET:          ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN:          ${{ secrets.YT_REFRESH_TOKEN }}
+          TELEGRAM_BOT_TOKEN:        ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:          ${{ secrets.TELEGRAM_CHAT_ID }}
+          TOPIC:                     ${{ inputs.topic }}
+          REGION:                    ${{ inputs.region }}
+          PUBLISH:                   ${{ inputs.publish }}
+          NO_UPLOAD:                 ${{ inputs.no_upload }}
         run: |
           args=()
-          [ -n "$TOPIC" ] && args+=(--topic "$TOPIC")
+          [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-IN}")
+          [ "$PUBLISH" = "now" ] && args+=(--publish now)
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
 
@@ -67,7 +92,7 @@ jobs:
             output/**/script.json
             output/**/research.json
             output/**/shorts/*.mp4
-          retention-days: 14
+          retention-days: 7
 
       - name: Commit history
         if: success()
@@ -76,4 +101,5 @@ jobs:
           git config user.email "noreply@users.noreply.github.com"
           git add data/history.json || true
           git diff --staged --quiet || git commit -m "chore: episode history [skip ci]"
+          git pull --rebase -q || true
           git push || true

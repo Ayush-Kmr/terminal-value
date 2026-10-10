@@ -54,3 +54,35 @@ PALETTE_DEFAULT = {
     "accent": "#E8B931",
     "danger": "#D1485A",
 }
+
+
+LANGUAGE_RULES = {
+    "hi": (
+        "LANGUAGE: Write all NARRATION in Hindi, in Devanagari script. Use the natural "
+        "spoken Hindi of an Indian news explainer: everyday words, with common English "
+        "terms (budget, company, technology, court, visa) and proper names kept the way "
+        "people actually say them. Write numbers as digits. "
+        "ALL ON-SCREEN TEXT (headline, value, caption, chart title and labels, timeline "
+        "events) must be in ENGLISH using Latin letters only: the renderer cannot draw "
+        "Devanagari. Image search terms and image prompts are always in English."
+    ),
+    "en": (
+        "LANGUAGE: Write narration in clear international English that a viewer in "
+        "India, the US or anywhere else follows on first listen. Explain any local "
+        "term the first time it appears. All on-screen text in English."
+    ),
+}
+
+
+def language_rules(language: str) -> str:
+    return LANGUAGE_RULES.get(language, LANGUAGE_RULES["en"])
+
+
+def latin_only(text: str) -> str:
+    """Drop text the fonts cannot draw (Devanagari etc.) instead of rendering
+    empty boxes. Keeps Latin letters, digits and common symbols."""
+    if not text:
+        return ""
+    if any(ord(c) > 0x024F and c not in "–—‘’“”…₹€£¥•·×−" for c in str(text)):
+        return ""
+    return str(text)
