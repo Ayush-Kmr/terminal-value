@@ -207,13 +207,24 @@ def candidates_for(cfg, args, n: int) -> list[dict]:
 
 
 def todays_kind(cfg, args) -> str:
-    """'long' on a long-video day, otherwise 'shorts'."""
+    """'long' on a long-video day, otherwise 'shorts' (standalone Shorts)."""
     if args.kind != "auto":
         return args.kind
     tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
     today = datetime.now(tz).strftime("%A").lower()
     days = [d.lower() for d in cfg.get_path("format.long.days", [])]
-    return "long" if not days or today in days else "shorts"
+    if days and today not in days:
+        return "shorts"
+    # Counted from the last long video actually uploaded, so a long day that
+    # fails is retried the next day instead of being skipped.
+    every = int(cfg.get_path("format.long.every_days", 1))
+    last = max((datetime.fromisoformat(e["created_at"]).astimezone(tz).date()
+                for e in state.load().get("episodes", [])
+                if e.get("kind", "long") == "long" and e.get("created_at")),
+               default=None)
+    if every > 1 and last and (datetime.now(tz).date() - last).days < every:
+        return "shorts"
+    return "long"
 
 
 def report(lines: list[str], video_id: str, wanted_public: bool) -> None:

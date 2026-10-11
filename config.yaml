@@ -77,12 +77,14 @@ trending:
 format:
   kind: "news explainer video"     # how prompts describe the video
   long:
-    days: []                    # long-video days. Empty = a long video every day
+    days: []                    # weekdays a long video may go out. Empty = any day
+    every_days: 2               # 2 = a long video on alternate days; 1 = every day
     target_minutes: 5           # ~750 words; about 4,500 voice characters
     words_per_minute: 150
     publish_times: ["19:00"]    # IST. Evening is the daily viewing peak in India
   short:
-    per_day: 2                  # cut from the day's long video
+    per_day: 2                  # every day: cut from the long video, or two
+                                # standalone Shorts on days without one
     target_seconds: 30
     publish_times: ["08:00", "20:30"]   # IST
 

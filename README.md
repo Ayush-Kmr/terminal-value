@@ -10,7 +10,7 @@ Channel: <https://www.youtube.com/@terminalvaluedoc>
 
 | Workflow | When | What it does |
 |---|---|---|
-| **Episode** | daily 16:00 IST | picks the top story → research → script → voice → video → uploads 1 long + 2 Shorts |
+| **Episode** | daily 16:00 IST | alternate days: top story → research → script → voice → 1 long video + 2 Shorts cut from it. Other days: 2 standalone Shorts on the top two stories |
 | **Reach report** | Mondays 08:45 IST | pulls view counts into `reports/` and `data/history.json` |
 | **Doctor** | on demand | tests every API key with one small call each |
 | **Brand channel** | on demand | applies `assets/brand/` and the About text in `config.yaml` |

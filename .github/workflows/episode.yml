@@ -2,8 +2,9 @@ name: Episode
 
 on:
   schedule:
-    # Every day 10:30 UTC = 16:00 IST. One long video on the day's top story
-    # (published 19:00 IST) plus two Shorts cut from it (20:30 and 08:00 IST).
+    # Every day 10:30 UTC = 16:00 IST. Alternate days: one long video on the
+    # top story (published 19:00 IST) plus two Shorts cut from it. Other days:
+    # two standalone Shorts. Shorts publish 20:30 and 08:00 IST either way.
     # Narration is the owner's cloned voice, generated on the runner.
     - cron: "30 10 * * *"
   workflow_dispatch:
@@ -17,7 +18,7 @@ on:
         options: [IN, US, CN, RU, WORLD]
         default: IN
       kind:
-        description: "auto = follow config.yaml (a long video plus two Shorts)"
+        description: "auto = follow config.yaml (long video on alternate days, two Shorts daily)"
         type: choice
         options: [auto, long, shorts]
         default: auto
