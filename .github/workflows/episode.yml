@@ -3,8 +3,8 @@ name: Episode
 on:
   schedule:
     # Every day 10:30 UTC = 16:00 IST. Alternate days: one long video on the
-    # top story (published 19:00 IST) plus two Shorts cut from it. Other days:
-    # two standalone Shorts. Shorts publish 20:30 and 08:00 IST either way.
+    # top story plus two Shorts cut from it. Other days: two standalone Shorts.
+    # Everything goes public as soon as it uploads (upload.publish in config.yaml).
     # Narration is the owner's cloned voice, generated on the runner.
     - cron: "30 10 * * *"
   workflow_dispatch:
@@ -23,10 +23,13 @@ on:
         options: [auto, long, shorts]
         default: auto
       publish:
-        description: "now = public as soon as it uploads; slot = next 19:00 IST"
+        description: "now = public as soon as it uploads; slot = hold for the next publish time"
         type: choice
         options: [now, slot]
         default: now
+      count:
+        description: "With kind = shorts: how many Shorts to make (blank = 2)"
+        required: false
       no_upload:
         description: "Build only, do not upload"
         type: boolean
@@ -98,12 +101,14 @@ jobs:
           REGION:                    ${{ inputs.region }}
           KIND:                      ${{ inputs.kind }}
           PUBLISH:                   ${{ inputs.publish }}
+          COUNT:                     ${{ inputs.count }}
           NO_UPLOAD:                 ${{ inputs.no_upload }}
         run: |
           args=()
           [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-IN}")
           [ -n "$KIND" ] && args+=(--kind "$KIND")
-          [ "$PUBLISH" = "now" ] && args+=(--publish now)
+          [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
+          [ -n "$COUNT" ] && args+=(--count "$COUNT")
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
 

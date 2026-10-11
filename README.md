@@ -15,8 +15,8 @@ Channel: <https://www.youtube.com/@terminalvaluedoc>
 | **Doctor** | on demand | tests every API key with one small call each |
 | **Brand channel** | on demand | applies `assets/brand/` and the About text in `config.yaml` |
 
-The long video is scheduled for 19:00 IST; Shorts for 20:30 IST and 08:00 IST
-the next morning. All times are in `config.yaml` under `format`.
+Every video goes public as soon as it uploads. To hold videos for fixed times
+instead, set `upload.publish: slot` in `config.yaml` (times are under `format`).
 
 Run one by hand: **Actions → Episode → Run workflow**. Leave *topic* blank for
 today's top trend, or type a story and choose its region.

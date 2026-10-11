@@ -3,7 +3,7 @@
 
     python main.py                          full run: trending topic -> video -> upload
     python main.py --topic "RBI repo rate" --region IN    make a video on a given story
-    python main.py --publish now            publish immediately instead of the next slot
+    python main.py --publish slot           schedule for the next slot instead of posting at once
     python main.py --no-upload              build only, leave the files on disk
     python main.py --reach                  performance report only
 """
@@ -239,7 +239,7 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
 
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
-    n = int(cfg.get_path("format.short.per_day", 2))
+    n = args.count or int(cfg.get_path("format.short.per_day", 2))
     stories = candidates_for(cfg, args, n)[:n]
     tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
     times = upload.slots(cfg, "short", n)
@@ -257,7 +257,7 @@ def run_shorts_day(cfg, args) -> int:
             if args.no_upload:
                 done.append(f"{company} (built, not uploaded)")
                 continue
-            now = args.publish == "now" and i == 0
+            now = args.publish == "now"
             when = None if now else times[i] if i < len(times) else None
             sid = upload.upload(cfg, Path(short["path"]),
                                 {"title": short["title"][:100], "language": short["language"],
@@ -289,6 +289,7 @@ def run_shorts_day(cfg, args) -> int:
 
 def run(args) -> int:
     cfg = load()
+    args.publish = args.publish or cfg.get_path("upload.publish", "now")
     do_gates = not args.no_gates
 
     if args.reach:
@@ -355,10 +356,12 @@ def run(args) -> int:
         times = [t for t in upload.slots(cfg, "short", len(built) + 4) if t > after]
         for s, when in zip(built, times):
             try:
+                direct = decision == "publish"
                 sid = upload.upload(cfg, Path(s["path"]),
                                     {"title": s["title"][:100], "language": meta["language"],
                                      "description": s["description"], "tags": meta["tags"]},
-                                    privacy="private", publish_at=when)
+                                    privacy="public" if direct else "private",
+                                    publish_at=None if direct else when)
                 short_ids.append(sid)
             except Exception as exc:  # noqa: BLE001
                 log.warning("Short upload failed: %s", exc)
@@ -390,8 +393,11 @@ def main() -> int:
     ap.add_argument("--angle", default="")
     ap.add_argument("--region", help="IN, US, CN, RU or WORLD (with --topic)")
     ap.add_argument("--language", choices=["hi", "en"], help="override narration language")
-    ap.add_argument("--publish", choices=["slot", "now"], default="slot",
-                    help="slot: schedule for the next publish time; now: public immediately")
+    ap.add_argument("--publish", choices=["slot", "now"],
+                    help="now: public as soon as it uploads; slot: schedule for the next "
+                         "publish time. Default: upload.publish in config.yaml")
+    ap.add_argument("--count", type=int, default=0,
+                    help="with --kind shorts: how many Shorts to make (default: per_day)")
     ap.add_argument("--kind", choices=["auto", "long", "shorts"], default="auto",
                     help="auto: long on format.long.days, Shorts otherwise")
     ap.add_argument("--no-upload", action="store_true")

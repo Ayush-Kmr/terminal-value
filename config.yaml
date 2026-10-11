@@ -209,6 +209,8 @@ gates:
 
 # ---------- upload ----------
 upload:
+  publish: now                 # now = public the moment it uploads; slot = hold
+                               # for the next publish_times slot
   category_id: 25              # News & Politics
   made_for_kids: false
   synthetic_media_disclosure: true

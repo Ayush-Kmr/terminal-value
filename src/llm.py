@@ -19,56 +19,83 @@ log = logging.getLogger(__name__)
 
 # Rolling aliases, not pinned versions: providers retire dated model names
 # every few months and a retired name is a 404 that stops the whole pipeline.
-GEMINI_MODEL = "gemini-flash-latest"
-# Groq has no alias, so pick the best available model at call time.
-GROQ_PREFERRED = ("llama-3.3-70b-versatile", "llama-4", "llama-3", "llama", "qwen", "gpt-oss")
-GROQ_EXCLUDE = ("guard", "whisper", "tts", "vision", "prompt-guard", "safeguard")
-_groq_model: str | None = None
+# The free tier counts requests per model per day (20 on the main one), so the
+# lite model is a second, separate allowance.
+GEMINI_MODELS = ("gemini-flash-latest", "gemini-flash-lite-latest")
+GEMINI_MODEL = GEMINI_MODELS[0]
+# Groq has no alias, so rank whatever chat models are available at call time.
+GROQ_PREFERRED = ("gpt-oss-120b", "llama-3.3-70b", "llama-4", "llama", "gpt-oss", "qwen")
+GROQ_EXCLUDE = ("guard", "whisper", "tts", "vision", "orpheus", "allam")
+# Groq's free tier counts max_tokens against a per-minute budget; 8000 is
+# refused outright on most models. No call here needs more than this.
+GROQ_MAX_TOKENS = 4000
+_groq_models: list[str] | None = None
+_exhausted: set[str] = set()     # models out of quota for the rest of this run
 
 
-def groq_model(client) -> str:
-    """First available chat model matching the preference order; cached."""
-    global _groq_model
-    if _groq_model:
-        return _groq_model
-    ids = [m.id for m in client.models.list().data
-           if not any(x in m.id.lower() for x in GROQ_EXCLUDE)]
-    for want in GROQ_PREFERRED:
-        # Within a family prefer the largest, e.g. 70b over 8b.
-        family = sorted((i for i in ids if want in i.lower()),
-                        key=lambda i: ("70b" in i or "120b" in i or "versatile" in i, i),
-                        reverse=True)
-        if family:
-            _groq_model = family[0]
-            log.info("Groq model: %s", _groq_model)
-            return _groq_model
-    raise RuntimeError(f"No usable Groq chat model among: {ids}")
+def groq_models(client) -> list[str]:
+    """Available chat models, best first; cached."""
+    global _groq_models
+    if _groq_models is None:
+        ids = [m.id for m in client.models.list().data
+               if not any(x in m.id.lower() for x in GROQ_EXCLUDE)]
+
+        def rank(i: str) -> int:
+            return next((n for n, want in enumerate(GROQ_PREFERRED) if want in i.lower()),
+                        len(GROQ_PREFERRED))
+        _groq_models = sorted(ids, key=lambda i: (rank(i), i))
+        if not _groq_models:
+            raise RuntimeError("No usable Groq chat model available")
+        log.info("Groq models: %s", ", ".join(_groq_models))
+    return _groq_models
 
 
 def _gemini(prompt: str, system: str | None, temperature: float) -> str:
     import google.generativeai as genai
 
     genai.configure(api_key=env("GEMINI_API_KEY", required=True))
-    model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system)
-    resp = model.generate_content(
-        prompt, generation_config={"temperature": temperature, "max_output_tokens": 8192}
-    )
-    return resp.text
+    last: Exception | None = None
+    for name in GEMINI_MODELS:
+        if name in _exhausted:
+            continue
+        try:
+            model = genai.GenerativeModel(name, system_instruction=system)
+            resp = model.generate_content(
+                prompt, generation_config={"temperature": temperature,
+                                           "max_output_tokens": 8192})
+            return resp.text
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            msg = str(exc)
+            # A spent allowance or a retired name will not recover mid-run;
+            # stop paying a failed request for it on every call.
+            if "429" in msg or "404" in msg:
+                _exhausted.add(name)
+            log.warning("Gemini %s failed (%s)", name, msg.splitlines()[0][:160])
+    raise last or RuntimeError("Gemini quota used up for this run")
 
 
 def _groq(prompt: str, system: str | None, temperature: float) -> str:
     from groq import Groq
 
-    client = Groq(api_key=env("GROQ_API_KEY", required=True))
+    client = Groq(api_key=env("GROQ_API_KEY", required=True), max_retries=1)
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    resp = client.chat.completions.create(
-        model=groq_model(client), messages=messages, temperature=temperature,
-        max_tokens=8000
-    )
-    return resp.choices[0].message.content
+    last: Exception | None = None
+    for name in groq_models(client):
+        try:
+            resp = client.chat.completions.create(
+                model=name, messages=messages, temperature=temperature,
+                max_tokens=GROQ_MAX_TOKENS)
+            if resp.choices[0].message.content:
+                return resp.choices[0].message.content
+            last = RuntimeError(f"{name} returned no text")
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            log.warning("Groq %s failed (%s)", name, str(exc)[:160])
+    raise last or RuntimeError("Groq returned nothing")
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=30))
@@ -77,7 +104,8 @@ def call(prompt: str, system: str | None = None, temperature: float = 0.7) -> st
     try:
         return _gemini(prompt, system, temperature)
     except Exception as exc:  # noqa: BLE001 - any provider error should fail over
-        log.warning("Gemini failed (%s); falling back to Groq", exc)
+        log.warning("Gemini unavailable (%s); falling back to Groq",
+                    str(exc).splitlines()[0][:120])
         return _groq(prompt, system, temperature)
 
 
