@@ -6,7 +6,9 @@ because a monetised channel cannot use them.
 """
 from __future__ import annotations
 
+import html
 import logging
+import re
 from pathlib import Path
 
 import requests
@@ -106,6 +108,13 @@ def pixabay_video(query: str, dest: Path) -> dict | None:
     return None
 
 
+def _plain(text: str) -> str:
+    """Commons returns the Artist field as HTML. Credits go into the video
+    description, and YouTube rejects a description containing < or >."""
+    text = html.unescape(re.sub(r"<[^>]*>", "", text or ""))
+    return re.sub(r"\s+", " ", text.replace("<", "").replace(">", "")).strip()
+
+
 def wikimedia_image(query: str, dest: Path) -> dict | None:
     """Archival photographs. Licence-filtered — this is where real historical
     imagery of real companies and people legitimately comes from."""
@@ -136,7 +145,8 @@ def wikimedia_image(query: str, dest: Path) -> dict | None:
             if _download(url, out):
                 return {
                     "path": str(out), "kind": "image",
-                    "credit": meta.get("Artist", {}).get("value", "Wikimedia Commons"),
+                    "credit": _plain(meta.get("Artist", {}).get("value", ""))
+                    or "Wikimedia Commons",
                     "licence": licence, "url": info.get("descriptionurl", ""),
                     "needs_attribution": "cc-by" in normalised,
                 }

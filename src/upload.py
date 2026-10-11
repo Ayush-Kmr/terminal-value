@@ -66,15 +66,22 @@ def next_slot(cfg: Config, kind: str = "long") -> datetime:
     return slots(cfg, kind, 1)[0]
 
 
+def _safe(text: str, max_bytes: int) -> str:
+    """YouTube rejects < and > in titles, descriptions and tags, and measures
+    the description limit in bytes — Devanagari is three bytes a character."""
+    text = str(text or "").replace("<", "").replace(">", "")
+    return text.encode("utf-8")[:max_bytes].decode("utf-8", "ignore").strip()
+
+
 def upload(cfg: Config, video: Path, meta: dict[str, Any],
            privacy: str = "private", publish_at: datetime | None = None) -> str:
     yt = client()
     language = meta.get("language") or cfg.get_path("channel.language", "en")
     body: dict[str, Any] = {
         "snippet": {
-            "title": meta["title"][:100],
-            "description": meta.get("description", "")[:5000],
-            "tags": meta.get("tags", [])[:60],
+            "title": _safe(meta["title"], 400)[:100],
+            "description": _safe(meta.get("description", ""), 4900),
+            "tags": [t for t in (_safe(t, 200) for t in meta.get("tags", [])[:60]) if t],
             "categoryId": str(cfg.get_path("upload.category_id", 22)),
             "defaultLanguage": language,
             "defaultAudioLanguage": language,
