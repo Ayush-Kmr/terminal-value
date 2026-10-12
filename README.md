@@ -31,7 +31,7 @@ today's top trend, or type a story and choose its region.
 3. `src/script.py` writes five sections; `src/voice.py` narrates each shot in the
    owner's cloned voice (an open model run by `scripts/clone_tts.py`); `src/assets.py` gathers a visual per shot (data cards, Wikimedia
    photos of real people and places, AI stills for mood).
-4. `src/render.py` assembles the video; `src/shorts.py` cuts two vertical Shorts.
+4. `src/render.py` assembles the video (animated cards, dissolves, music ducked under the voice); `src/shorts.py` builds the Shorts natively at 9:16.
 5. `src/upload.py` uploads everything. A Telegram message reports the result,
    including when YouTube keeps a video private or a run fails.
 

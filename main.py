@@ -18,7 +18,7 @@ from pathlib import Path
 
 from src import (assets, gate, hooks, reach, render, research, script as script_mod,
                  seo, shorts, state, thumbnail, upload, voice)
-from src.config import ROOT, load
+from src.config import ROOT, load, portrait
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,8 +86,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
 
     # ---- render ---------------------------------------------------------
     clips = render.build_shot_clips(cfg, shot_list, workdir)
-    music = next((ROOT / "assets" / "music").glob("*.mp3"), None)
-    video = render.concat_with_audio(cfg, clips, shot_list, workdir, music)
+    video = render.concat_with_audio(cfg, clips, shot_list, workdir,
+                                     render.pick_music(cfg, company))
 
     # ---- packaging ------------------------------------------------------
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
@@ -159,9 +159,11 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
     shot_list = voice.narrate_shots(cfg, script_mod.all_shots(sc), workdir,
                                     story.get("region"), language)
-    assets.gather(cfg, shot_list, workdir, company)
-    clips = render.build_shot_clips(cfg, shot_list, workdir)
-    video = render.concat_with_audio(cfg, clips, shot_list, workdir, None)
+    tall = portrait(cfg)          # drawn 9:16 from the start, not cropped later
+    assets.gather(tall, shot_list, workdir, company)
+    clips = render.build_shot_clips(tall, shot_list, workdir)
+    video = render.concat_with_audio(tall, clips, shot_list, workdir,
+                                     render.pick_music(cfg, company))
 
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
     best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language)[0]

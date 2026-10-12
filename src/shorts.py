@@ -1,17 +1,18 @@
-"""Shorts, cut from the long episode.
+"""Shorts: vertical videos, built natively at 9:16.
 
-Shorts exist to buy subscribers; longs buy watch hours. Cutting from the long
-costs nothing extra and keeps the two formats visually identical, which is how
-a Short converts into a subscriber who then watches the full video.
+Shorts exist to buy subscribers; longs buy watch hours. A Short cut from a
+long video reuses its narration and pictures but has its cards drawn again
+for the tall frame, so nothing is shrunk into a letterbox.
 """
 from __future__ import annotations
 
+import copy
 import logging
 import subprocess
 from pathlib import Path
 
-from . import llm
-from .config import Config, latin_only
+from . import assets, llm, render
+from .config import Config, latin_only, portrait
 
 log = logging.getLogger(__name__)
 
@@ -50,62 +51,67 @@ def _offset(shots: list[dict], index: int) -> float:
 
 
 def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
-    """Transparent 1080x1920 overlay: headline above the video, channel name
-    below. Drawn with Pillow so it wraps and uses the brand font (ffmpeg's
-    drawtext is missing from many builds)."""
-    import textwrap
-
+    """Transparent 1080x1920 overlay: the headline, held at the top for the
+    whole Short, below where the app draws its own controls. Drawn with
+    Pillow so it wraps and uses the brand font."""
     from PIL import Image, ImageDraw
 
-    from .visuals.motion import _font
+    from .visuals.motion import _fit, _font
 
     vcfg = cfg.get("visuals", {})
     pal = vcfg.get("palette", {})
     img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-
-    lines = textwrap.wrap(title.upper(), 16)[:3]
-    f = _font(vcfg, "display", 86)
-    y = 600 - len(lines) * 100          # the video frame starts at y=656
+    font, lines, size = _fit(d, vcfg, "display", title.upper(), 900, 84, 52, max_lines=2)
+    line_h = int(size * 1.14)
+    y = 285 - len(lines) * line_h / 2
     for line in lines:
-        d.text((540, y), line, font=f, fill=pal.get("accent", "#E8B931"), anchor="ma",
-               stroke_width=6, stroke_fill="#000000")
-        y += 100
-
-    d.text((540, 1330), cfg.get_path("channel.name", "").upper(),
-           font=_font(vcfg, "mono", 34), fill=pal.get("ink", "#F2F4F7"), anchor="ma")
+        d.text((540, y), line, font=font, fill=pal.get("accent", "#E8B931"), anchor="ma",
+               stroke_width=8, stroke_fill="#0B0E13")
+        y += line_h
+    d.text((540, 1920 - 272), cfg.get_path("channel.name", "").upper(),
+           font=_font(vcfg, "mono", 30, "Bold"), fill=pal.get("muted", "#8B949E"), anchor="ma")
     img.save(out)
     return out
 
 
-def cut(cfg: Config, source: Path, shots: list[dict], moment: dict,
-        out: Path, title: str, max_seconds: float = 58.0) -> Path:
-    """9:16 with the full 16:9 frame in the middle over a blurred fill, so no
-    on-screen text is cropped away. Headline above. Hard cap 58 seconds."""
-    last = max(s["index"] for s in shots)
-    first_i = max(0, min(int(moment["start_index"]), last))
-    last_i = max(first_i, min(int(moment["end_index"]), last))
-    start = _offset(shots, first_i)
-    end = _offset(shots, last_i + 1)
-    duration = min(max(end - start, 12.0), max_seconds, 58.0)
-
+def finish(cfg: Config, video: Path, out: Path, title: str, max_seconds: float = 58.0) -> Path:
+    """Lay the headline over a vertical cut and cap it at Shorts length."""
     plate = _headline_plate(cfg, title, out.with_suffix(".png"))
-    vf = (
-        "[0:v]split=2[a][b];"
-        "[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-        "boxblur=28:4,eq=brightness=-0.32:saturation=0.6[bg];"
-        "[b]scale=1080:-2[fg];"
-        "[bg][fg]overlay=0:(H-h)/2[base];"
-        "[base][1:v]overlay=0:0,format=yuv420p[v]"
-    )
-    cmd = ["ffmpeg", "-y", "-ss", f"{start:.3f}", "-t", f"{duration:.3f}", "-i", str(source),
-           "-i", str(plate), "-filter_complex", vf, "-map", "[v]", "-map", "0:a?",
-           "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-           "-c:a", "aac", "-b:a", "160k", str(out)]
+    cmd = ["ffmpeg", "-y", "-i", str(video), "-i", str(plate), "-filter_complex",
+           "[0:v][1:v]overlay=0:0,format=yuv420p[v]", "-map", "[v]", "-map", "0:a?",
+           "-t", f"{max_seconds:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "19",
+           "-c:a", "copy", str(out)]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError(f"Short render failed:\n{res.stderr[-2000:]}")
-    log.info("Short cut: %s (%.1fs)", out.name, duration)
+    return out
+
+
+def cut(cfg: Config, shots: list[dict], moment: dict, out: Path, title: str,
+        company: str, max_seconds: float = 58.0) -> Path:
+    """Rebuild a run of shots from the long video as a vertical Short: same
+    narration and pictures, cards redrawn for 9:16."""
+    last = max(s["index"] for s in shots)
+    first_i = max(0, min(int(moment["start_index"]), last))
+    last_i = max(first_i, min(int(moment["end_index"]), last))
+    chosen = [copy.deepcopy(s) for s in shots if first_i <= s["index"] <= last_i]
+    # Whole shots only: trimming mid-sentence is worse than a shorter Short.
+    while len(chosen) > 1 and sum(float(s.get("duration", 5)) for s in chosen) > max_seconds:
+        chosen.pop()
+    for s in chosen:
+        s.pop("clip", None)
+
+    tall = portrait(cfg)
+    work = out.with_suffix("")
+    work.mkdir(parents=True, exist_ok=True)
+    assets.redraw_cards(tall, chosen, work / "assets", company)
+    clips = render.build_shot_clips(tall, chosen, work)
+    video = render.concat_with_audio(tall, clips, chosen, work,
+                                     render.pick_music(cfg, f"{company}-{out.stem}"))
+    finish(cfg, video, out, title, max_seconds)
+    log.info("Short cut: %s (%.1fs)", out.name,
+             sum(float(s.get("duration", 5)) for s in chosen))
     return out
 
 
@@ -116,13 +122,14 @@ def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
     moments = [m for m in pick_moments(shots, n, target) if isinstance(m, dict)][:n]
     outdir = workdir / "shorts"
     outdir.mkdir(parents=True, exist_ok=True)
-    more = long_url or cfg.get_path("channel.url", "")
+    more = long_url or "the full video on the channel"
+
     built = []
     for i, m in enumerate(moments):
         try:
             headline = latin_only(m.get("hook_text", "")) or latin_only(company) or "EXPLAINED"
-            path = cut(cfg, source, shots, m, outdir / f"short_{i+1}.mp4", headline,
-                       max_seconds=target + 12)
+            path = cut(cfg, shots, m, outdir / f"short_{i+1}.mp4", headline, company,
+                       max_seconds=min(target + 12, 58))
             title = (m.get("title") or headline).strip()[:90]
             built.append({
                 "path": str(path),
@@ -140,11 +147,9 @@ def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
 
 def standalone(cfg: Config, video: Path, shots: list[dict], workdir: Path,
                headline: str, title: str, language: str = "en") -> dict:
-    """A Short that is its own story rather than a cut: reframe the whole
-    rendered clip to 9:16."""
-    last = max(s["index"] for s in shots)
-    out = cut(cfg, video, shots, {"start_index": 0, "end_index": last},
-              workdir / "short.mp4", latin_only(headline) or "EXPLAINED")
+    """A Short that is its own story: the video was already rendered 9:16, so
+    it only needs its headline."""
+    out = finish(cfg, video, workdir / "short.mp4", latin_only(headline) or "EXPLAINED")
     return {
         "path": str(out),
         "title": f"{title.strip()[:90]} #shorts",

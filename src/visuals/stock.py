@@ -141,7 +141,7 @@ def wikimedia_image(query: str, dest: Path) -> dict | None:
             # Commons also holds SVGs, PDFs, audio and video; stills only.
             if not url or Path(url.split("?")[0]).suffix.lower() not in {".jpg", ".jpeg", ".png"}:
                 continue
-            out = dest.with_suffix(Path(url).suffix or ".jpg")
+            out = dest.with_suffix(Path(url.split("?")[0]).suffix or ".jpg")
             if _download(url, out):
                 return {
                     "path": str(out), "kind": "image",

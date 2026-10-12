@@ -18,10 +18,36 @@ log = logging.getLogger(__name__)
 MOTION_TYPES = {"stat_reveal", "chart", "timeline", "quote_card", "document"}
 
 
+def _vis(cfg: Config) -> dict:
+    return {**cfg.get("visuals", {}), "wordmark": cfg.get_path("channel.name", "")}
+
+
+def redraw_cards(cfg: Config, shots: list[dict], img_dir: Path, company: str) -> None:
+    """Draw the cards again for a different frame shape (a Short cut from a
+    long video). Photographs and clips are reused as they are."""
+    img_dir.mkdir(parents=True, exist_ok=True)
+    vis_cfg = _vis(cfg)
+    for shot in shots:
+        dest = img_dir / f"shot_{shot['index']:03d}.png"
+        asset = Path(shot["asset"]) if shot.get("asset") else None
+        try:
+            if shot.get("visual_type") in MOTION_TYPES:
+                motion.render(shot, vis_cfg, dest)
+                shot["asset"] = str(dest)
+            elif asset is None or motion.frames_dir(asset):
+                # A typographic fallback card, not a picture.
+                motion.title_card((shot.get("visual_spec") or {}).get("headline", "") or company,
+                                  "", vis_cfg, dest)
+                shot["asset"] = str(dest)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Could not redraw card %03d (%s); keeping the original",
+                        shot["index"], exc)
+
+
 def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[dict]:
     img_dir = workdir / "assets"
     img_dir.mkdir(parents=True, exist_ok=True)
-    vis_cfg = cfg.get("visuals", {})
+    vis_cfg = _vis(cfg)
     credits: list[dict] = []
 
     for shot in shots:

@@ -30,6 +30,15 @@ def load(path: Path | None = None) -> Config:
         return Config(yaml.safe_load(fh))
 
 
+def portrait(cfg: Config) -> Config:
+    """The same configuration laid out 9:16, for Shorts."""
+    import copy
+
+    out = Config(copy.deepcopy(dict(cfg)))
+    out.setdefault("visuals", {})["resolution"] = [1080, 1920]
+    return out
+
+
 def env(key: str, required: bool = False, default: str | None = None) -> str | None:
     val = os.getenv(key, default)
     if required and not val:

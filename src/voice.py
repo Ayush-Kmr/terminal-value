@@ -72,12 +72,12 @@ def _synthesise(text: str, out: Path, cfg: Config, voice_id: str) -> None:
 
 
 def _polish(raw: Path, out: Path) -> None:
-    """Trim the silence the model leaves at either end and level the take."""
+    """Trim the silence the model leaves at either end. No compressor: it
+    lifts the quiet tail after every word, which is heard as room echo."""
     trim = "silenceremove=start_periods=1:start_threshold=-48dB:start_silence=0.05"
     subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
-         f"{trim},areverse,{trim},areverse,highpass=f=70,"
-         "acompressor=threshold=-22dB:ratio=2:attack=10:release=150,"
+         f"{trim},areverse,{trim},areverse,highpass=f=75,"
          "alimiter=limit=0.89:level=disabled,afade=t=in:d=0.01",
          "-ar", "44100", "-ac", "1", "-b:a", "160k", str(out)],
         check=True,

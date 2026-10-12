@@ -124,6 +124,7 @@ jobs:
             output/**/script.json
             output/**/research.json
             output/**/shorts/*.mp4
+            output/**/short.mp4
           retention-days: 7
 
       - name: Commit history
