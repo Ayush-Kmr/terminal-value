@@ -3,7 +3,6 @@
 __pycache__/
 *.pyc
 output/
-assets/music/*.mp3
 data/token.json
 .DS_Store
 .venv-voice/
