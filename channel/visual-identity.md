@@ -5,8 +5,9 @@ no two episodes look like the same template. Consistent *system*, varied *output
 
 ## Core look
 
-Dark, archival, slightly clinical. Think annual-report-meets-crime-board.
-Near-black background (#0E1116), bone-white type, exactly one accent colour
+Clean and confident: dark cards for the numbers, bright real-world pictures
+between them. Cards sit on a near-black background (#0E1116) with bone-white
+type and exactly one accent colour
 (#E8B931 amber) that only ever marks the thing the viewer should look at.
 Red (#D1485A) is reserved exclusively for decline — losses, layoffs, the fall.
 
@@ -23,7 +24,7 @@ like a scrapbook.
 | `timeline` | Compressing years | Horizontal, amber marker moving left to right |
 | `quote_card` | A real quote from a real filing or interview | Must carry attribution + date on screen. Never invented |
 | `photo` | Archival / stock | Slow Ken Burns, max 6% zoom. Faster than that looks cheap |
-| `ai_still` | Mood, era, interior, abstract concept | Never real people, never logos, never readable text |
+| `ai_still` | A place, an industry, an object, a concept no photo shows | Bright, clear and specific: a wide daylight shot of the real setting. Never a dark silhouette or an empty corridor. Never real people, never logos, never readable text |
 | `document` | A filing, memo or court exhibit | Highlight the one line that matters in amber |
 
 ## Hard rules

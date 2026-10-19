@@ -15,6 +15,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube",
+    "https://www.googleapis.com/auth/youtube.force-ssl",   # caption uploads
     "https://www.googleapis.com/auth/yt-analytics.readonly",
 ]
 

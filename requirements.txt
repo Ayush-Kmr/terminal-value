@@ -26,3 +26,4 @@ num2words>=0.5.13   # spells out figures for the cloned voice
 google-api-python-client>=2.140
 google-auth-oauthlib>=1.2
 google-auth-httplib2>=0.2
+trafilatura>=1.12

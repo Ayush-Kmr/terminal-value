@@ -35,7 +35,9 @@ def client():
         client_id=env("YT_CLIENT_ID", required=True),
         client_secret=env("YT_CLIENT_SECRET", required=True),
         token_uri="https://oauth2.googleapis.com/token",
-        scopes=SCOPES,
+        # No scopes: the refresh then returns every scope the token was
+        # granted, so a token re-made with the caption scope gets captions,
+        # and an older one keeps working for uploads.
     )
     creds.refresh(Request())
     return build("youtube", "v3", credentials=creds, cache_discovery=False)

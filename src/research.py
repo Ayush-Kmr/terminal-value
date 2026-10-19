@@ -234,30 +234,95 @@ def grounded_briefing(topic: str, angle: str) -> tuple[str, list[Source]]:
         "and what happens next. Only include what reputable outlets have reported. "
         "Where reports conflict or something is unconfirmed, say so explicitly."
     )
-    try:
-        r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{llm.GEMINI_MODEL}:generateContent",
-            headers={"x-goog-api-key": key},
-            json={"contents": [{"parts": [{"text": prompt}]}],
-                  "tools": [{"google_search": {}}],
-                  "generationConfig": {"temperature": 0.2}},
-            timeout=120,
-        )
-        r.raise_for_status()
-        cand = r.json()["candidates"][0]
-        text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
-        chunks = cand.get("groundingMetadata", {}).get("groundingChunks", [])
-        sources, seen = [], set()
-        for c in chunks:
-            web = c.get("web") or {}
-            if web.get("uri") and web.get("title") not in seen:
-                seen.add(web.get("title"))
-                sources.append(Source(web.get("title", "Source"), web["uri"], "press"))
-        log.info("Grounded briefing: %d chars, %d sources", len(text), len(sources))
-        return text, sources
-    except Exception as exc:  # noqa: BLE001
-        log.warning("Grounded briefing unavailable (%s); using headlines only", exc)
-        return "", []
+    # Each model has its own free daily allowance, so a spent main model
+    # does not have to mean a headlines-only video.
+    for model in llm.GEMINI_MODELS:
+        try:
+            return _grounded(key, model, prompt)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Grounded briefing on %s unavailable (%s)", model,
+                        str(exc).splitlines()[0][:160])
+    return "", []
+
+
+def _grounded(key: str, model: str, prompt: str) -> tuple[str, list[Source]]:
+    r = requests.post(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+        headers={"x-goog-api-key": key},
+        json={"contents": [{"parts": [{"text": prompt}]}],
+              "tools": [{"google_search": {}}],
+              "generationConfig": {"temperature": 0.2}},
+        timeout=120,
+    )
+    r.raise_for_status()
+    cand = r.json()["candidates"][0]
+    text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
+    chunks = cand.get("groundingMetadata", {}).get("groundingChunks", [])
+    sources, seen = [], set()
+    for c in chunks:
+        web = c.get("web") or {}
+        if web.get("uri") and web.get("title") not in seen:
+            seen.add(web.get("title"))
+            sources.append(Source(web.get("title", "Source"), web["uri"], "press"))
+    log.info("Grounded briefing (%s): %d chars, %d sources", model, len(text), len(sources))
+    return text, sources
+
+
+def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
+                  total: int = 11000) -> tuple[str, list[Source]]:
+    """The reporting itself, not just its headlines: the full text of the
+    latest articles on the story. Bing's news feed links straight to the
+    publisher (Google News links are redirects), and trafilatura strips each
+    page down to the article body. Costs no API quota."""
+    import urllib.parse
+    import xml.etree.ElementTree as ET
+
+    import trafilatura
+
+    ua = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36"}
+    # The picker's search phrase is often too narrow for the news feed; widen
+    # to the topic and the keywords until there is enough reporting.
+    items, seen_urls = [], set()
+    for query in dict.fromkeys(q for q in queries if q):
+        try:
+            r = requests.get("https://www.bing.com/news/search",
+                             params={"q": query, "format": "rss", "mkt": "en-IN"},
+                             headers=ua, timeout=20)
+            r.raise_for_status()
+            found = ET.fromstring(r.content).findall(".//item")
+        except Exception as exc:  # noqa: BLE001
+            log.warning("News article search failed for %r: %s", query, exc)
+            continue
+        for it in found:
+            link = it.findtext("link") or ""
+            url = urllib.parse.parse_qs(urllib.parse.urlparse(link).query).get("url", [link])[0]
+            # MSN pages are script shells with no extractable article.
+            if url not in seen_urls and "msn.com" not in url:
+                seen_urls.add(url)
+                items.append((it, url))
+        if len(items) >= limit * 2:
+            break
+
+    parts, sources, size = [], [], 0
+    for it, url in items[:limit * 3]:
+        title = (it.findtext("title") or "").strip()
+        outlet = urllib.parse.urlparse(url).netloc.removeprefix("www.")
+        try:
+            page = requests.get(url, headers=ua, timeout=15)
+            body = trafilatura.extract(page.text) or ""
+        except Exception:  # noqa: BLE001 - one dead link must not stop research
+            continue
+        if len(body) < 600:          # paywall stub or cookie wall
+            continue
+        chunk = body[:per_article]
+        parts.append(f"### {title} ({outlet}, {(it.findtext('pubDate') or '')[:16]})\n{chunk}")
+        sources.append(Source(f"{outlet}: {title}", url, "press"))
+        size += len(chunk)
+        if len(sources) >= limit or size >= total:
+            break
+    log.info("Article research: %d articles, %d chars", len(sources), size)
+    return "\n\n".join(parts), sources
 
 
 NEWS_EXTRACT_PROMPT = """You are a news researcher building a fact base for an
@@ -302,6 +367,9 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     log.info("Researching story: %s", topic)
 
     briefing, sources = grounded_briefing(topic, angle)
+    articles, article_sources = article_texts(
+        [story.get("search_query"), topic, *[str(k) for k in story.get("keywords", [])[:2]]])
+    sources = list(sources) + article_sources
 
     query = (story.get("search_query") or topic) + " when:3d"
     heads = trends.news_headlines("en-IN", "IN", query, limit=15)
@@ -311,6 +379,8 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     material = ""
     if briefing:
         material += "BRIEFING (search-grounded):\n" + briefing
+    if articles:
+        material += "\n\nARTICLES (full text of today's reporting):\n" + articles
     if story.get("why_trending"):
         material += "\n\nWHY IT IS TRENDING:\n" + story["why_trending"]
     if heads:
@@ -322,16 +392,16 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
         wiki_text, wiki_src = wikipedia_summary(story["wiki_title"])
         if wiki_text:
             material += ("\n\nBACKGROUND (encyclopedia; may predate this week's events):\n"
-                         + wiki_text[:6000])
+                         + wiki_text[:3000])
 
-    if not briefing and len(heads) < 3:
+    if not briefing and not articles and len(heads) < 3:
         raise RuntimeError(f"Not enough reporting found on {topic!r} to make a video")
 
     beat_ids = "|".join(b["id"] for b in cfg.get_path("structure.beats", []))
     data = llm.json_call(
         NEWS_EXTRACT_PROMPT.format(
             today=f"{datetime.now():%d %B %Y}", topic=topic, angle=angle,
-            material=material[:40000], beat_ids=beat_ids),
+            material=material[:16000], beat_ids=beat_ids),
         temperature=0.2,
     )
 

@@ -16,8 +16,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from src import (assets, gate, hooks, reach, render, research, script as script_mod,
-                 seo, shorts, state, thumbnail, upload, voice)
+from src import (assets, captions, gate, hooks, reach, render, research,
+                 script as script_mod, seo, shorts, state, thumbnail, upload, voice)
 from src.config import ROOT, load, portrait
 
 logging.basicConfig(
@@ -30,25 +30,6 @@ log = logging.getLogger("pipeline")
 
 def slug(text: str) -> str:
     return "".join(c if c.isalnum() else "-" for c in text.lower()).strip("-")[:48]
-
-
-def write_srt(shots: list[dict], out: Path) -> Path:
-    """Captions from shot timings. Uploaded alongside the video — captions
-    measurably help retention and they are free."""
-    def stamp(t: float) -> str:
-        h, rem = divmod(int(t), 3600)
-        m, s = divmod(rem, 60)
-        return f"{h:02d}:{m:02d}:{s:02d},{int((t % 1) * 1000):03d}"
-
-    lines, t = [], 0.0
-    for i, shot in enumerate(shots, 1):
-        dur = float(shot.get("duration", 5))
-        text = (shot.get("narration") or "").strip()
-        if text:
-            lines += [str(i), f"{stamp(t)} --> {stamp(t + dur)}", text, ""]
-        t += dur
-    out.write_text("\n".join(lines), encoding="utf-8")
-    return out
 
 
 def produce(cfg, story: dict, workdir: Path) -> dict:
@@ -91,7 +72,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
 
     # ---- packaging ------------------------------------------------------
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
-    title_opts = seo.titles(cfg, company, angle, best_fact, language)
+    fact_lines = [str(f.get("claim", "")) for f in fb.facts]
+    title_opts = seo.titles(cfg, company, angle, best_fact, language, facts=fact_lines)
     best = title_opts[0]
     title = best["title"]
     keywords = [str(k) for k in story.get("keywords", [])]
@@ -106,11 +88,14 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     if attribution:
         desc = (desc + "\n\nIMAGE CREDITS\n" + attribution)[:4900]
 
-    srt = write_srt(shot_list, workdir / "captions.srt")
+    srt = captions.srt(shot_list, workdir / "captions.srt")
 
-    backdrop = next((Path(s["asset"]) for s in shot_list
-                     if s.get("visual_type") in {"photo", "ai_still"} and s.get("asset")
-                     and Path(s["asset"]).suffix.lower() != ".mp4"), None)
+    # A real photograph of the subject beats an illustration on a thumbnail.
+    stills = [s for s in shot_list
+              if s.get("visual_type") in {"photo", "ai_still"} and s.get("asset")
+              and Path(s["asset"]).suffix.lower() != ".mp4"]
+    stills.sort(key=lambda s: s.get("visual_type") != "photo")
+    backdrop = Path(stills[0]["asset"]) if stills else None
     thumb = thumbnail.generate(
         cfg,
         {"company": company, "thumb_figure": best.get("thumb_figure", ""),
@@ -166,7 +151,9 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
                                      render.pick_music(cfg, company))
 
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
-    best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language)[0]
+    best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language,
+                      maxlen=seo.SHORT_TITLE_MAX,
+                      facts=[str(f.get("claim", "")) for f in fb.facts])[0]
     keywords = [str(k) for k in story.get("keywords", [])]
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               best.get("thumb_text") or company, best["title"], language)
@@ -242,8 +229,12 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
-    stories = candidates_for(cfg, args, n)[:n]
-    tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
+    return make_shorts(cfg, args, candidates_for(cfg, args, n)[:n])
+
+
+def make_shorts(cfg, args, stories: list[dict]) -> int:
+    """One standalone Short per story, each at its own daily slot."""
+    n = len(stories)
     times = upload.slots(cfg, "short", n)
     st = state.load()
     done, failures = [], []
@@ -302,7 +293,8 @@ def run(args) -> int:
     if todays_kind(cfg, args) == "shorts":
         return run_shorts_day(cfg, args)
 
-    candidates = candidates_for(cfg, args, 4)
+    n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
+    candidates = candidates_for(cfg, args, 4 + n_shorts)
     story = candidates[0]
     if do_gates and cfg.get_path("gates.topic_approval", False):
         story = gate.topic_gate(cfg, candidates)
@@ -319,13 +311,18 @@ def run(args) -> int:
     meta = produce(cfg, story, workdir)
     shot_list = meta.pop("_shots")
     video = Path(meta["video"])
-    n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
+    # Shorts are their own stories (the next ones down today's list): they
+    # outperformed cuts from the long video about five to one. A manual topic
+    # has no other stories, so its Shorts are cut from the long video.
+    short_stories = [c for c in candidates if c["topic"] != company][:n_shorts]
 
     if args.no_upload:
-        if n_shorts:
+        if n_shorts and not short_stories:
             shorts.build_all(cfg, video, shot_list, workdir, company, n_shorts,
                              meta["language"])
         log.info("Built %s (upload skipped)", video)
+        if short_stories:
+            make_shorts(cfg, args, short_stories)
         return 0
 
     # ---- optional review gate -------------------------------------------
@@ -349,7 +346,7 @@ def run(args) -> int:
 
     # ---- shorts ----------------------------------------------------------
     short_ids = []
-    if n_shorts:
+    if n_shorts and not short_stories:
         built = shorts.build_all(cfg, video, shot_list, workdir, company, n_shorts,
                                  meta["language"], f"https://youtu.be/{video_id}")
         # Shorts go out after the long, at their own daily slots.
@@ -380,12 +377,14 @@ def run(args) -> int:
     lines = [
         f"✅ {meta['title']}",
         f"https://youtu.be/{video_id}",
-        f"{meta['region']} · {meta['language']} · {meta['runtime']} · {len(short_ids)} Short(s) queued",
+        f"{meta['region']} · {meta['language']} · {meta['runtime']}",
         (f"Goes public {publish_at:%a %d %b %H:%M}" if publish_at else "Published now"),
     ]
     if meta["warnings"]:
         lines.append("Research warnings: " + "; ".join(meta["warnings"]))
     report(lines, video_id, decision == "publish")
+    if short_stories:
+        return make_shorts(cfg, args, short_stories)
     return 0
 
 

@@ -23,16 +23,20 @@ POLLINATIONS = "https://image.pollinations.ai/prompt/"
 
 # Appended to every prompt. These are credibility rules, not style preferences —
 # see channel/visual-identity.md.
+# Bright and specific on purpose: the earlier "deep shadow, desaturated" look
+# produced near-black frames and silhouettes that read as murky on a phone.
 STYLE = (
-    "cinematic documentary still, deep shadow, muted desaturated palette, "
-    "single warm amber light source, 35mm film grain, shallow depth of field, "
+    "editorial photojournalism, wide establishing shot, natural daylight, "
+    "rich true-to-life colour, clear subject in sharp focus, high detail, "
+    "35mm documentary photograph, "
     "no text, no letters, no logos, no watermarks, no recognisable real people, "
-    "no faces in focus, editorial photography"
+    "no faces in focus"
 )
 NEGATIVE = (
     "text, letters, words, logos, brand marks, watermark, signature, "
     "celebrity, recognisable face, cartoon, 3d render, oversaturated, "
-    "stock photo smile, distorted hands"
+    "stock photo smile, distorted hands, silhouette, underexposed, pitch black, "
+    "empty dark corridor"
 )
 
 

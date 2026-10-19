@@ -2,18 +2,20 @@ name: Episode
 
 on:
   schedule:
-    # Every day 10:30 UTC = 16:00 IST. Alternate days: one long video on the
-    # top story plus two Shorts cut from it. Other days: two standalone Shorts.
-    # Everything goes public as soon as it uploads (upload.publish in config.yaml).
-    # Narration is the owner's cloned voice, generated on the runner.
-    - cron: "30 10 * * *"
+    # Every day 03:30 UTC = 09:00 IST. Alternate days: one long video on the
+    # top story; every day: two standalone Shorts on the next stories.
+    # Uploads are scheduled for fixed slots (format.*.publish_times in
+    # config.yaml: long 19:00, Shorts 08:00 and 20:30 IST). GitHub often
+    # starts scheduled runs hours late, so this fires early enough to finish
+    # before the 19:00 slot even then.
+    - cron: "30 3 * * *"
   workflow_dispatch:
     inputs:
       topic:
         description: "Story to cover (leave blank to pick today's top trend)"
         required: false
       region:
-        description: "Region for a manual topic: IN = Hindi; US, CN, RU, WORLD = English"
+        description: "Region for a manual topic (all narrated in English)"
         type: choice
         options: [IN, US, CN, RU, WORLD]
         default: IN
@@ -23,10 +25,10 @@ on:
         options: [auto, long, shorts]
         default: auto
       publish:
-        description: "now = public as soon as it uploads; slot = hold for the next publish time"
+        description: "slot = go public at the next fixed publish time; now = public as soon as it uploads"
         type: choice
-        options: [now, slot]
-        default: now
+        options: [slot, now]
+        default: slot
       count:
         description: "With kind = shorts: how many Shorts to make (blank = 2)"
         required: false

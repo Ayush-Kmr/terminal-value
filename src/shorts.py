@@ -11,7 +11,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from . import assets, llm, render
+from . import assets, captions, llm, render
 from .config import Config, latin_only, portrait
 
 log = logging.getLogger(__name__)
@@ -75,11 +75,20 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
     return out
 
 
-def finish(cfg: Config, video: Path, out: Path, title: str, max_seconds: float = 58.0) -> Path:
-    """Lay the headline over a vertical cut and cap it at Shorts length."""
+def finish(cfg: Config, video: Path, out: Path, title: str, max_seconds: float = 58.0,
+           shots: list[dict] | None = None) -> Path:
+    """Lay the headline and the word-by-word captions over a vertical cut and
+    cap it at Shorts length."""
     plate = _headline_plate(cfg, title, out.with_suffix(".png"))
-    cmd = ["ffmpeg", "-y", "-i", str(video), "-i", str(plate), "-filter_complex",
-           "[0:v][1:v]overlay=0:0,format=yuv420p[v]", "-map", "[v]", "-map", "0:a?",
+    track = captions.overlay(cfg, shots, (1080, 1920), out.parent / f"{out.stem}_cc") \
+        if shots else None
+    inputs = ["-i", str(video), "-i", str(plate)]
+    graph = "[0:v][1:v]overlay=0:0"
+    if track:
+        inputs += ["-i", str(track)]
+        graph += "[h];[h][2:v]overlay=0:0:eof_action=pass"
+    cmd = ["ffmpeg", "-y", *inputs, "-filter_complex",
+           graph + ",format=yuv420p[v]", "-map", "[v]", "-map", "0:a?",
            "-t", f"{max_seconds:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "19",
            "-c:a", "copy", str(out)]
     res = subprocess.run(cmd, capture_output=True, text=True)
@@ -109,7 +118,7 @@ def cut(cfg: Config, shots: list[dict], moment: dict, out: Path, title: str,
     clips = render.build_shot_clips(tall, chosen, work)
     video = render.concat_with_audio(tall, clips, chosen, work,
                                      render.pick_music(cfg, f"{company}-{out.stem}"))
-    finish(cfg, video, out, title, max_seconds)
+    finish(cfg, video, out, title, max_seconds, chosen)
     log.info("Short cut: %s (%.1fs)", out.name,
              sum(float(s.get("duration", 5)) for s in chosen))
     return out
@@ -149,7 +158,8 @@ def standalone(cfg: Config, video: Path, shots: list[dict], workdir: Path,
                headline: str, title: str, language: str = "en") -> dict:
     """A Short that is its own story: the video was already rendered 9:16, so
     it only needs its headline."""
-    out = finish(cfg, video, workdir / "short.mp4", latin_only(headline) or "EXPLAINED")
+    out = finish(cfg, video, workdir / "short.mp4", latin_only(headline) or "EXPLAINED",
+                 shots=shots)
     return {
         "path": str(out),
         "title": f"{title.strip()[:90]} #shorts",

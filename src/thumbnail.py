@@ -82,11 +82,69 @@ def person_layout(cfg: Config, words: str, portrait: Path | None, out: Path) -> 
     return out
 
 
+def headline_layout(cfg: Config, words: str, figure: str, backdrop: Path | None,
+                    out: Path) -> Path:
+    """The channel's thumbnail: a bright picture of the subject on the right,
+    a dark fade on the left carrying 2-4 huge words that name the story, and
+    the key figure in an accent badge. Words + picture + number read as one
+    idea at phone size; the old full-dark, figure-only layout did not say
+    what the video was about."""
+    from .visuals.motion import _fit
+
+    pal = _pal(cfg)
+    vcfg = cfg.get("visuals", {})
+    if backdrop and Path(backdrop).exists():
+        img = Image.open(backdrop).convert("RGB")
+        # cover-crop to 16:9
+        r = max(TW / img.width, TH / img.height)
+        img = img.resize((int(img.width * r) + 1, int(img.height * r) + 1), Image.LANCZOS)
+        left, top = (img.width - TW) // 2, (img.height - TH) // 2
+        img = img.crop((left, top, left + TW, top + TH))
+        img = ImageEnhance.Contrast(ImageEnhance.Color(img).enhance(1.15)).enhance(1.08)
+    else:
+        img = Image.new("RGB", (TW, TH), pal["surface"])
+
+    # Left-to-right fade so the type always sits on dark.
+    fade = Image.new("L", (TW, 1))
+    for x in range(TW):
+        fade.putpixel((x, 0), int(235 * max(0.0, 1 - x / (TW * 0.68)) ** 0.9))
+    img.paste(Image.new("RGB", (TW, TH), "#06080B"), (0, 0), fade.resize((TW, TH)))
+    d = ImageDraw.Draw(img)
+
+    x0 = 56
+    y = 70
+    if figure:
+        fb = _font(vcfg, "display", 120)
+        bw = d.textlength(figure, font=fb)
+        colour = pal["danger"] if figure.startswith("-") else pal["accent"]
+        d.rectangle([x0 - 18, y - 6, x0 + bw + 22, y + 140], fill=colour)
+        d.text((x0 + 2, y + 66), figure, font=fb, fill="#0B0E13", anchor="lm")
+        y += 178
+
+    start = 170
+    while True:
+        font, lines, size = _fit(d, vcfg, "display", words.upper(), TW * 0.6,
+                                 start, 64, max_lines=3)
+        line_h = int(size * 1.08)
+        if y + line_h * len(lines) <= TH - 50 or size <= 64:
+            break
+        start = int(size * 0.92)
+    if not figure:
+        y = (TH - line_h * len(lines)) / 2
+    for i, line in enumerate(lines):
+        colour = pal["accent"] if (i == len(lines) - 1 and not figure) else pal["ink"]
+        d.text((x0, y), line, font=font, fill=colour,
+               stroke_width=max(3, size // 22), stroke_fill="#000000")
+        y += line_h
+
+    img.save(out, quality=92)
+    return out
+
+
 def generate(cfg: Config, meta: dict, backdrop: Path | None, out: Path) -> Path:
-    """Rotate layouts by episode number so the channel page has rhythm."""
     figure = str(meta.get("thumb_figure", "")).strip()
     words = str(meta.get("thumb_words", meta.get("company", "")))[:40]
-
-    if figure:
-        return number_layout(cfg, figure, words, backdrop, out)
-    return person_layout(cfg, words, backdrop, out)
+    # A figure the words already contain would be said twice.
+    if figure and figure.lower().rstrip("m%") in words.lower():
+        figure = ""
+    return headline_layout(cfg, words, figure, backdrop, out)

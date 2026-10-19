@@ -10,9 +10,12 @@ the audio rather than being guessed.
 """
 from __future__ import annotations
 
+import difflib
 import json
 import logging
 import os
+import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -109,13 +112,100 @@ def _clone_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None
     }, ensure_ascii=False, indent=1), encoding="utf-8")
 
     log.info("Cloned voice: speaking %d shots (%s)", len(todo), language)
+    # TQDM_DISABLE: the model draws a progress bar per sentence, which buried
+    # everything else in the run log.
     res = subprocess.run([python, str(ROOT / "scripts" / "clone_tts.py"), str(jobs)],
-                         stdout=sys.stderr, stderr=subprocess.STDOUT)
+                         stdout=sys.stderr, stderr=subprocess.STDOUT,
+                         env={**os.environ, "TQDM_DISABLE": "1"})
     if res.returncode != 0:
         raise VoiceError(f"Cloned voice run failed with exit code {res.returncode}")
     for (_, path), raw in zip(todo, raws):
         _polish(raw, path)
         raw.unlink()
+
+
+WHISPER = "https://api.groq.com/openai/v1/audio/transcriptions"
+MATCH_OK = 0.82        # transcript vs script word match; below this, re-speak
+
+
+def transcribe(path: Path, language: str | None) -> dict | None:
+    """What the take actually says, with word timings (Groq's hosted Whisper,
+    free tier). None when no key is set or the call fails: the check is a
+    safety net, never a reason to lose a run."""
+    key = env("GROQ_API_KEY")
+    if not key:
+        return None
+    for attempt in range(4):
+        try:
+            with open(path, "rb") as f:
+                r = requests.post(
+                    WHISPER, headers={"Authorization": f"Bearer {key}"},
+                    files={"file": (path.name, f)},
+                    data={"model": "whisper-large-v3-turbo", "response_format": "verbose_json",
+                          "timestamp_granularities[]": "word",
+                          "language": language if language in ("hi", "en") else "en"},
+                    timeout=60)
+            if r.status_code == 429:          # ~20 requests a minute on the free tier
+                import time
+                time.sleep(float(r.headers.get("retry-after", 6)) + 1)
+                continue
+            r.raise_for_status()
+            return r.json()
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Transcription of %s failed: %s", path.name, exc)
+            return None
+    return None
+
+
+def _words(text: str, language: str | None) -> list[str]:
+    return re.findall(r"[a-z0-9']+|[\u0900-\u097F]+",
+                      spoken(text, language or "en").lower())
+
+
+def match(script_text: str, heard: str, language: str | None) -> float:
+    """0-1: how much of the script the take really says. Catches the cloned
+    voice's failure modes: a clipped ending, a repeated phrase, mumbling."""
+    a, b = _words(script_text, language), _words(heard, language)
+    if not a:
+        return 1.0
+    return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
+
+
+def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
+                language: str | None, rounds: int = 2) -> dict[Path, dict]:
+    """Listen to every take; re-speak the ones that do not say their line, and
+    keep whichever take matched best. Returns each file's transcript."""
+    heard: dict[Path, dict] = {}
+    score: dict[Path, float] = {}
+    for path, text in todo_text.items():
+        t = transcribe(path, language)
+        if t is None:
+            return heard            # no transcriber: nothing to check against
+        heard[path], score[path] = t, match(text, t.get("text", ""), language)
+
+    for rnd in range(rounds):
+        bad = [p for p, sc in score.items() if sc < MATCH_OK]
+        if not bad:
+            break
+        log.info("Voice check round %d: re-speaking %d/%d takes (%s)", rnd + 1, len(bad),
+                 len(score), ", ".join(f"{p.stem}={score[p]:.2f}" for p in bad[:8]))
+        for p in bad:
+            shutil.move(p, p.with_suffix(".prev.mp3"))
+        _clone_batch(cfg, [(todo_text[p], p) for p in bad], language, audio_dir)
+        for p in bad:
+            prev = p.with_suffix(".prev.mp3")
+            t = transcribe(p, language)
+            sc = match(todo_text[p], (t or {}).get("text", ""), language) if t else 0.0
+            if t and sc > score[p]:
+                heard[p], score[p] = t, sc
+                prev.unlink()
+            else:
+                shutil.move(prev, p)        # the old take was better
+    low = [f"{p.stem}={sc:.2f}" for p, sc in score.items() if sc < MATCH_OK]
+    if low:
+        log.warning("Voice check: %d takes still below %.2f: %s", len(low), MATCH_OK,
+                    ", ".join(low[:10]))
+    return heard
 
 
 def duration(path: Path) -> float:
@@ -137,9 +227,16 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
     if cloned:
         todo = [(text, audio_dir / f"shot_{s['index']:03d}.mp3") for s in shots
                 if (text := (s.get("narration") or "").strip())]
-        todo = [(text, path) for text, path in todo if not path.exists()]
-        if todo:
-            _clone_batch(cfg, todo, language, audio_dir)
+        missing = [(text, path) for text, path in todo if not path.exists()]
+        if missing:
+            _clone_batch(cfg, missing, language, audio_dir)
+        heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language)
+                 if cfg.get_path("voice.check", True) else {})
+        for shot in shots:
+            t = heard.get(audio_dir / f"shot_{shot['index']:03d}.mp3")
+            if t and t.get("words"):
+                shot["words"] = [{"word": w["word"], "start": float(w["start"]),
+                                  "end": float(w["end"])} for w in t["words"]]
     else:
         voice_id = voice_id_for(cfg, region, language)
 

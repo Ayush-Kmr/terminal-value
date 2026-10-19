@@ -56,6 +56,7 @@ Return JSON:
          "headline": "<text on screen, if any — max 6 words>",
          "value": "<the number for stat_reveal>",
          "caption": "<source caption, shown small>",
+         "quote": "<quote_card only: the supplied quote, verbatim, max 25 words>",
          "chart": {{"kind":"line|bar","title":"...","x":[...],"y":[...],"y_label":"..."}},
          "events": [{{"year":"<date or year>","event":"<max 8 words>","pivotal":false}}],
          "search_terms": "<for photo of a REAL named person, place or thing: just its name, 1-4 words, as on Wikipedia>",
@@ -77,7 +78,9 @@ Rules:
   figures or names from memory: for current events your memory is out of date.
 - A chart needs at least three real data points from FINANCIAL DATA. A timeline
   needs 3-6 "events". Use quote_card only for a supplied verbatim quote that is
-  in English. If you have neither data nor a quote, use photo or ai_still.
+  in English: put the quote in "quote" and "Name, role, date" in "caption". If you have neither data nor a quote, use photo or ai_still.
+- Prefer photo over ai_still: real places, buildings, products and objects
+  hold attention better. Use ai_still only for what no photograph can show.
 - Every photo shot needs "search_terms" (a real, named subject) or
   "stock_terms" (a generic scene), never a sentence. Also give every photo
   shot a "prompt" as a fallback illustration."""
@@ -115,23 +118,37 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
             continue
 
         relevant = [f for f in fb.get("facts", []) if f.get("beat") == bid] or fb.get("facts", [])[:10]
-
-        result = llm.json_call(
-            BEAT_PROMPT.format(
-                beat_id=bid, company=fb["company"], angle=fb["angle"],
-                kind=cfg.get_path("format.kind", "documentary"),
-                language=language_rules(language),
-                intent=beat["intent"], words=words, seconds=seconds,
-                voice=voice_doc[:2500], visuals=visual_doc[:2000],
-                facts=_json.dumps(relevant[:18], indent=2),
-                financials=_json.dumps(fb.get("financials", []), indent=2),
-                quotes=_json.dumps(fb.get("quotes", []), indent=2),
-                previous=" ".join(said_so_far)[-2500:] or "(nothing yet)",
-            ),
-            temperature=0.8,
+        # Compact JSON and trimmed docs: on Groq's free tier the prompt and the
+        # answer share 8,000 tokens a minute.
+        prompt = BEAT_PROMPT.format(
+            beat_id=bid, company=fb["company"], angle=fb["angle"],
+            kind=cfg.get_path("format.kind", "documentary"),
+            language=language_rules(language),
+            intent=beat["intent"], words=words, seconds=seconds,
+            voice=voice_doc[:2200], visuals=visual_doc[:1200],
+            facts=_json.dumps(relevant[:16], ensure_ascii=False),
+            financials=_json.dumps(fb.get("financials", [])[:12], ensure_ascii=False),
+            quotes=_json.dumps(fb.get("quotes", [])[:6], ensure_ascii=False),
+            previous=" ".join(said_so_far)[-1500:] or "(nothing yet)",
         )
+        result = llm.json_call(prompt, temperature=0.8)
         if not isinstance(result, dict) or not result.get("shots"):
             raise RuntimeError(f"Beat {bid} came back without shots")
+        # Models write short. A long video that lands under 8 minutes cannot
+        # carry mid-roll ads, so a beat well under its length is rewritten once.
+        got = len(" ".join(s.get("narration", "") for s in result["shots"]).split())
+        if got < words * 0.75:
+            log.info("Beat %s came back at %d/%d words; asking for the full length",
+                     bid, got, words)
+            longer = llm.json_call(
+                prompt + f"\n\nIMPORTANT: a previous draft of this beat was only {got} "
+                f"words. It must be {words} words. Add depth from the facts above "
+                "(context, numbers, who said what, what it means for viewers), not padding.",
+                temperature=0.8)
+            if isinstance(longer, dict) and longer.get("shots"):
+                got2 = len(" ".join(s.get("narration", "") for s in longer["shots"]).split())
+                if got2 > got:
+                    result = longer
         result["id"] = bid
         out_beats.append(result)
         said_so_far.append(result.get("narration", ""))
@@ -172,8 +189,8 @@ def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
                 "value": figure,
                 "caption": "",
                 "prompt": (
-                    f"Dark, grainy, cinematic still evoking {fb.get('company','a company')}'s "
-                    "world. Abstract and atmospheric. No text, no logos, no faces."
+                    f"Wide establishing shot of the real-world setting of {fb.get('company','the story')}: "
+                    "the place, the industry or the objects involved. No text, no logos, no faces."
                 ),
             },
             "emphasis": "hold" if i == len(sentences) - 1 else "normal",

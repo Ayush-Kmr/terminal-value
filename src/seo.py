@@ -16,6 +16,7 @@ from .config import Config, latin_only
 log = logging.getLogger(__name__)
 
 TITLE_MAX = 70          # beyond this it truncates on mobile search
+SHORT_TITLE_MAX = 50    # the Shorts feed shows about 40 characters
 CLICKBAIT = [
     "you won't believe", "shocking", "insane", "destroyed", "exposed",
     "the truth about", "gone wrong", "!!!",
@@ -33,6 +34,8 @@ TITLE_PROMPT = """Write 8 title options for a YouTube {kind}.
 Subject: {company}
 The question the video answers: {angle}
 Strongest fact in the video: {fact}
+Other facts in the video (any number in a title must come from these):
+{facts}
 
 {language}
 
@@ -45,6 +48,10 @@ Rules:
 - A number in the title is good when it is a real number from the research.
 - The title and thumbnail must combine into one idea, so let the thumbnail
   carry the number if the title carries the claim.
+- Every word must be plain English a viewer understands at a glance. Never
+  use jargon or nicknames from the reporting (say "tunnel-boring machines",
+  never "moles"). Read the title back: it must make sense to someone who has
+  not seen the news.
 
 Vary the strategy across the eight: the claim, the specific number, the open
 question, the contradiction, the consequence for an ordinary viewer.
@@ -53,19 +60,24 @@ Return a JSON array of objects:
   title         - the title
   strategy      - which strategy
   thumb_text    - 2-4 words for the thumbnail, ALWAYS in English capitals-friendly
-                  Latin letters, not repeating the title
+                  Latin letters. It must name WHO or WHAT the story is about plus
+                  the tension (e.g. "CHINA BLOCKS INDIA", "RBI CUTS RATES"), so it
+                  makes sense on its own. Do not repeat the title or the figure.
   thumb_figure  - one real figure from the research for the thumbnail, at most
                   6 characters (e.g. "-94%", "$4B", "37"), or "" if none fits
-  summary       - two plain sentences describing the video, in the title's language"""
+  summary       - two plain sentences describing the video, in the title's
+                  language. The first sentence must contain the main search term
+                  (the name of the person, company, place or event): it is the
+                  only part of the description viewers see before "more"."""
 
 
-def _lint(title: str) -> tuple[int, list[str]]:
+def _lint(title: str, maxlen: int = TITLE_MAX) -> tuple[int, list[str]]:
     issues: list[str] = []
     score = 0
     low = title.lower()
-    if len(title) > TITLE_MAX:
+    if len(title) > maxlen:
         score -= 20
-        issues.append(f"{len(title)} chars (max {TITLE_MAX})")
+        issues.append(f"{len(title)} chars (max {maxlen})")
     if len(title) < 12:
         score -= 30
         issues.append("too short")
@@ -84,11 +96,34 @@ def _lint(title: str) -> tuple[int, list[str]]:
     return score, issues
 
 
+STOP = {"the", "and", "for", "with", "near", "new", "over", "into", "from", "its",
+        "why", "how", "what", "after", "amid", "says", "news"}
+
+
+def _names_subject(title: str, subject: str) -> bool:
+    """The thing people search for must lead: a title that never says what
+    it is about cannot rank or be understood in a feed."""
+    head = title[:45].lower()
+    words = [w for w in re.split(r"[^\w]+", subject.lower()) if len(w) > 2 and w not in STOP]
+    return not words or any(w in head for w in words[:3])
+
+
+def _unsupported_numbers(text: str, evidence: str) -> list[str]:
+    """Figures in a title or thumbnail that the research never mentions."""
+    plain = evidence.replace(",", "")
+    return [n for n in re.findall(r"\d+(?:\.\d+)?", text.replace(",", ""))
+            if n not in plain]
+
+
 def titles(cfg: Config, company: str, angle: str, best_fact: str,
-           language: str = "en") -> list[dict[str, Any]]:
+           language: str = "en", maxlen: int = TITLE_MAX,
+           facts: list[str] | None = None) -> list[dict[str, Any]]:
+    facts = [f for f in (facts or []) if f][:12]
+    evidence = " ".join([company, angle, best_fact, *facts])
     options = llm.json_call(
         TITLE_PROMPT.format(
-            company=company, angle=angle, fact=best_fact, maxlen=TITLE_MAX,
+            company=company, angle=angle, fact=best_fact, maxlen=maxlen,
+            facts="\n".join(f"- {f}" for f in facts) or "(none)",
             kind=cfg.get_path("format.kind", "documentary"),
             language=TITLE_LANGUAGE.get(language, TITLE_LANGUAGE["en"])),
         temperature=0.9,
@@ -97,9 +132,18 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
     for o in options:
         if not isinstance(o, dict) or not o.get("title"):
             continue
-        adj, issues = _lint(o["title"])
+        adj, issues = _lint(o["title"], maxlen)
+        if not _names_subject(o["title"], company):
+            adj -= 30
+            issues.append("subject not named in the first 45 characters")
+        made_up = _unsupported_numbers(o["title"], evidence)
+        if made_up:
+            adj -= 60
+            issues.append(f"number not in research: {', '.join(made_up)}")
         o["thumb_text"] = latin_only(o.get("thumb_text", "")) or latin_only(company)
         o["thumb_figure"] = latin_only(str(o.get("thumb_figure", "")))[:6]
+        if _unsupported_numbers(o["thumb_figure"], evidence):
+            o["thumb_figure"] = ""
         out.append({**o, "lint_score": adj, "issues": issues})
     if not out:
         raise RuntimeError("Title generator returned nothing usable")
@@ -123,8 +167,9 @@ def chapters(cfg: Config, shots: list[dict]) -> str:
 
 
 def hashtags(keywords: list[str], language: str) -> str:
+    """Three at most: the first three show above the title."""
     tags = []
-    for k in keywords[:3]:
+    for k in keywords[:2]:
         word = re.sub(r"[^0-9A-Za-zऀ-ॿ]", "", k.title())
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
@@ -154,13 +199,13 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
 
 
 def tags(company: str, keywords: list[str], language: str = "en") -> list[str]:
-    base = [company, *keywords, f"{company} explained", f"{company} news",
-            "explained", "news explained", "current affairs"]
+    """A handful of distinct terms. Tags barely affect ranking any more; the
+    old "<topic> explained / news / hindi" variants only padded the list."""
+    base = [company, *keywords[:6], "news explained"]
     if language == "hi":
-        base += ["hindi news", "news in hindi", f"{company} hindi", "samachar"]
-    # YouTube caps total tag length at 500 characters.
+        base += ["hindi news"]
     out, total, seen = [], 0, set()
-    for t in base:
+    for t in base[:10]:
         t = str(t).strip()[:60]
         if not t or t.lower() in seen:
             continue

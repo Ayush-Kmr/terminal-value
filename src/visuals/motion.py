@@ -367,7 +367,8 @@ def quote_card(spec: dict, cfg: dict, out: Path) -> Path:
     pal = s.pal
     s.kicker("On the record")
     s.footer()
-    text = str(spec.get("headline") or spec.get("value") or "").strip().strip('"“”')
+    text = str(spec.get("quote") or spec.get("headline") or spec.get("value") or "")
+    text = text.strip().strip('"“”')
     max_w = (s.right - s.left) * (1.0 if s.portrait else 0.86)
     font, lines, size = _fit(s.sd, cfg, "body", text, max_w, s.px(92), s.px(50),
                              max_lines=7 if s.portrait else 4, weight="Bold")

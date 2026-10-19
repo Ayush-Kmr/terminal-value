@@ -26,9 +26,11 @@ GEMINI_MODEL = GEMINI_MODELS[0]
 # Groq has no alias, so rank whatever chat models are available at call time.
 GROQ_PREFERRED = ("gpt-oss-120b", "llama-3.3-70b", "llama-4", "llama", "gpt-oss", "qwen")
 GROQ_EXCLUDE = ("guard", "whisper", "tts", "vision", "orpheus", "allam")
-# Groq's free tier counts max_tokens against a per-minute budget; 8000 is
-# refused outright on most models. No call here needs more than this.
+# Groq's free tier counts prompt + max_tokens against a budget of 8,000 tokens
+# a minute; a request over it is refused outright (and the run drops to a
+# weaker model). So the answer allowance shrinks as the prompt grows.
 GROQ_MAX_TOKENS = 4000
+GROQ_TPM = 8000
 _groq_models: list[str] | None = None
 _exhausted: set[str] = set()     # models out of quota for the rest of this run
 
@@ -78,17 +80,22 @@ def _gemini(prompt: str, system: str | None, temperature: float) -> str:
 def _groq(prompt: str, system: str | None, temperature: float) -> str:
     from groq import Groq
 
-    client = Groq(api_key=env("GROQ_API_KEY", required=True), max_retries=1)
+    # The SDK waits out a 429 using the server's retry-after, which on the
+    # per-minute budget is seconds: far better than a weaker model.
+    client = Groq(api_key=env("GROQ_API_KEY", required=True), max_retries=4)
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
+    prompt_tokens = int(len((system or "") + prompt) / 3.2) + 50   # conservative
+    max_tokens = max(1200, min(GROQ_MAX_TOKENS, GROQ_TPM - 300 - prompt_tokens))
     last: Exception | None = None
     for name in groq_models(client):
         try:
+            extra = {"extra_body": {"reasoning_effort": "low"}} if "gpt-oss" in name else {}
             resp = client.chat.completions.create(
                 model=name, messages=messages, temperature=temperature,
-                max_tokens=GROQ_MAX_TOKENS)
+                max_tokens=max_tokens, **extra)
             if resp.choices[0].message.content:
                 return resp.choices[0].message.content
             last = RuntimeError(f"{name} returned no text")
