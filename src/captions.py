@@ -99,7 +99,7 @@ def _draw(cfg: Config, size: tuple[int, int], words: list[str], active: int,
 
 
 def overlay(cfg: Config, shots: list[dict], size: tuple[int, int], workdir: Path,
-            y_frac: float = 0.71) -> Path | None:
+            y_frac: float = 0.79) -> Path | None:
     """A transparent caption track the length of the narration."""
     words = timeline(shots)
     if not words:

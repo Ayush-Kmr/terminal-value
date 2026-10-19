@@ -62,7 +62,7 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
     pal = vcfg.get("palette", {})
     img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    font, lines, size = _fit(d, vcfg, "display", title.upper(), 900, 84, 52, max_lines=2)
+    font, lines, size = _fit(d, vcfg, "display", title.upper(), 900, 84, 52, max_lines=3)
     line_h = int(size * 1.14)
     y = 285 - len(lines) * line_h / 2
     for line in lines:

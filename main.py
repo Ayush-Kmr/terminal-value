@@ -18,7 +18,7 @@ from pathlib import Path
 
 from src import (assets, captions, gate, hooks, reach, render, research,
                  script as script_mod, seo, shorts, state, thumbnail, upload, voice)
-from src.config import ROOT, load, portrait
+from src.config import ROOT, latin_only, load, portrait
 
 logging.basicConfig(
     level=logging.INFO,
@@ -155,8 +155,11 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
                       maxlen=seo.SHORT_TITLE_MAX,
                       facts=[str(f.get("claim", "")) for f in fb.facts])[0]
     keywords = [str(k) for k in story.get("keywords", [])]
+    # The on-screen headline is the title itself: written to be understood
+    # cold, where the 2-4 word thumbnail text often is not.
+    headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
-                              best.get("thumb_text") or company, best["title"], language)
+                              headline, best["title"], language)
     short["description"] = seo.description(
         cfg, best.get("summary") or fb.summary, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],

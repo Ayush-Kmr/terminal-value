@@ -43,7 +43,9 @@ def _encode(inputs: list[str], graph: str, seconds: float, fps: int, dest: Path)
 def _plate(shot: dict, cfg: Config, dest: Path) -> Path | None:
     """Caption plate for a photograph or clip, drawn from the shot's headline."""
     text = (shot.get("visual_spec") or {}).get("headline", "")
-    if not text or not cfg.get_path("visuals.lower_thirds", True):
+    w, h, _ = _size(cfg)
+    # Shorts carry word captions in the same band; two texts there collide.
+    if not text or h > w or not cfg.get_path("visuals.lower_thirds", True):
         return None
     try:
         vis = {**cfg.get("visuals", {})}

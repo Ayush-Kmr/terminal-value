@@ -201,6 +201,8 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
                 prev.unlink()
             else:
                 shutil.move(prev, p)        # the old take was better
+    if score:
+        log.info("Voice check: %d takes, lowest match %.2f", len(score), min(score.values()))
     low = [f"{p.stem}={sc:.2f}" for p, sc in score.items() if sc < MATCH_OK]
     if low:
         log.warning("Voice check: %d takes still below %.2f: %s", len(low), MATCH_OK,

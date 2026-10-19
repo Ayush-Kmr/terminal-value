@@ -71,6 +71,8 @@ Return JSON:
 Rules:
 - Vary sentence length deliberately. Three short sentences in a row, then a long one.
 - Every number spoken aloud should appear on screen in the same shot.
+- stat_reveal is for an amount, a percentage or a count. Never a date or a
+  year: dates go in a timeline or a headline.
 - Use "hold" emphasis on at most two shots: a beat of silence after a number lands.
 - If a fact is marked needs_verification, either omit it or phrase it as attributed
   ("according to Reuters", "the company says") rather than stated as bare fact.
