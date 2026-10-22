@@ -27,17 +27,20 @@ channel:
     New explainer every other day at 7 PM IST. New Shorts every day at 8 AM and 8:30 PM IST.
 
     Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments and we will correct it.
+  # From YouTube search suggestions (what people actually type), 2026-10-22.
   keywords:
-    - business news explained
-    - india economy
-    - news explained
-    - current affairs
-    - indian stock market news
-    - geopolitics explained
-    - world economy
-    - business news
-    - daily news analysis
-    - explained
+    - business news india
+    - business news today
+    - stock market news today
+    - share market news today english
+    - economy explained
+    - india us trade deal latest news
+    - tariffs explained
+    - gold price news
+    - china economy explained
+    - india inflation latest news
+    - layoffs in india
+    - rbi repo rate news today
   # Appended to every description. Keep it accurate: it tells viewers (and
   # YouTube) how the video was made.
   # Closes every description, before the sources.

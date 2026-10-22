@@ -21,15 +21,21 @@ channel:
     New explainer every other day at 7 PM IST. New Shorts every day at 8 AM and 8:30 PM IST.
 
     Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments.
+  # From YouTube search suggestions (what Tamil viewers actually type),
+  # 2026-10-22: mostly English + "tamil", plus Tamil-script questions.
   keywords:
-    - tamil news
     - business news tamil
-    - tamil news explained
-    - india economy tamil
-    - share market tamil
-    - world news tamil
-    - current affairs tamil
-    - explained in tamil
+    - share market news today in tamil
+    - stock market tamil news
+    - gold rate tamil news
+    - economy explained in tamil
+    - rbi repo rate news today tamil
+    - china economy in tamil
+    - layoffs tamil
+    - tamil nadu business news
+    - தங்கம் விலை நிலவரம்
+    - ஷேர் மார்க்கெட் நிலவரம்
+    - பொருளாதாரம்
   cta: >-
     ஒவ்வொரு இரண்டு நாளுக்கும் ஒரு முழு விளக்க வீடியோ, தினமும் Shorts.
     செய்திக்குப் பின்னால் இருக்கும் கதையைத் தவறவிடாமல் இருக்க Subscribe செய்யுங்கள்.

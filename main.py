@@ -133,7 +133,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
         "company": company, "angle": angle, "title": title,
         "region": region, "language": language,
         "title_options": title_opts, "description": desc,
-        "tags": seo.tags(company, keywords, language), "chapters": chapter_text,
+        "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
+        "chapters": chapter_text,
         "runtime": f"{int(runtime//60)}:{int(runtime%60):02d}",
         "word_count": sc["word_count"], "warnings": warnings,
         "video": str(video), "thumbnail": str(thumb), "captions": str(srt),
@@ -195,7 +196,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         keywords or [company], language,
         facts=[str(f.get("claim", "")) for f in fb.facts][:4]) + " #shorts"
     short["captions"] = str(captions.srt(shot_list, workdir / "captions.srt"))
-    short.update({"company": company, "tags": seo.tags(company, keywords, language),
+    short.update({"company": company,
+                  "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
                   "language": language, "region": story.get("region"),
                   "warnings": warnings, "angle": story.get("angle", "")})
     (workdir / "metadata.json").write_text(

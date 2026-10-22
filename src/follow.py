@@ -51,11 +51,16 @@ English summary: {summary}
 Facts in the video (any number in the title must come from these):
 {facts}
 
-Write in {name} (in {name} script). Keep the main name the story is about (a
-person, company, country or product) at the start, in the spelling {name}
-viewers type into YouTube search; English letters are fine for names like RBI,
-Tesla or H-1B. Between {minlen} and {maxlen} characters. No ALL CAPS, no
-exclamation marks, no clickbait.
+WHAT {name} VIEWERS TYPE INTO YOUTUBE SEARCH about this story (real search
+suggestions; they mostly search in English with "tamil" added):
+{searches}
+
+Write the title in {name} script, but START it with the best-fitting search
+phrase above in English letters, followed by " | " (e.g. "Gold Rate Tamil |
+தங்கம் விலை குறையுமா?", "RBI Repo Rate Tamil | உங்கள் EMI உயருமா?"). If
+none fits, start with the subject's name as {name} viewers type it. Between
+{minlen} and {maxlen} characters. No ALL CAPS, no exclamation marks, no
+clickbait.
 
 Return JSON:
 {{"title": "...",
@@ -119,6 +124,21 @@ def _load_shots(src: Path, workdir: Path) -> list[dict]:
     return shots
 
 
+ACRONYMS = {"rbi", "us", "usa", "uk", "ipo", "gdp", "emi", "sebi", "gst", "imf", "ai", "it", "ev",
+            "cpi", "fd", "sip", "nse", "bse", "tcs", "hdfc", "sbi", "lic", "upi", "iren"}
+
+
+def _head_case(title: str) -> str:
+    """"gold price tamil | ..." -> "Gold Price Tamil | ...": search phrases
+    come back in lower case."""
+    head, sep, rest = title.partition(" | ")
+    if not sep or not head.isascii():
+        return title
+    head = " ".join(w.upper() if w.lower() in ACRONYMS else w[:1].upper() + w[1:]
+                    for w in head.split())
+    return f"{head} | {rest}"
+
+
 def _thumbnail(cfg: Config, meta: dict, pkg: dict, title: str, shots: list[dict],
                src: Path, workdir: Path) -> Path:
     """The channel's own thumbnail: its words over the same picture, with the
@@ -169,17 +189,21 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     name = LANGUAGE_NAMES.get(language, language)
     maxlen = seo.SHORT_TITLE_MAX if is_short else seo.TITLE_MAX
     nfacts = 4 if is_short else 7
+    from . import keywords
+    searches = keywords.for_story(company, language)
     pkg = llm.json_call(PACKAGE_PROMPT.format(
+        searches="\n".join(f"- {s}" for s in searches) or "(none found)",
         kind="Short" if is_short else "video", name=name, title=en_title,
         summary=(meta.get("title_options") or [{}])[0].get("summary", "")
         or research.get("summary", ""),
         facts="\n".join(f"- {f}" for f in facts[:25]) or "-", maxlen=maxlen,
         minlen=maxlen * 2 // 3, nfacts=nfacts),
         temperature=0.5)
-    title = str(pkg.get("title") or en_title).strip()[:maxlen + 10]
+    title = _head_case(str(pkg.get("title") or en_title).strip())[:maxlen + 10]
     summary = str(pkg.get("summary") or "").strip()
     local_facts = [str(f) for f in pkg.get("facts") or [] if f][:nfacts]
-    search = [str(t) for t in pkg.get("search") or [] if t][:6]
+    # Real search phrases first, then the model's {name}-script ones.
+    search = list(dict.fromkeys(searches[:4] + [str(t) for t in pkg.get("search") or [] if t]))[:8]
     sources = research.get("sources", [])
     keywords = [t for t in meta.get("tags", []) if t != "news explained"][:4]
 

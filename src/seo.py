@@ -41,6 +41,12 @@ Other facts in the video (any number in a title must come from these):
 
 {language}
 
+WHAT PEOPLE TYPE INTO YOUTUBE SEARCH about this story (real search
+suggestions, most searched first):
+{searches}
+Use the best-fitting phrase word for word, inside the first 40 characters, in
+most of the titles. Leave out phrases that do not match what the video covers.
+
 Rules:
 - Between {minlen} and {maxlen} characters: longer titles carry more of the
   words people search for.
@@ -128,13 +134,17 @@ def _unsupported_numbers(text: str, evidence: str) -> list[str]:
 def titles(cfg: Config, company: str, angle: str, best_fact: str,
            language: str = "en", maxlen: int = TITLE_MAX,
            facts: list[str] | None = None) -> list[dict[str, Any]]:
+    from . import keywords
+
     facts = [f for f in (facts or []) if f][:12]
     evidence = " ".join([company, angle, best_fact, *facts])
+    searches = keywords.for_story(company, language)
     options = llm.json_call(
         TITLE_PROMPT.format(
             company=company, angle=angle, fact=best_fact, maxlen=maxlen,
             facts="\n".join(f"- {f}" for f in facts) or "(none)",
             kind=cfg.get_path("format.kind", "documentary"), minlen=maxlen * 2 // 3,
+            searches="\n".join(f"- {s}" for s in searches) or "(none found)",
             language=TITLE_LANGUAGE.get(language, TITLE_LANGUAGE["en"])),
         temperature=0.9,
     )
@@ -160,6 +170,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         raise RuntimeError("Title generator returned nothing usable")
     out.sort(key=lambda t: (t["lint_score"], len(t["title"])), reverse=True)
     for t in out:
+        t["searches"] = searches
         t["summary"] = re.sub(r"^(this|the) video (\w+ )?", "", t.get("summary", ""),
                               flags=re.I).strip()
         t["summary"] = t["summary"][:1].upper() + t["summary"][1:]
