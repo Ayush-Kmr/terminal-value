@@ -151,9 +151,23 @@ SHORT_BEAT = {
     "label": "Short",
     "share": 1.0,
     "intent": ("A complete {seconds}-second explainer of this one story for someone who has "
-               "not heard of it: the single most striking verified fact first, then what "
-               "happened, then why it matters. 4-6 shots. No greeting, no sign-off."),
+               "not heard of it. FIRST SENTENCE: at most 8 words, the single most striking "
+               "verified fact or the open question it raises, so a scrolling viewer needs "
+               "the rest (e.g. 'India just lost its cheapest oil.'). Then what happened, "
+               "then why it matters to the viewer. 6-9 shots of ONE sentence each, so the "
+               "picture changes every few seconds. LAST SENTENCE: short, and it leads "
+               "straight back into the first one (it names what the opening line was "
+               "about, or asks the question the opening answers), so the Short loops. "
+               "No greeting, no sign-off, no 'subscribe'."),
 }
+
+
+def hook_words(sc: dict) -> int:
+    """Words in a script's first sentence."""
+    import re
+    first = next((s.get("narration", "") for b in sc.get("beats", []) for s in b.get("shots", [])
+                  if (s.get("narration") or "").strip()), "")
+    return len(re.split(r"(?<=[.?!।])\s+", first.strip())[0].split())
 
 
 def produce_short(cfg, story: dict, workdir: Path) -> dict:
@@ -167,13 +181,26 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     (workdir / "research.json").write_text(
         json.dumps(fb.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
     beat = {**SHORT_BEAT, "intent": SHORT_BEAT["intent"].format(seconds=seconds)}
-    sc = script_mod.write(cfg, fb, "", language, beats=[beat],
-                          total_words=int(seconds / 60 * wpm))
+    tall = portrait(cfg)          # drawn 9:16 from the start, not cropped later
+    # Shorts change picture faster than long videos.
+    tall["visuals"]["shot_seconds"] = cfg.get_path("format.short.shot_seconds",
+                                                   cfg.get_path("visuals.shot_seconds"))
+    # The first line decides whether the thumb keeps scrolling: a script whose
+    # opening sentence runs long is written again (up to twice).
+    for attempt in range(3):
+        sc = script_mod.write(tall, fb, "", language, beats=[beat],
+                              total_words=int(seconds / 60 * wpm))
+        if hook_words(sc) <= 10:
+            break
+        log.info("Short opening is %d words; rewriting (%d)", hook_words(sc), attempt + 1)
+        beat = {**beat, "intent": beat["intent"] + " YOUR LAST DRAFT'S FIRST SENTENCE WAS "
+                f"{hook_words(sc)} WORDS. IT MUST BE 8 OR FEWER."}
+    for b_ in sc["beats"]:              # a silent shot in a Short is dead air
+        b_["shots"] = [s for s in b_.get("shots", []) if (s.get("narration") or "").strip()]
     (workdir / "script.json").write_text(
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
-    shot_list = voice.narrate_shots(cfg, script_mod.all_shots(sc), workdir,
+    shot_list = voice.narrate_shots(tall, script_mod.all_shots(sc), workdir,
                                     story.get("region"), language)
-    tall = portrait(cfg)          # drawn 9:16 from the start, not cropped later
     assets.gather(tall, shot_list, workdir, company)
     clips = render.build_shot_clips(tall, shot_list, workdir)
     video = render.concat_with_audio(tall, clips, shot_list, workdir,

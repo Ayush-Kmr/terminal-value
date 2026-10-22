@@ -43,7 +43,7 @@ WHAT HAS ALREADY BEEN SAID (do not repeat any of it):
 {previous}
 
 Write the narration, then break it into shots. Each shot pairs 1-3 sentences of
-narration with one visual. Shots run 4-9 seconds. Never cut faster than 4s.
+narration with one visual. Shots run {shot_min:g}-{shot_max:g} seconds. Never cut faster than {shot_min:g}s.
 
 Return JSON:
 {{
@@ -124,6 +124,8 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
         # answer share 8,000 tokens a minute.
         prompt = BEAT_PROMPT.format(
             beat_id=bid, company=fb["company"], angle=fb["angle"],
+            shot_min=cfg.get_path("visuals.shot_seconds", [4, 9])[0],
+            shot_max=cfg.get_path("visuals.shot_seconds", [4, 9])[1],
             kind=cfg.get_path("format.kind", "documentary"),
             language=language_rules(language),
             intent=beat["intent"], words=words, seconds=seconds,

@@ -99,7 +99,10 @@ format:
     per_day: 2                  # two standalone Shorts every day, on the next
                                 # stories after the long video's. Standalone
                                 # Shorts outperformed cuts from the long ~5x.
-    target_seconds: 35
+    # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
+    # 30-45 s is the length where completion drops most (Shorts playbook).
+    target_seconds: 28
+    shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     publish_times: ["08:00", "20:30"]   # IST
 
 # ---------- the explainer spine ----------

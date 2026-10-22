@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 TITLE_MAX = 90          # 70-100 characters rank better in search; the subject
                         # leads, so a truncated title still says what it is
-SHORT_TITLE_MAX = 65    # the Shorts feed shows about 40: the subject goes first
+SHORT_TITLE_MAX = 50    # the Shorts feed shows about 40: the subject goes first
 CLICKBAIT = [
     "you won't believe", "shocking", "insane", "destroyed", "exposed", "exposes",
     "destroys", "slams",
