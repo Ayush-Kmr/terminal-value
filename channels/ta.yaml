@@ -8,9 +8,9 @@
 channel:
   name: "Terminal Value Tamil"
   handle: ""                       # fill in once the channel exists
-  channel_id: ""                   # fill in once the channel exists: uploads
+  channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads
                                    # refuse to go anywhere else when it is set
-  url: ""
+  url: "https://www.youtube.com/channel/UC5QnQWBbS5AVKvgxsZl4V3w"
   tagline: "செய்திக்குப் பின்னால் இருக்கும் கதை."
   language: ta
   about: |
