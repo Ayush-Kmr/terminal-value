@@ -64,12 +64,14 @@ question, the contradiction, the consequence for an ordinary viewer.
 Return a JSON array of objects:
   title         - the title
   strategy      - which strategy
-  thumb_text    - 2-4 words for the thumbnail, ALWAYS in English capitals-friendly
-                  Latin letters. It must name WHO or WHAT the story is about plus
-                  the tension (e.g. "CHINA BLOCKS INDIA", "RBI CUTS RATES"), so it
-                  makes sense on its own. Do not repeat the title or the figure.
-  thumb_figure  - one real figure from the research for the thumbnail, at most
-                  6 characters (e.g. "-94%", "$4B", "37"), or "" if none fits
+  thumb_text    - 2-3 words for the thumbnail, in English (Latin letters). The
+                  title already gives the facts; the thumbnail gives the STAKE or
+                  the emotion, in words NOT used in the title (e.g. "BEAR MARKET",
+                  "WHO PAYS?", "YOUR EMI RISES", "JOBS AT RISK").
+  thumb_entity  - who or where, 1-2 words, shown small as context ("CHINA",
+                  "RBI", "IREN", "INDIA-US")
+  thumb_figure  - one real figure from the research, at most 6 characters
+                  ("-94%", "$4B", "37"), that is NOT already in the title, or ""
   summary       - two plain sentences describing the story, in the title's
                   language. The first sentence must START with the main search
                   term (the name of the person, company, place or event): it is
@@ -149,6 +151,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
             adj -= 60
             issues.append(f"number not in research: {', '.join(made_up)}")
         o["thumb_text"] = latin_only(o.get("thumb_text", "")) or latin_only(company)
+        o["thumb_entity"] = latin_only(str(o.get("thumb_entity", "")))[:16]
         o["thumb_figure"] = latin_only(str(o.get("thumb_figure", "")))[:6]
         if _unsupported_numbers(o["thumb_figure"], evidence):
             o["thumb_figure"] = ""

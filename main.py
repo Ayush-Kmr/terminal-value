@@ -110,12 +110,18 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     stills = [s for s in shot_list
               if s.get("visual_type") in {"photo", "ai_still"} and s.get("asset")
               and Path(s["asset"]).suffix.lower() != ".mp4"]
-    stills.sort(key=lambda s: s.get("visual_type") != "photo")
+    # Prefer a scene or an illustration to a photo found by a name: a named
+    # search can return people who are not the story (a "CSI 300" search
+    # brought back a politician's visit to an exchange).
+    stills.sort(key=lambda s: (s.get("visual_type") == "photo"
+                               and bool((s.get("visual_spec") or {}).get("search_terms")),
+                               s.get("visual_type") != "photo"))
     backdrop = Path(stills[0]["asset"]) if stills else None
     thumb = thumbnail.generate(
         cfg,
         {"company": company, "thumb_figure": best.get("thumb_figure", ""),
-         "thumb_words": best.get("thumb_text") or company},
+         "thumb_words": best.get("thumb_text") or company, "title": title,
+         "thumb_entity": best.get("thumb_entity", "")},
         backdrop, workdir / "thumbnail.jpg")
 
     runtime = sum(s["duration"] for s in shot_list)

@@ -18,7 +18,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from . import assets, captions, gate, llm, render, seo, shorts, state, upload, voice
+from . import assets, captions, gate, llm, render, seo, shorts, state, thumbnail, upload, voice
 from .config import ROOT, Config, language_rules, latin_only, portrait
 
 log = logging.getLogger(__name__)
@@ -61,6 +61,8 @@ Return JSON:
 {{"title": "...",
   "summary": "<two plain sentences in {name}; the first STARTS with the subject>",
   "facts": ["<the {nfacts} most important facts above, each one short sentence in {name}>"],
+  "thumb_text": "<2-3 words in {name} for the thumbnail: the stake or emotion,
+                 not words from the title (e.g. 'உங்கள் EMI உயரும்')>",
   "search": ["<6 short phrases {name} viewers would type into YouTube search to find
              this story, in {name} script, e.g. the subject + news / share price / explained>"]}}"""
 
@@ -115,6 +117,27 @@ def _load_shots(src: Path, workdir: Path) -> list[dict]:
         else:
             shot["asset"] = None
     return shots
+
+
+def _thumbnail(cfg: Config, meta: dict, pkg: dict, title: str, shots: list[dict],
+               src: Path, workdir: Path) -> Path:
+    """The channel's own thumbnail: its words over the same picture, with the
+    English video's figure and direction. Falls back to the English one."""
+    en = (meta.get("title_options") or [{}])[0]
+    stills = [s for s in shots if s.get("visual_type") in {"photo", "ai_still"}
+              and s.get("asset") and Path(s["asset"]).suffix.lower() != ".mp4"]
+    stills.sort(key=lambda s: (s.get("visual_type") == "photo"
+                               and bool((s.get("visual_spec") or {}).get("search_terms")),
+                               s.get("visual_type") != "photo"))
+    try:
+        return thumbnail.generate(cfg, {
+            "title": title, "thumb_words": str(pkg.get("thumb_text") or en.get("thumb_text", "")),
+            "thumb_entity": en.get("thumb_entity", ""), "thumb_figure": en.get("thumb_figure", ""),
+            "direction": thumbnail.direction(en.get("thumb_figure", ""), meta.get("title", "")),
+        }, Path(stills[0]["asset"]) if stills else None, workdir / "thumbnail.jpg")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Own thumbnail failed (%s); using the main channel's", exc)
+        return src / "thumbnail.jpg"
 
 
 def produce(cfg: Config, src: Path, workdir: Path) -> dict:
@@ -177,7 +200,7 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
                    description=seo.description(cfg, summary, seo.chapters(cfg, shots),
                                                sources, keywords or [company], language,
                                                facts=local_facts, tags_extra=search),
-                   thumbnail=str(src / "thumbnail.jpg"),
+                   thumbnail=str(_thumbnail(cfg, meta, pkg, title, shots, src, workdir)),
                    runtime=f"{int(sum(s['duration'] for s in shots) // 60)}:"
                            f"{int(sum(s['duration'] for s in shots) % 60):02d}")
     (workdir / "metadata.json").write_text(
