@@ -222,7 +222,8 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
         label = {"ta": "முக்கிய தகவல்கள்", "hi": "मुख्य तथ्य"}.get(language, "KEY FACTS")
         parts.append(label + "\n" + "\n".join(f"• {f}" for f in facts[:7]))
     if cfg.get_path("channel.cta"):
-        parts.append(cfg.get_path("channel.cta").strip())
+        links = [str(x) for x in cfg.get_path("channel.links", []) or [] if x]
+        parts.append("\n".join([cfg.get_path("channel.cta").strip(), *links]))
 
     lines = []
     for s in sources[:12]:

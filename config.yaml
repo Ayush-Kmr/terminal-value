@@ -43,6 +43,11 @@ channel:
     - rbi repo rate news today
   # Appended to every description. Keep it accurate: it tells viewers (and
   # YouTube) how the video was made.
+  # Links shown under the call to action in every description, e.g.
+  #   - "Daily brief on Telegram: https://t.me/..."
+  #   - "Books we used (affiliate): https://amzn.to/..."
+  # An affiliate link needs the disclosure in the line itself.
+  links: []
   # Closes every description, before the sources.
   cta: >-
     New explainer every other day at 7 PM IST and two Shorts every day.
