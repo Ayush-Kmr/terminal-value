@@ -52,13 +52,17 @@ Facts in the video (any number in the title must come from these):
 {facts}
 
 Write in {name} (in {name} script). Keep the main name the story is about (a
-person, company, country or product) near the start, in the spelling {name}
+person, company, country or product) at the start, in the spelling {name}
 viewers type into YouTube search; English letters are fine for names like RBI,
-Tesla or H-1B. Under {maxlen} characters. No ALL CAPS, no exclamation marks,
-no clickbait.
+Tesla or H-1B. Between {minlen} and {maxlen} characters. No ALL CAPS, no
+exclamation marks, no clickbait.
 
-Return JSON: {{"title": "...", "summary": "<two plain sentences in {name}; the first
-names the subject>"}}"""
+Return JSON:
+{{"title": "...",
+  "summary": "<two plain sentences in {name}; the first STARTS with the subject>",
+  "facts": ["<the {nfacts} most important facts above, each one short sentence in {name}>"],
+  "search": ["<6 short phrases {name} viewers would type into YouTube search to find
+             this story, in {name} script, e.g. the subject + news / share price / explained>"]}}"""
 
 
 def builds(root: Path) -> list[Path]:
@@ -141,32 +145,38 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     facts = [str(f.get("claim", "")) for f in research.get("facts", [])]
     name = LANGUAGE_NAMES.get(language, language)
     maxlen = seo.SHORT_TITLE_MAX if is_short else seo.TITLE_MAX
+    nfacts = 4 if is_short else 7
     pkg = llm.json_call(PACKAGE_PROMPT.format(
         kind="Short" if is_short else "video", name=name, title=en_title,
         summary=(meta.get("title_options") or [{}])[0].get("summary", "")
         or research.get("summary", ""),
-        facts="\n".join(f"- {f}" for f in facts[:25]) or "-", maxlen=maxlen),
+        facts="\n".join(f"- {f}" for f in facts[:25]) or "-", maxlen=maxlen,
+        minlen=maxlen * 2 // 3, nfacts=nfacts),
         temperature=0.5)
     title = str(pkg.get("title") or en_title).strip()[:maxlen + 10]
     summary = str(pkg.get("summary") or "").strip()
+    local_facts = [str(f) for f in pkg.get("facts") or [] if f][:nfacts]
+    search = [str(t) for t in pkg.get("search") or [] if t][:6]
     sources = research.get("sources", [])
     keywords = [t for t in meta.get("tags", []) if t != "news explained"][:4]
 
     out = {"company": company, "angle": meta.get("angle", ""), "region": meta.get("region"),
            "language": language, "warnings": meta.get("warnings", []),
-           "tags": seo.tags(company, keywords, language), "source": src.name}
+           "tags": seo.tags(company, keywords, language, extra=search), "source": src.name,
+           "captions": str(captions.srt(shots, workdir / "captions.srt"))}
     if is_short:
         # The headline over the Short stays the English one: on-screen text
         # is drawn in Latin letters, like the rest of the pictures.
         short = shorts.standalone(cfg, video, shots, workdir,
                                   latin_only(en_title) or company, title, language)
         out.update(short, kind="short", description=seo.description(
-            cfg, summary, "", sources[:6], keywords or [company], language) + "\n#shorts")
+            cfg, summary, "", sources[:6], keywords or [company], language,
+            facts=local_facts, tags_extra=search) + " #shorts")
     else:
         out.update(kind="long", title=title, video=str(video),
                    description=seo.description(cfg, summary, seo.chapters(cfg, shots),
-                                               sources, keywords or [company], language),
-                   captions=str(captions.srt(shots, workdir / "captions.srt")),
+                                               sources, keywords or [company], language,
+                                               facts=local_facts, tags_extra=search),
                    thumbnail=str(src / "thumbnail.jpg"),
                    runtime=f"{int(sum(s['duration'] for s in shots) // 60)}:"
                            f"{int(sum(s['duration'] for s in shots) % 60):02d}")
@@ -185,11 +195,24 @@ def run(cfg: Config, root: Path, publish: str = "slot", no_upload: bool = False)
     short_slots = upload.slots(cfg, "short", 4)
     n_short = 0
     done, failures = [], []
+    skip_regions = {r.upper() for r in cfg.get_path("follow.skip_regions", []) or []}
+    max_shorts = int(cfg.get_path("follow.max_shorts", 99))
+    shorts_taken = 0
 
     for src in folders:
         if src.name in done_before:
             log.info("Already published %s; skipping", src.name)
             continue
+        # Only the stories that matter to this channel's viewers.
+        src_meta = json.loads((src / "metadata.json").read_text(encoding="utf-8"))
+        if str(src_meta.get("region") or "").upper() in skip_regions:
+            log.info("Skipping %s: %s story", src.name, src_meta.get("region"))
+            continue
+        if "path" in src_meta:
+            if shorts_taken >= max_shorts:
+                log.info("Skipping %s: already %d Short(s) today", src.name, shorts_taken)
+                continue
+            shorts_taken += 1
         workdir = ROOT / "output" / cfg.get_path("channel.language", "xx") / src.name
         workdir.mkdir(parents=True, exist_ok=True)
         log.info("Following %s -> %s", src.name, workdir)
@@ -210,10 +233,10 @@ def run(cfg: Config, root: Path, publish: str = "slot", no_upload: bool = False)
                                 publish_at=when)
             if meta["kind"] == "long":
                 upload.set_thumbnail(vid, Path(meta["thumbnail"]))
-                upload.upload_captions(vid, Path(meta["captions"]), meta["language"])
-                playlist = cfg.get_path(f"upload.playlists.{meta['language']}")
-                if playlist:
-                    upload.add_to_playlist(vid, playlist)
+            upload.upload_captions(vid, Path(meta["captions"]), meta["language"])
+            # Topic playlists match on the English subject and tags.
+            upload.add_to_playlists(cfg, vid, meta["language"], meta["company"],
+                                    src_meta.get("title", ""), " ".join(src_meta.get("tags", [])))
             state.record_episode(st, {
                 "company": meta["company"], "angle": meta["angle"], "title": meta["title"],
                 "region": meta["region"], "language": meta["language"], "video_id": vid,

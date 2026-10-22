@@ -40,6 +40,10 @@ channel:
     - explained
   # Appended to every description. Keep it accurate: it tells viewers (and
   # YouTube) how the video was made.
+  # Closes every description, before the sources.
+  cta: >-
+    New explainer every other day at 7 PM IST and two Shorts every day.
+    Subscribe so you never miss the story behind the headline.
   disclosure: >-
     This video was produced with AI: the script was written and the narration
     synthesised by AI from the published news reports listed above. Corrections
@@ -72,6 +76,7 @@ trending:
     - Active military operations where the facts are contested between governments
     - Sexual content, suicide or self-harm
     - Pure celebrity gossip, film trailers, sports fixtures and match scores
+    - Stories with no clear effect on money, prices, jobs, companies, markets or the economy, such as natural hazards, science and space, engineering curiosities, and border or territorial disputes
 
 # ---------- format ----------
 format:
@@ -80,8 +85,11 @@ format:
     days: []                    # weekdays a long video may go out. Empty = any day
     every_days: 2               # 2 = a long video on alternate days; 1 = every day
     # Over 8 minutes so the video can carry mid-roll ads once monetised.
-    # The writer tends to come in short, so aim above the line.
-    target_minutes: 9.5
+    # The narration runs faster than 150 words a minute (a 9.5-minute script
+    # came out at 8:28), so aim well above the line. A video that still ends
+    # up under min_minutes is reported in Telegram.
+    target_minutes: 10.5
+    min_minutes: 8
     words_per_minute: 150
     publish_times: ["19:00"]    # IST. Evening is the daily viewing peak in India
   short:
@@ -233,3 +241,11 @@ upload:
   playlists:                   # one playlist per narration language
     hi: "हिंदी में — Explained"
     en: "Explained in English"
+  # Topic playlists: a video joins every playlist one of whose words appears
+  # in its subject, title or tags (whole words, any case). Keeps viewers
+  # watching the next video on the same subject.
+  topic_playlists:
+    "Stock Market & Companies": [stock, stocks, share, shares, sensex, nifty, ipo, market, markets, investors, earnings, profit, layoffs, jobs, ceo, startup, valuation, bear, bull]
+    "Banking, RBI & the Rupee": [rbi, bank, banks, banking, repo, rate, rates, rupee, inflation, loan, loans, sebi, credit, gold]
+    "Trade, Tariffs & Deals": [trade, tariff, tariffs, export, exports, import, imports, fta, sanctions, oil, wto]
+    "China & Global Economy": [china, chinese, us, usa, america, russia, europe, imf, global, world, recession, fed, dollar]

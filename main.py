@@ -95,15 +95,14 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     title = best["title"]
     keywords = [str(k) for k in story.get("keywords", [])]
     chapter_text = seo.chapters(cfg, shot_list)
+    # Each picture credited once, however many shots used it.
+    attribution = "\n".join(dict.fromkeys(
+        f"- {c['credit']} ({c['licence']}) {c.get('url','')}"
+        for c in credits if c.get("needs_attribution")))
     desc = seo.description(
         cfg, best.get("summary") or fb.summary, chapter_text,
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources],
-        keywords or [company], language)
-    attribution = "\n".join(
-        f"- {c['credit']} ({c['licence']}) {c.get('url','')}"
-        for c in credits if c.get("needs_attribution"))
-    if attribution:
-        desc = (desc + "\n\nIMAGE CREDITS\n" + attribution)[:4900]
+        keywords or [company], language, facts=fact_lines, credits=attribution)
 
     srt = captions.srt(shot_list, workdir / "captions.srt")
 
@@ -120,6 +119,10 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
         backdrop, workdir / "thumbnail.jpg")
 
     runtime = sum(s["duration"] for s in shot_list)
+    floor = float(cfg.get_path("format.long.min_minutes", 0))
+    if floor and runtime < floor * 60:
+        warnings = [*warnings, f"Long video is only {runtime / 60:.1f} min, under "
+                               f"{floor:g}: no mid-roll ads on it"]
     meta = {
         "company": company, "angle": angle, "title": title,
         "region": region, "language": language,
@@ -183,7 +186,9 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     short["description"] = seo.description(
         cfg, best.get("summary") or fb.summary, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
-        keywords or [company], language) + "\n#shorts"
+        keywords or [company], language,
+        facts=[str(f.get("claim", "")) for f in fb.facts][:4]) + " #shorts"
+    short["captions"] = str(captions.srt(shot_list, workdir / "captions.srt"))
     short.update({"company": company, "tags": seo.tags(company, keywords, language),
                   "language": language, "region": story.get("region"),
                   "warnings": warnings, "angle": story.get("angle", "")})
@@ -279,6 +284,9 @@ def make_shorts(cfg, args, stories: list[dict]) -> int:
                                 {"title": short["title"][:100], "language": short["language"],
                                  "description": short["description"], "tags": short["tags"]},
                                 privacy="public" if now else "private", publish_at=when)
+            upload.upload_captions(sid, Path(short["captions"]), short["language"])
+            upload.add_to_playlists(cfg, sid, short["language"], company, short["title"],
+                                    " ".join(short["tags"]))
             state.record_episode(st, {
                 "company": company, "angle": short["angle"], "title": short["title"],
                 "region": short["region"], "language": short["language"],
@@ -365,10 +373,8 @@ def run(args) -> int:
                              publish_at=publish_at)
     upload.set_thumbnail(video_id, Path(meta["thumbnail"]))
     upload.upload_captions(video_id, Path(meta["captions"]), meta["language"])
-    playlist = cfg.get_path(f"upload.playlists.{meta['language']}") \
-        or cfg.get_path("upload.default_playlist", "")
-    if playlist:
-        upload.add_to_playlist(video_id, playlist)
+    upload.add_to_playlists(cfg, video_id, meta["language"], company, meta["title"],
+                            " ".join(meta["tags"]))
 
     # ---- shorts ----------------------------------------------------------
     short_ids = []

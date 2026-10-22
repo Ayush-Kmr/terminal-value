@@ -15,10 +15,12 @@ from .config import Config, latin_only
 
 log = logging.getLogger(__name__)
 
-TITLE_MAX = 70          # beyond this it truncates on mobile search
-SHORT_TITLE_MAX = 50    # the Shorts feed shows about 40 characters
+TITLE_MAX = 90          # 70-100 characters rank better in search; the subject
+                        # leads, so a truncated title still says what it is
+SHORT_TITLE_MAX = 65    # the Shorts feed shows about 40: the subject goes first
 CLICKBAIT = [
-    "you won't believe", "shocking", "insane", "destroyed", "exposed",
+    "you won't believe", "shocking", "insane", "destroyed", "exposed", "exposes",
+    "destroys", "slams",
     "the truth about", "gone wrong", "!!!",
 ]
 
@@ -40,9 +42,12 @@ Other facts in the video (any number in a title must come from these):
 {language}
 
 Rules:
-- Under {maxlen} characters. Shorter is better.
-- The main thing people are searching (the name of the person, company, place
-  or event) must appear near the start.
+- Between {minlen} and {maxlen} characters: longer titles carry more of the
+  words people search for.
+- Lead with the exact words people type into YouTube search for this story:
+  the name of the person, company, place or event, plus the search word that
+  goes with it ("IREN stock", "Yes Bank share price", "RBI repo rate",
+  "India US trade deal"). Those words must be in the first 40 characters.
 - State or imply a specific claim or question. Promise only what the video delivers.
 - No ALL CAPS words. No exclamation marks. No "shocking", "insane", "exposed".
 - A number in the title is good when it is a real number from the research.
@@ -65,16 +70,19 @@ Return a JSON array of objects:
                   makes sense on its own. Do not repeat the title or the figure.
   thumb_figure  - one real figure from the research for the thumbnail, at most
                   6 characters (e.g. "-94%", "$4B", "37"), or "" if none fits
-  summary       - two plain sentences describing the video, in the title's
-                  language. The first sentence must contain the main search term
-                  (the name of the person, company, place or event): it is the
-                  only part of the description viewers see before "more"."""
+  summary       - two plain sentences describing the story, in the title's
+                  language. The first sentence must START with the main search
+                  term (the name of the person, company, place or event): it is
+                  the only part of the description viewers see before "more".
+                  Never start with "This video" or "The video"."""
 
 
 def _lint(title: str, maxlen: int = TITLE_MAX) -> tuple[int, list[str]]:
     issues: list[str] = []
     score = 0
     low = title.lower()
+    if len(title) >= maxlen * 2 // 3 and len(title) <= maxlen:
+        score += 10                     # long enough to carry search words
     if len(title) > maxlen:
         score -= 20
         issues.append(f"{len(title)} chars (max {maxlen})")
@@ -103,7 +111,7 @@ STOP = {"the", "and", "for", "with", "near", "new", "over", "into", "from", "its
 def _names_subject(title: str, subject: str) -> bool:
     """The thing people search for must lead: a title that never says what
     it is about cannot rank or be understood in a feed."""
-    head = title[:45].lower()
+    head = title[:40].lower()
     words = [w for w in re.split(r"[^\w]+", subject.lower()) if len(w) > 2 and w not in STOP]
     return not words or any(w in head for w in words[:3])
 
@@ -124,7 +132,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         TITLE_PROMPT.format(
             company=company, angle=angle, fact=best_fact, maxlen=maxlen,
             facts="\n".join(f"- {f}" for f in facts) or "(none)",
-            kind=cfg.get_path("format.kind", "documentary"),
+            kind=cfg.get_path("format.kind", "documentary"), minlen=maxlen * 2 // 3,
             language=TITLE_LANGUAGE.get(language, TITLE_LANGUAGE["en"])),
         temperature=0.9,
     )
@@ -135,7 +143,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         adj, issues = _lint(o["title"], maxlen)
         if not _names_subject(o["title"], company):
             adj -= 30
-            issues.append("subject not named in the first 45 characters")
+            issues.append("subject not named in the first 40 characters")
         made_up = _unsupported_numbers(o["title"], evidence)
         if made_up:
             adj -= 60
@@ -147,7 +155,11 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         out.append({**o, "lint_score": adj, "issues": issues})
     if not out:
         raise RuntimeError("Title generator returned nothing usable")
-    out.sort(key=lambda t: (t["lint_score"], -len(t["title"])), reverse=True)
+    out.sort(key=lambda t: (t["lint_score"], len(t["title"])), reverse=True)
+    for t in out:
+        t["summary"] = re.sub(r"^(this|the) video (\w+ )?", "", t.get("summary", ""),
+                              flags=re.I).strip()
+        t["summary"] = t["summary"][:1].upper() + t["summary"][1:]
     return out
 
 
@@ -169,8 +181,10 @@ def chapters(cfg: Config, shots: list[dict]) -> str:
 def hashtags(keywords: list[str], language: str) -> str:
     """Three at most: the first three show above the title."""
     tags = []
+    # Phrases with figures in them make unreadable hashtags (#Rbi550Repo).
+    keywords = [k for k in keywords if not re.search(r"\d", k)] or keywords
     for k in keywords[:2]:
-        word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title())
+        word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title() if k.isascii() else k)
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
     tags.append({"hi": "#hindinews", "ta": "#tamilnews"}.get(language, "#explained"))
@@ -178,12 +192,23 @@ def hashtags(keywords: list[str], language: str) -> str:
 
 
 def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict],
-                keywords: list[str], language: str = "en") -> str:
+                keywords: list[str], language: str = "en", facts: list[str] | None = None,
+                credits: str = "", tags_extra: list[str] | None = None) -> str:
     """Built from parts rather than generated: the sources and the disclosure
-    must be exact, and a model asked to copy them verbatim sometimes does not."""
+    must be exact, and a model asked to copy them verbatim sometimes does not.
+    Order: summary, chapters, key facts, call to action, sources, credits,
+    disclosure, then the hashtags last."""
     parts = [summary.strip()]
     if chapter_text:
         parts.append("CHAPTERS\n" + chapter_text)
+    facts = [f.strip() for f in (facts or []) if f and f.strip()]
+    if facts:
+        # The facts the video is built on: real words for search to match,
+        # and the viewer can check them against the sources below.
+        label = {"ta": "முக்கிய தகவல்கள்", "hi": "मुख्य तथ्य"}.get(language, "KEY FACTS")
+        parts.append(label + "\n" + "\n".join(f"• {f}" for f in facts[:7]))
+    if cfg.get_path("channel.cta"):
+        parts.append(cfg.get_path("channel.cta").strip())
 
     lines = []
     for s in sources[:12]:
@@ -192,22 +217,28 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
         lines.append(f"- {title}" + (f" — {url}" if url and len(url) < 120 else ""))
     if lines:
         parts.append("SOURCES\n" + "\n".join(lines))
+    if credits:
+        parts.append("IMAGE CREDITS\n" + credits)
 
     parts.append(cfg.get_path("channel.disclosure", "").strip())
-    parts.append(hashtags(keywords, language))
-    return "\n\n".join(p for p in parts if p)[:4900]
+    tail = hashtags(list(tags_extra or []) + keywords, language)
+    body = "\n\n".join(p for p in parts if p)
+    # Trim the body, never the hashtags: they must close the description.
+    return body[:4880 - len(tail)] + "\n\n" + tail
 
 
-def tags(company: str, keywords: list[str], language: str = "en") -> list[str]:
+def tags(company: str, keywords: list[str], language: str = "en",
+         extra: list[str] | None = None) -> list[str]:
     """A handful of distinct terms. Tags barely affect ranking any more; the
-    old "<topic> explained / news / hindi" variants only padded the list."""
-    base = [company, *keywords[:6], "news explained"]
+    old "<topic> explained / news / hindi" variants only padded the list.
+    `extra` (search phrases in the channel's own script) goes first."""
+    base = [*(extra or [])[:6], company, *keywords[:6], "news explained"]
     if language == "hi":
         base += ["hindi news"]
     elif language == "ta":
         base += ["tamil news", "tamil news explained"]
     out, total, seen = [], 0, set()
-    for t in base[:10]:
+    for t in base[:14]:
         t = str(t).strip()[:60]
         if not t or t.lower() in seen:
             continue

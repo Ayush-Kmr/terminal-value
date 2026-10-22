@@ -139,7 +139,7 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
         # Models write short. A long video that lands under 8 minutes cannot
         # carry mid-roll ads, so a beat well under its length is rewritten once.
         got = len(" ".join(s.get("narration", "") for s in result["shots"]).split())
-        if got < words * 0.75:
+        if got < words * 0.9:
             log.info("Beat %s came back at %d/%d words; asking for the full length",
                      bid, got, words)
             longer = llm.json_call(

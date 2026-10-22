@@ -31,10 +31,15 @@ def channel_key() -> str:
     return "" if key in ("", "en", "main") else key
 
 
+# Lists of named things a channel file replaces whole instead of adding to.
+REPLACE = {"topic_playlists"}
+
+
 def _merge(base: dict, over: dict) -> dict:
     out = dict(base)
     for k, v in over.items():
-        out[k] = _merge(out[k], v) if isinstance(v, dict) and isinstance(out.get(k), dict) else v
+        nested = isinstance(v, dict) and isinstance(out.get(k), dict) and k not in REPLACE
+        out[k] = _merge(out[k], v) if nested else v
     return out
 
 

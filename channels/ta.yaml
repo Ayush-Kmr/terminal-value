@@ -30,6 +30,9 @@ channel:
     - world news tamil
     - current affairs tamil
     - explained in tamil
+  cta: >-
+    ஒவ்வொரு இரண்டு நாளுக்கும் ஒரு முழு விளக்க வீடியோ, தினமும் Shorts.
+    செய்திக்குப் பின்னால் இருக்கும் கதையைத் தவறவிடாமல் இருக்க Subscribe செய்யுங்கள்.
   disclosure: >-
     இந்த வீடியோ AI மூலம் தயாரிக்கப்பட்டது: மேலே உள்ள செய்தி அறிக்கைகளிலிருந்து
     ஸ்கிரிப்ட் எழுதப்பட்டு, குரல் AI மூலம் உருவாக்கப்பட்டது. This video was
@@ -52,6 +55,27 @@ voice:
 upload:
   playlists:
     ta: "தமிழில் — Explained"
+  topic_playlists:
+    "பங்குச் சந்தை & நிறுவனங்கள் | Stock Market": [stock, stocks, share, shares, sensex, nifty, ipo, market, markets, investors, earnings, profit, layoffs, jobs, ceo, startup, valuation, bear, bull]
+    "வங்கி, RBI & ரூபாய் | Banking": [rbi, bank, banks, banking, repo, rate, rates, rupee, inflation, loan, loans, sebi, credit, gold]
+    "வர்த்தகம் & வரிகள் | Trade & Tariffs": [trade, tariff, tariffs, export, exports, import, imports, fta, sanctions, oil, wto]
+    "உலகப் பொருளாதாரம் | Global Economy": [china, chinese, us, usa, america, russia, europe, imf, global, world, recession, fed, dollar]
+
+# Which of the main channel's videos get a Tamil version. A Tamil channel
+# that republishes every English video is a translated copy channel, which
+# YouTube's mass-produced-content rule targets; and US stock stories mean
+# little to Tamil viewers. So: no US-only stories, and one Short a day.
+follow:
+  skip_regions: [US]
+  max_shorts: 1
+
+# Offset from the English channel's 08:00 / 20:30 / 19:00 so the two channels
+# never publish the same story in the same minute.
+format:
+  long:
+    publish_times: ["19:30"]
+  short:
+    publish_times: ["09:00", "21:00"]
 
 visuals:
   fonts:

@@ -7,6 +7,7 @@ regardless of what you request — that is their rule for new projects, not a bu
 from __future__ import annotations
 
 import logging
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -197,6 +198,21 @@ def add_to_playlist(video_id: str, playlist_title: str) -> None:
         ).execute()
     except Exception as exc:  # noqa: BLE001
         log.warning("Playlist add failed: %s", exc)
+
+
+def topic_playlists(cfg: Config, *texts: str) -> list[str]:
+    """The upload.topic_playlists a video belongs in, by whole-word match on
+    its subject, title and tags."""
+    words = set(re.findall(r"[a-z0-9]+", " ".join(texts).lower()))
+    return [name for name, keys in (cfg.get_path("upload.topic_playlists", {}) or {}).items()
+            if words & {k.lower() for k in keys}]
+
+
+def add_to_playlists(cfg: Config, video_id: str, language: str, *texts: str) -> None:
+    """The language playlist plus every matching topic playlist."""
+    names = [cfg.get_path(f"upload.playlists.{language}")] + topic_playlists(cfg, *texts)
+    for name in dict.fromkeys(n for n in names if n):
+        add_to_playlist(video_id, name)
 
 
 def status(video_id: str) -> dict[str, Any]:
