@@ -42,6 +42,10 @@ def main() -> int:
     yt = upload.client()
     ch = yt.channels().list(part="snippet,brandingSettings,status", mine=True).execute()["items"][0]
     want = cfg.get_path("channel.channel_id")
+    if not want:
+        print(f"channel.channel_id is not set. The token belongs to "
+              f"{ch['snippet']['title']} ({ch['id']}); put that ID in the config if it is right.")
+        return 1
     if ch["id"] != want:
         print(f"Refusing: token belongs to channel {ch['id']}, config says {want}.")
         return 1

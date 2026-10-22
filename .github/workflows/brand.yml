@@ -4,6 +4,11 @@ name: Brand channel
 on:
   workflow_dispatch:
     inputs:
+      channel:
+        description: "Which channel to brand"
+        type: choice
+        options: [main, ta]
+        default: main
       dry_run:
         description: "Show what would change without applying it"
         type: boolean
@@ -24,5 +29,6 @@ jobs:
         env:
           YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_REFRESH_TOKEN: ${{ inputs.channel == 'ta' && secrets.YT_REFRESH_TOKEN_TA || secrets.YT_REFRESH_TOKEN }}
+          CHANNEL:          ${{ inputs.channel }}
         run: python scripts/brand_channel.py ${{ inputs.dry_run && '--dry-run' || '' }}

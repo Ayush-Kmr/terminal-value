@@ -1,8 +1,10 @@
 """Narration, rendered per shot so audio and visuals stay locked.
 
-Two providers (voice.provider in config.yaml): "clone" speaks in the channel
+Three providers (voice.provider in config.yaml): "clone" speaks in the channel
 owner's own cloned voice with an open model that runs on the build machine and
-costs nothing per character; "elevenlabs" calls the ElevenLabs API.
+costs nothing per character; "indic" is AI4Bharat's open Indic Parler-TTS, also
+run on the build machine, for languages the clone cannot speak (Tamil);
+"elevenlabs" calls the ElevenLabs API.
 
 Per-shot rendering (rather than one long file) means a re-write of one sentence
 costs one API call, not a full re-render — and shot durations come straight from
@@ -124,6 +126,40 @@ def _clone_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None
         raw.unlink()
 
 
+def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> None:
+    """Speak every missing shot in one run of scripts/indic_tts.py (its own
+    virtualenv). Figures are spelled out in words first: the model reads
+    Tamil script, not digits."""
+    python = (os.environ.get("INDIC_PYTHON")
+              or str(ROOT / ".venv-indic" / "bin" / "python"))
+    if not Path(python).exists():
+        raise VoiceError(f"Indic voice environment not found at {python}. See SETUP.md.")
+    raws = [path.with_suffix(".wav") for _, path in todo]
+    jobs = audio_dir / "indic_jobs.json"
+    jobs.write_text(json.dumps({
+        "description": cfg.get_path("voice.indic.description", ""),
+        "items": [{"text": spoken(text, cfg.get_path("channel.language", "en")),
+                   "out": str(raw)} for (text, _), raw in zip(todo, raws)],
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("Indic voice: speaking %d shots", len(todo))
+    res = subprocess.run([python, str(ROOT / "scripts" / "indic_tts.py"), str(jobs)],
+                         stdout=sys.stderr, stderr=subprocess.STDOUT,
+                         env={**os.environ, "TQDM_DISABLE": "1"})
+    if res.returncode != 0:
+        raise VoiceError(f"Indic voice run failed with exit code {res.returncode}")
+    for (_, path), raw in zip(todo, raws):
+        _polish(raw, path)
+        raw.unlink()
+
+
+def _speak_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None,
+                 audio_dir: Path) -> None:
+    if cfg.get_path("voice.provider") == "indic":
+        _indic_batch(cfg, todo, audio_dir)
+    else:
+        _clone_batch(cfg, todo, language, audio_dir)
+
+
 WHISPER = "https://api.groq.com/openai/v1/audio/transcriptions"
 MATCH_OK = 0.82        # transcript vs script word match; below this, re-speak
 
@@ -143,7 +179,7 @@ def transcribe(path: Path, language: str | None) -> dict | None:
                     files={"file": (path.name, f)},
                     data={"model": "whisper-large-v3-turbo", "response_format": "verbose_json",
                           "timestamp_granularities[]": "word",
-                          "language": language if language in ("hi", "en") else "en"},
+                          "language": language if language in ("hi", "en", "ta") else "en"},
                     timeout=60)
             if r.status_code == 429:          # ~20 requests a minute on the free tier
                 import time
@@ -158,7 +194,7 @@ def transcribe(path: Path, language: str | None) -> dict | None:
 
 
 def _words(text: str, language: str | None) -> list[str]:
-    return re.findall(r"[a-z0-9']+|[\u0900-\u097F]+",
+    return re.findall(r"[a-z0-9']+|[\u0900-\u097F]+|[\u0B80-\u0BFF]+",
                       spoken(text, language or "en").lower())
 
 
@@ -177,6 +213,9 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
     keep whichever take matched best. Returns each file's transcript."""
     heard: dict[Path, dict] = {}
     score: dict[Path, float] = {}
+    # Whisper hears Tamil less exactly than English, so the bar is set per
+    # channel; a lower bar still catches a take that skips or garbles a line.
+    match_ok = float(cfg.get_path("voice.match_ok", MATCH_OK))
     for path, text in todo_text.items():
         t = transcribe(path, language)
         if t is None:
@@ -184,14 +223,14 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
         heard[path], score[path] = t, match(text, t.get("text", ""), language)
 
     for rnd in range(rounds):
-        bad = [p for p, sc in score.items() if sc < MATCH_OK]
+        bad = [p for p, sc in score.items() if sc < match_ok]
         if not bad:
             break
         log.info("Voice check round %d: re-speaking %d/%d takes (%s)", rnd + 1, len(bad),
                  len(score), ", ".join(f"{p.stem}={score[p]:.2f}" for p in bad[:8]))
         for p in bad:
             shutil.move(p, p.with_suffix(".prev.mp3"))
-        _clone_batch(cfg, [(todo_text[p], p) for p in bad], language, audio_dir)
+        _speak_batch(cfg, [(todo_text[p], p) for p in bad], language, audio_dir)
         for p in bad:
             prev = p.with_suffix(".prev.mp3")
             t = transcribe(p, language)
@@ -203,9 +242,9 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
                 shutil.move(prev, p)        # the old take was better
     if score:
         log.info("Voice check: %d takes, lowest match %.2f", len(score), min(score.values()))
-    low = [f"{p.stem}={sc:.2f}" for p, sc in score.items() if sc < MATCH_OK]
+    low = [f"{p.stem}={sc:.2f}" for p, sc in score.items() if sc < match_ok]
     if low:
-        log.warning("Voice check: %d takes still below %.2f: %s", len(low), MATCH_OK,
+        log.warning("Voice check: %d takes still below %.2f: %s", len(low), match_ok,
                     ", ".join(low[:10]))
     return heard
 
@@ -223,7 +262,7 @@ def duration(path: Path) -> float:
 def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
                   region: str | None = None, language: str | None = None) -> list[dict]:
     """Synthesise one audio file per shot; attach real durations."""
-    cloned = cfg.get_path("voice.provider", "elevenlabs") == "clone"
+    cloned = cfg.get_path("voice.provider", "elevenlabs") in ("clone", "indic")
     audio_dir = outdir / "audio"
     audio_dir.mkdir(parents=True, exist_ok=True)
     if cloned:
@@ -231,7 +270,7 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
                 if (text := (s.get("narration") or "").strip())]
         missing = [(text, path) for text, path in todo if not path.exists()]
         if missing:
-            _clone_batch(cfg, missing, language, audio_dir)
+            _speak_batch(cfg, missing, language, audio_dir)
         heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language)
                  if cfg.get_path("voice.check", True) else {})
         for shot in shots:

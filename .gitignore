@@ -7,3 +7,4 @@ data/token.json
 .DS_Store
 .venv-voice/
 assets/voice/sample_full.wav
+.venv-indic/

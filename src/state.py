@@ -10,9 +10,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from .config import ROOT
+from .config import ROOT, channel_key
 
-HISTORY = ROOT / "data" / "history.json"
+# Each channel keeps its own history: data/history.json for the main channel,
+# data/history.<CHANNEL>.json for the others.
+HISTORY = ROOT / "data" / (f"history.{channel_key()}.json" if channel_key() else "history.json")
 
 
 def _blank() -> dict[str, Any]:

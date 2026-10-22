@@ -75,9 +75,35 @@ def _safe(text: str, max_bytes: int) -> str:
     return text.encode("utf-8")[:max_bytes].decode("utf-8", "ignore").strip()
 
 
+_verified: str | None = None
+
+
+def check_channel(cfg: Config, yt) -> str:
+    """The channel the token belongs to, refusing to go on when it is not the
+    one config names. Two channels share this repo; a token mix-up must never
+    put a Tamil video on the English channel or the other way round."""
+    global _verified
+    if _verified:
+        return _verified
+    mine = yt.channels().list(part="id,snippet", mine=True).execute()["items"][0]
+    want = cfg.get_path("channel.channel_id")
+    if not want:
+        raise RuntimeError(
+            f"channel.channel_id is not set for {cfg.get_path('channel.name')}. The token "
+            f"belongs to {mine['snippet']['title']} ({mine['id']}): if that is right, "
+            "put that ID in the channel's config file.")
+    if mine["id"] != want:
+        raise RuntimeError(
+            f"Refusing to upload: the token belongs to {mine['snippet']['title']} "
+            f"({mine['id']}), but {cfg.get_path('channel.name')} is {want}.")
+    _verified = mine["id"]
+    return _verified
+
+
 def upload(cfg: Config, video: Path, meta: dict[str, Any],
            privacy: str = "private", publish_at: datetime | None = None) -> str:
     yt = client()
+    check_channel(cfg, yt)
     language = meta.get("language") or cfg.get_path("channel.language", "en")
     body: dict[str, Any] = {
         "snippet": {

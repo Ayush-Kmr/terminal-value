@@ -121,3 +121,36 @@ Download the artifact, watch it. If it's good, run it again unticked.
 
 After that it runs Mondays and Thursdays at 10:10 IST, producing a day ahead of
 the Tuesday/Friday publish slots so you have time to review.
+
+---
+
+## 11. Tamil channel (same videos, in Tamil)
+
+Every day, after the English videos are made, the **Episode** workflow's
+`tamil` job translates each one shot by shot, narrates it in Tamil with
+AI4Bharat's open Indic Parler-TTS (free, runs inside GitHub Actions, voice
+"Jaya") and uploads it to the Tamil channel at the same publish slots. Same
+stories, same pictures. Settings live in `channels/ta.yaml`; its history in
+`data/history.ta.json`. The job does nothing until step 3 below is done.
+
+1. **Create the channel** on the same Google account: youtube.com → profile
+   picture → Settings → *Add or manage your channel(s)* → **Create a channel**.
+   Name it (e.g. *Terminal Value Tamil*). Then verify it at
+   <https://www.youtube.com/verify> (each channel is verified separately).
+2. **Hugging Face token** (the Tamil voice model is free but asks you to accept
+   its terms once): sign up at <https://huggingface.co/join>, open
+   <https://huggingface.co/ai4bharat/indic-parler-tts> and click **Agree and
+   access**, then make a *Read* token at
+   <https://huggingface.co/settings/tokens> and save it as the GitHub secret
+   `HF_TOKEN`.
+3. **YouTube token for the Tamil channel**, from the repo folder:
+
+   ```bash
+   .venv/bin/python scripts/get_youtube_token.py ~/Downloads/client_secret_*.json --secret YT_REFRESH_TOKEN_TA
+   ```
+
+   When Google asks which channel, pick the **Tamil** one. The script prints the
+   channel's name and ID: the ID goes in `channel.channel_id` in
+   `channels/ta.yaml` (uploads refuse to go anywhere else).
+4. Actions → **Brand channel** → Run workflow with channel `ta` (banner, About,
+   keywords). Upload `assets/brand/avatar.png` as the profile picture by hand.

@@ -114,12 +114,22 @@ jobs:
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
 
+      # Marks the folder the artifact is rooted at, so each build keeps its
+      # folder name when the Tamil job downloads it.
+      - run: mkdir -p output && echo "${{ github.run_id }}" > output/run.txt
+        if: always()
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: episode-${{ github.run_number }}
           path: |
+            output/run.txt
+            output/**/shots.json
+            output/**/assets/*
+            !output/**/assets/*.frames
+            !output/**/assets/*.frames/**
             output/**/final.mp4
             output/**/thumbnail.jpg
             output/**/metadata.json
@@ -136,5 +146,111 @@ jobs:
           git config user.email "noreply@users.noreply.github.com"
           git add data/history.json || true
           git diff --staged --quiet || git commit -m "chore: episode history [skip ci]"
+          git pull --rebase -q || true
+          git push || true
+
+  # The Tamil channel: the same videos, translated and narrated in Tamil
+  # (src/follow.py), uploaded with the Tamil channel's own token. Skipped
+  # until the YT_REFRESH_TOKEN_TA secret exists.
+  tamil:
+    needs: produce
+    if: ${{ !cancelled() && needs.produce.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - name: Is the Tamil channel set up?
+        id: on
+        env:
+          TOKEN: ${{ secrets.YT_REFRESH_TOKEN_TA }}
+        run: |
+          if [ -n "$TOKEN" ] || [ "${{ inputs.no_upload }}" = "true" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No YT_REFRESH_TOKEN_TA secret yet, so no Tamil videos. See SETUP.md, 'Tamil channel'."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.on.outputs.go
+
+      - uses: actions/setup-python@v5
+        if: steps.on.outputs.go
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # libraqm + libfribidi let Pillow shape Tamil script for the captions.
+      - name: Install ffmpeg
+        if: steps.on.outputs.go
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu libraqm0 libfribidi0
+
+      - run: pip install -r requirements.txt
+        if: steps.on.outputs.go
+
+      - name: Cache Tamil voice environment and model
+        if: steps.on.outputs.go
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv-indic
+            ~/.cache/huggingface
+          key: indic-${{ runner.os }}-${{ hashFiles('requirements-indic.txt') }}
+
+      - name: Install Tamil voice model
+        if: steps.on.outputs.go
+        run: |
+          if [ ! -x .venv-indic/bin/python ]; then
+            python -m venv .venv-indic
+            .venv-indic/bin/pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+            .venv-indic/bin/pip install -q -r requirements-indic.txt
+          fi
+
+      - uses: actions/download-artifact@v4
+        if: steps.on.outputs.go
+        with:
+          name: episode-${{ github.run_number }}
+          path: en-builds
+
+      - name: Produce Tamil versions
+        if: steps.on.outputs.go
+        env:
+          CHANNEL:            ta
+          HF_TOKEN:           ${{ secrets.HF_TOKEN }}
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
+          CF_ACCOUNT_ID:      ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN:       ${{ secrets.CF_API_TOKEN }}
+          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
+          YT_CLIENT_ID:       ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET:   ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+          PUBLISH:            ${{ inputs.publish }}
+          NO_UPLOAD:          ${{ inputs.no_upload }}
+        run: |
+          args=(--follow en-builds)
+          [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
+          [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
+          python main.py "${args[@]}"
+
+      - name: Upload artifacts
+        if: always() && steps.on.outputs.go
+        uses: actions/upload-artifact@v4
+        with:
+          name: tamil-${{ github.run_number }}
+          path: |
+            output/ta/**/final.mp4
+            output/ta/**/short.mp4
+            output/ta/**/metadata.json
+            output/ta/**/script.json
+          retention-days: 7
+
+      - name: Commit history
+        if: success() && steps.on.outputs.go
+        run: |
+          git config user.name "terminal-value-bot"
+          git config user.email "noreply@users.noreply.github.com"
+          git add data/history.ta.json || true
+          git diff --staged --quiet || git commit -m "chore: tamil episode history [skip ci]"
           git pull --rebase -q || true
           git push || true

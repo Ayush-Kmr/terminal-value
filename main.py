@@ -16,7 +16,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from src import (assets, captions, gate, hooks, reach, render, research,
+from src import (assets, captions, follow, gate, hooks, reach, render, research,
                  script as script_mod, seo, shorts, state, thumbnail, upload, voice)
 from src.config import ROOT, latin_only, load, portrait
 
@@ -30,6 +30,22 @@ log = logging.getLogger("pipeline")
 
 def slug(text: str) -> str:
     return "".join(c if c.isalnum() else "-" for c in text.lower()).strip("-")[:48]
+
+
+def save_shots(shot_list: list[dict], workdir: Path) -> None:
+    """The finished shot list, with picture paths relative to the build
+    folder: the Tamil channel (src/follow.py) rebuilds the video from it."""
+    out = []
+    for s in shot_list:
+        s = dict(s)
+        if s.get("asset"):
+            try:
+                s["asset"] = str(Path(s["asset"]).resolve().relative_to(workdir.resolve()))
+            except ValueError:
+                s["asset"] = None
+        out.append(s)
+    (workdir / "shots.json").write_text(
+        json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def produce(cfg, story: dict, workdir: Path) -> dict:
@@ -69,6 +85,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     clips = render.build_shot_clips(cfg, shot_list, workdir)
     video = render.concat_with_audio(cfg, clips, shot_list, workdir,
                                      render.pick_music(cfg, company))
+    save_shots(shot_list, workdir)
 
     # ---- packaging ------------------------------------------------------
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
@@ -137,6 +154,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
 
     fb = research.build_news(cfg, story)
     warnings = research.validate_news(cfg, fb)
+    (workdir / "research.json").write_text(
+        json.dumps(fb.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
     beat = {**SHORT_BEAT, "intent": SHORT_BEAT["intent"].format(seconds=seconds)}
     sc = script_mod.write(cfg, fb, "", language, beats=[beat],
                           total_words=int(seconds / 60 * wpm))
@@ -149,6 +168,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     clips = render.build_shot_clips(tall, shot_list, workdir)
     video = render.concat_with_audio(tall, clips, shot_list, workdir,
                                      render.pick_music(cfg, company))
+    save_shots(shot_list, workdir)
 
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
     best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language,
@@ -293,6 +313,9 @@ def run(args) -> int:
         print(path.read_text(encoding="utf-8"))
         return 0
 
+    if args.follow:
+        return follow.run(cfg, Path(args.follow), args.publish, args.no_upload)
+
     if todays_kind(cfg, args) == "shorts":
         return run_shorts_day(cfg, args)
 
@@ -408,13 +431,17 @@ def main() -> int:
     ap.add_argument("--no-gates", action="store_true")
     ap.add_argument("--no-shorts", action="store_true")
     ap.add_argument("--reach", action="store_true")
+    ap.add_argument("--follow", metavar="DIR",
+                    help="second channel (CHANNEL=ta): publish the main channel's builds "
+                         "found under DIR again in this channel's language")
     args = ap.parse_args()
 
     try:
         return run(args)
     except Exception as exc:  # noqa: BLE001
         log.exception("Run failed")
-        gate.notify(f"❌ Terminal Value run failed: {type(exc).__name__}: {str(exc)[:500]}",
+        gate.notify(f"❌ {load().get_path('channel.name', 'Terminal Value')} run failed: "
+                    f"{type(exc).__name__}: {str(exc)[:500]}",
                     markdown=False)
         return 1
 

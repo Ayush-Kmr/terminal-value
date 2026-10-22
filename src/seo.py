@@ -170,10 +170,10 @@ def hashtags(keywords: list[str], language: str) -> str:
     """Three at most: the first three show above the title."""
     tags = []
     for k in keywords[:2]:
-        word = re.sub(r"[^0-9A-Za-zऀ-ॿ]", "", k.title())
+        word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title())
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
-    tags.append("#hindinews" if language == "hi" else "#explained")
+    tags.append({"hi": "#hindinews", "ta": "#tamilnews"}.get(language, "#explained"))
     return " ".join(tags)
 
 
@@ -204,6 +204,8 @@ def tags(company: str, keywords: list[str], language: str = "en") -> list[str]:
     base = [company, *keywords[:6], "news explained"]
     if language == "hi":
         base += ["hindi news"]
+    elif language == "ta":
+        base += ["tamil news", "tamil news explained"]
     out, total, seen = [], 0, set()
     for t in base[:10]:
         t = str(t).strip()[:60]

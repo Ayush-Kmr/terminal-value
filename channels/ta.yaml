@@ -1,0 +1,58 @@
+# ============================================================
+#  The Tamil channel.
+#  Laid over config.yaml when CHANNEL=ta, so only what differs is here.
+#  It publishes the main channel's videos again, translated and narrated in
+#  Tamil (src/follow.py): same stories, same visuals, same day.
+# ============================================================
+
+channel:
+  name: "Terminal Value Tamil"
+  handle: ""                       # fill in once the channel exists
+  channel_id: ""                   # fill in once the channel exists: uploads
+                                   # refuse to go anywhere else when it is set
+  url: ""
+  tagline: "செய்திக்குப் பின்னால் இருக்கும் கதை."
+  language: ta
+  about: |
+    இந்தியா மற்றும் உலக வணிகச் செய்திகள், தமிழில் தெளிவாக. என்ன நடந்தது, எப்படி இங்கு வந்தோம், உங்கள் பணம், வேலை, பொருளாதாரத்திற்கு இது என்ன அர்த்தம் என்பதை எளிமையாக விளக்குகிறோம்.
+
+    India and world business news explained in Tamil. Every day we pick the story India and the world are searching for and explain it with the numbers, dates and people involved.
+
+    New explainer every other day at 7 PM IST. New Shorts every day at 8 AM and 8:30 PM IST.
+
+    Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments.
+  keywords:
+    - tamil news
+    - business news tamil
+    - tamil news explained
+    - india economy tamil
+    - share market tamil
+    - world news tamil
+    - current affairs tamil
+    - explained in tamil
+  disclosure: >-
+    இந்த வீடியோ AI மூலம் தயாரிக்கப்பட்டது: மேலே உள்ள செய்தி அறிக்கைகளிலிருந்து
+    ஸ்கிரிப்ட் எழுதப்பட்டு, குரல் AI மூலம் உருவாக்கப்பட்டது. This video was
+    produced with AI from the news reports listed above. Corrections are welcome
+    in the comments.
+
+voice:
+  # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine like the
+  # cloned voice. The cloned voice cannot speak Tamil. The description picks
+  # the narrator: Jaya is the model's recommended Tamil speaker (Kavitha is
+  # the other one).
+  provider: indic
+  match_ok: 0.5                # Whisper hears Tamil less exactly than English
+  indic:
+    description: >-
+      Jaya speaks in a clear, confident and slightly expressive tone at a
+      moderate pace, with a moderate pitch. The recording is of very high
+      quality, with the speaker's voice sounding clear and very close up.
+
+upload:
+  playlists:
+    ta: "தமிழில் — Explained"
+
+visuals:
+  fonts:
+    caption: "assets/fonts/NotoSansTamil-Bold.ttf"   # Shorts word captions in Tamil (OFL)

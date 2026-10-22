@@ -24,10 +24,33 @@ class Config(dict):
         return node
 
 
+def channel_key() -> str:
+    """Which channel this run is for: "" is the main (English) channel; "ta"
+    is the Tamil one, set with the CHANNEL environment variable."""
+    key = (os.getenv("CHANNEL") or "").strip().lower()
+    return "" if key in ("", "en", "main") else key
+
+
+def _merge(base: dict, over: dict) -> dict:
+    out = dict(base)
+    for k, v in over.items():
+        out[k] = _merge(out[k], v) if isinstance(v, dict) and isinstance(out.get(k), dict) else v
+    return out
+
+
 def load(path: Path | None = None) -> Config:
+    """config.yaml, with channels/<CHANNEL>.yaml laid over it for a second
+    channel: that file holds only what differs (name, language, voice)."""
     path = path or ROOT / "config.yaml"
     with open(path, "r", encoding="utf-8") as fh:
-        return Config(yaml.safe_load(fh))
+        data = yaml.safe_load(fh)
+    key = channel_key()
+    if key:
+        over = ROOT / "channels" / f"{key}.yaml"
+        if not over.exists():
+            raise RuntimeError(f"CHANNEL={key} but {over} does not exist")
+        data = _merge(data, yaml.safe_load(over.read_text(encoding="utf-8")) or {})
+    return Config(data)
 
 
 def portrait(cfg: Config) -> Config:
@@ -76,6 +99,16 @@ LANGUAGE_RULES = {
         "ALL ON-SCREEN TEXT (headline, value, caption, chart title and labels, timeline "
         "events) must be in ENGLISH using Latin letters only: the renderer cannot draw "
         "Devanagari. Image search terms and image prompts are always in English."
+    ),
+    "ta": (
+        "LANGUAGE: Write all NARRATION in Tamil, in Tamil script, as spoken by a "
+        "Tamil news explainer: natural everyday Tamil, not stiff written Tamil. Keep "
+        "common English terms and proper names the way Tamil speakers say them, but "
+        "spelled in Tamil script (கம்பெனி, டெக்னாலஜி, ஆர்.பி.ஐ). The narrator reads "
+        "Tamil script only, so no Latin letters in narration. Write numbers, years, "
+        "percentages and amounts as digits with their symbol (2026, 5.5%, ₹500, "
+        "$4 பில்லியன்): they are read out in Tamil automatically. "
+        "ALL ON-SCREEN TEXT stays in ENGLISH using Latin letters only."
     ),
     "en": (
         "LANGUAGE: Write narration in clear international English that a viewer in "

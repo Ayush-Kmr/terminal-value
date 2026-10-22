@@ -23,18 +23,64 @@ HI_0_99 = (
 ).split()
 HI_SCALES = ((10**9, "अरब"), (10**7, "करोड़"), (10**5, "लाख"), (10**3, "हज़ार"), (100, "सौ"))
 
+# Tamil. num2words has no Tamil, so the reader is here. Tens and hundreds
+# have a standalone form (இருபது, நூறு) and a joining form used when more
+# follows (இருபத்து, நூற்று).
+TA_UNITS = "பூஜ்ஜியம் ஒன்று இரண்டு மூன்று நான்கு ஐந்து ஆறு ஏழு எட்டு ஒன்பது".split()
+TA_TEENS = ("பத்து பதினொன்று பன்னிரண்டு பதின்மூன்று பதினான்கு பதினைந்து பதினாறு "
+            "பதினேழு பதினெட்டு பத்தொன்பது").split()
+TA_TENS = ("_ _ இருபது முப்பது நாற்பது ஐம்பது அறுபது எழுபது எண்பது தொண்ணூறு").split()
+TA_TENS_J = ("_ _ இருபத்து முப்பத்து நாற்பத்து ஐம்பத்து அறுபத்து எழுபத்து எண்பத்து "
+             "தொண்ணூற்று").split()
+TA_HUNDREDS = ("_ நூறு இருநூறு முந்நூறு நானூறு ஐநூறு அறுநூறு எழுநூறு எண்ணூறு "
+               "தொள்ளாயிரம்").split()
+TA_HUNDREDS_J = ("_ நூற்று இருநூற்று முந்நூற்று நானூற்று ஐநூற்று அறுநூற்று எழுநூற்று "
+                 "எண்ணூற்று தொள்ளாயிரத்து").split()
+TA_THOUSANDS = ("_ ஆயிரம் இரண்டாயிரம் மூவாயிரம் நான்காயிரம் ஐயாயிரம் ஆறாயிரம் ஏழாயிரம் "
+                "எட்டாயிரம் ஒன்பதாயிரம்").split()
+
+
+def _ta_join(word: str) -> str:
+    """ஆயிரம் -> ஆயிரத்து, லட்சம் -> லட்சத்து: the form used when more follows."""
+    return word[:-2] + "த்து" if word.endswith("ம்") else word
+
+
+def tamil_int(n: int) -> str:
+    if n < 10:
+        return TA_UNITS[n]
+    if n < 20:
+        return TA_TEENS[n - 10]
+    if n < 100:
+        t, r = divmod(n, 10)
+        return f"{TA_TENS_J[t]} {TA_UNITS[r]}" if r else TA_TENS[t]
+    if n < 1000:
+        h, r = divmod(n, 100)
+        return f"{TA_HUNDREDS_J[h]} {tamil_int(r)}" if r else TA_HUNDREDS[h]
+    for value, name in ((10**7, "கோடி"), (10**5, "லட்சம்"), (10**3, "ஆயிரம்")):
+        if n >= value:
+            q, r = divmod(n, value)
+            if value == 1000 and q < 10:
+                head = TA_THOUSANDS[q]
+            else:
+                head = f"{'ஒரு' if q == 1 else tamil_int(q)} {name}"
+            return f"{_ta_join(head)} {tamil_int(r)}" if r else head
+    return str(n)
+
+
 CURRENCY = {
     "hi": {"$": "डॉलर", "₹": "रुपये", "€": "यूरो", "£": "पाउंड"},
     "en": {"$": "dollars", "₹": "rupees", "€": "euros", "£": "pounds"},
+    "ta": {"$": "டாலர்", "₹": "ரூபாய்", "€": "யூரோ", "£": "பவுண்டு"},
 }
-PERCENT = {"hi": "प्रतिशत", "en": "percent"}
-POINT = {"hi": "दशमलव", "en": "point"}
+PERCENT = {"hi": "प्रतिशत", "en": "percent", "ta": "சதவீதம்"}
+POINT = {"hi": "दशमलव", "en": "point", "ta": "புள்ளி"}
 SCALE_WORDS = (r"million|billion|trillion|thousand|lakh|crore|"
-               r"मिलियन|बिलियन|ट्रिलियन|हज़ार|हजार|लाख|करोड़|अरब")
+               r"मिलियन|बिलियन|ट्रिलियन|हज़ार|हजार|लाख|करोड़|अरब|"
+               r"மில்லியன்|பில்லியன்|டிரில்லியன்|ஆயிரம்|லட்சம்|கோடி")
 
 NUMBER = re.compile(
     rf"(?P<cur>[$₹€£])?\s?(?P<num>\d+(?:,\d+)*(?:\.\d+)?)(?P<pct>\s?%)?"
-    rf"(?P<scale>\s?(?:{SCALE_WORDS})(?![\wऀ-ॿ]))?")
+    rf"(?P<scale>\s?(?:{SCALE_WORDS})(?![\wऀ-ॿ\u0B80-\u0BFF]))?")
 
 
 def hindi_int(n: int) -> str:
@@ -51,6 +97,8 @@ def hindi_int(n: int) -> str:
 
 
 def _integer(n: int, language: str, is_year: bool) -> str:
+    if language == "ta":
+        return tamil_int(n)
     if language == "hi":
         # Years before 2000 are said in hundreds: 1991 is "उन्नीस सौ इक्यानवे".
         if is_year and 1100 <= n <= 1999:
@@ -67,6 +115,7 @@ def _number(raw: str, language: str, plain: bool) -> str:
     words = _integer(int(whole), language, is_year)
     if frac:
         digit = (lambda d: HI_0_99[int(d)]) if language == "hi" else (
+            lambda d: TA_UNITS[int(d)]) if language == "ta" else (
             lambda d: num2words(int(d), lang="en"))
         words += f" {POINT[language]} " + " ".join(digit(d) for d in frac)
     return words

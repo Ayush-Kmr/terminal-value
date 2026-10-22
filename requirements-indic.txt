@@ -1,0 +1,5 @@
+# The Tamil narrator (AI4Bharat Indic Parler-TTS, Apache-2.0), installed into
+# .venv-indic (see scripts/indic_tts.py). Pinned to a commit: the package is
+# only published on GitHub.
+parler-tts @ git+https://github.com/huggingface/parler-tts.git@d108732cd57788ec86bc857d99a6cabd66663d68
+soundfile

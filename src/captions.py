@@ -16,7 +16,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, features
 
 from .config import Config, latin_only
 
@@ -69,6 +69,14 @@ def _groups(words: list[tuple[str, float, float]], size: int = 3,
     return groups
 
 
+def native_script(cfg: Config) -> bool:
+    """Captions can be drawn in the narration's own script (Tamil): the
+    channel names a font for it (visuals.fonts.caption) and Pillow has the
+    text shaper such scripts need (libraqm, which needs libfribidi)."""
+    font = cfg.get_path("visuals.fonts.caption")
+    return bool(font) and features.check("raqm")
+
+
 def _draw(cfg: Config, size: tuple[int, int], words: list[str], active: int,
           y_frac: float) -> Image.Image:
     from .visuals.motion import _font
@@ -78,10 +86,12 @@ def _draw(cfg: Config, size: tuple[int, int], words: list[str], active: int,
     pal = vcfg.get("palette", {})
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    clean = [latin_only(x).upper().strip("\"'“”‘’") or "·" for x in words]
-    pt = int(w * 0.088)
+    native = native_script(cfg)
+    clean = [x.strip("\"'“”‘’") if native else latin_only(x).upper().strip("\"'“”‘’") or "·"
+             for x in words]
+    pt = int(w * (0.07 if native else 0.088))
     while True:
-        font = _font(vcfg, "display", pt)
+        font = _font(vcfg, "caption" if native else "display", pt)
         space = d.textlength(" ", font=font)
         widths = [d.textlength(x, font=font) for x in clean]
         total = sum(widths) + space * (len(clean) - 1)
@@ -102,6 +112,11 @@ def overlay(cfg: Config, shots: list[dict], size: tuple[int, int], workdir: Path
             y_frac: float = 0.79) -> Path | None:
     """A transparent caption track the length of the narration."""
     words = timeline(shots)
+    if not native_script(cfg) and not any(latin_only(w[0]) for w in words):
+        # Narration in a script the fonts cannot draw: no captions rather
+        # than a row of placeholder dots.
+        log.info("Captions skipped: no font or shaper for the narration's script")
+        return None
     if not words:
         return None
     total = sum(float(s.get("duration", 5)) for s in shots)
