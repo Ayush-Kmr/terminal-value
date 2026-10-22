@@ -87,6 +87,9 @@ format:
   long:
     days: []                    # weekdays a long video may go out. Empty = any day
     every_days: 2               # 2 = a long video on alternate days; 1 = every day
+    # Every 3rd long video is an evergreen explainer from data/evergreen.yaml
+    # (searched for month after month) instead of today's news. 0 = never.
+    evergreen_every: 3
     # Over 8 minutes so the video can carry mid-roll ads once monetised.
     # The narration runs faster than 150 words a minute (a 9.5-minute script
     # came out at 8:28), so aim well above the line. A video that still ends

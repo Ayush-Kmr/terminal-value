@@ -1,0 +1,55 @@
+# Evergreen explainers: every format.long.evergreen_every-th long video is
+# the next unused topic here instead of today's news. Each one answers a
+# question people keep searching for (YouTube search suggestions, India,
+# 2026-10-22); news gets views for days, these for months. The Tamil channel
+# gets them too, where Tamil viewers search "<topic> explained in tamil".
+# Add topics at the bottom; used ones are tracked in data/history.json.
+topics:
+  - topic: RBI repo rate
+    angle: What is the repo rate, and how does a change in it reach your home loan EMI?
+    search: [what is repo rate, rbi repo rate cut effect on home loan, repo rate explained in tamil]
+  - topic: Tariffs
+    angle: What are tariffs, who really pays them, and how do they affect India?
+    search: [what are tariffs and how do they affect us, tariffs explained, tariff in tamil]
+  - topic: Rupee vs dollar
+    angle: Why does the rupee keep falling against the dollar, and who wins and loses when it does?
+    search: [why rupee is falling, why rupee is falling against dollar tamil]
+  - topic: Gold price
+    angle: Why is the gold price rising so fast, and what actually moves it?
+    search: [why is gold price rising so fast, why is gold price increasing in india, gold investment in tamil]
+  - topic: Inflation
+    angle: What is inflation, how is it measured in India, and why does it eat your savings?
+    search: [what is inflation, inflation explained in tamil]
+  - topic: Indian stock market
+    angle: How does the stock market actually work in India, from your order to the exchange?
+    search: [how does stock market work in india, stock market basics in tamil]
+  - topic: IPO
+    angle: What is an IPO, how does it work, and why do some IPOs fall on listing day?
+    search: [what is ipo and how it works, ipo explained in tamil]
+  - topic: Recession
+    angle: What is a recession, how is it called, and how close is India to one?
+    search: [what is recession, 2008 recession explained in tamil]
+  - topic: GDP
+    angle: What is GDP, what does India's growth number really measure, and what does it miss?
+    search: [what is gdp, gdp explained in tamil]
+  - topic: How banks make money
+    angle: How do banks make money from your deposits and loans?
+    search: [how banks make money from deposits, how banks make money]
+  - topic: China vs India economy
+    angle: Why is China's economy so far ahead of India's, and can India close the gap?
+    search: [why china is ahead of india, china economy in tamil]
+  - topic: Semiconductors in India
+    angle: What is a semiconductor, and why is India spending billions to make its own chips?
+    search: [what is semiconductor, what is semiconductor in tamil]
+  - topic: Bull and bear markets
+    angle: What are bull and bear markets, and what history says about how long they last
+    search: [what is bull and bear market means, what is a bear market]
+  - topic: Fiscal deficit
+    angle: What is the fiscal deficit, and why does the government's borrowing matter to you?
+    search: [what is fiscal deficit, fiscal deficit in tamil]
+  - topic: How Reliance makes money
+    angle: How does Reliance Industries actually make its money, business by business?
+    search: [how reliance makes money, how reliance earn money]
+  - topic: SIP
+    angle: What is a SIP, how does it work, and what do the numbers say about investing monthly?
+    search: [what is sip and how it works, sip in tamil]

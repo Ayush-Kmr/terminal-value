@@ -258,6 +258,29 @@ def candidates_for(cfg, args, n: int) -> list[dict]:
     return candidates
 
 
+def evergreen_story(cfg, args) -> dict | None:
+    """Every format.long.evergreen_every-th long video: the next unused topic
+    from data/evergreen.yaml, written as an explainer rather than news."""
+    import yaml
+
+    every = int(cfg.get_path("format.long.evergreen_every", 0))
+    path = ROOT / "data" / "evergreen.yaml"
+    if args.topic or every <= 0 or not path.exists():
+        return None
+    eps = [e for e in state.load().get("episodes", []) if e.get("kind", "long") == "long"]
+    if len(eps) % every != every - 1:
+        return None
+    used = {str(e.get("evergreen", "")).lower() for e in eps}
+    for t in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("topics", []):
+        if t["topic"].lower() not in used:
+            return {"topic": t["topic"], "company": t["topic"], "angle": t["angle"],
+                    "region": "IN", "language": "en", "search_query": t["topic"],
+                    "wiki_title": "", "keywords": list(t.get("search", []))[:4] or [t["topic"]],
+                    "evergreen": t["topic"]}
+    log.warning("Every evergreen topic has been used: add more to %s", path)
+    return None
+
+
 def todays_kind(cfg, args) -> str:
     """'long' on a long-video day, otherwise 'shorts' (standalone Shorts)."""
     if args.kind != "auto":
@@ -364,7 +387,9 @@ def run(args) -> int:
 
     n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
     candidates = candidates_for(cfg, args, 4 + n_shorts)
-    story = candidates[0]
+    story = evergreen_story(cfg, args) or candidates[0]
+    if story.get("evergreen"):
+        log.info("Evergreen explainer today: %s", story["angle"])
     if do_gates and cfg.get_path("gates.topic_approval", False):
         story = gate.topic_gate(cfg, candidates)
     if story is None:
@@ -437,6 +462,7 @@ def run(args) -> int:
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
         "video_id": video_id, "short_ids": short_ids, "kind": "long",
+        "evergreen": story.get("evergreen", ""),
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })
     state.save(st)
