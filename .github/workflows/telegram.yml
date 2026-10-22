@@ -1,0 +1,45 @@
+name: Telegram bot
+
+# Answers the bot's slash commands (/status, /english, /tamil, ...). There is
+# no server: every run listens to Telegram for about five minutes, and a new
+# run starts every five minutes. GitHub sometimes starts scheduled runs late,
+# so a command can now and then wait a few minutes for its answer.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+    - cron: "0 16 * * *"       # 21:30 IST: daily summary of both channels
+  workflow_dispatch:
+
+concurrency:
+  group: telegram
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -q -r requirements.txt
+      - name: Answer commands
+        env:
+          YT_CLIENT_ID:        ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET:    ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN:    ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_REFRESH_TOKEN_TA: ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN:        ${{ github.token }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
+            python scripts/telegram_bot.py --digest
+          fi
+          python scripts/telegram_bot.py --poll 285

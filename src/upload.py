@@ -28,10 +28,12 @@ SCOPES = [
 ]
 
 
-def client():
+def credentials(refresh_token: str | None = None) -> Credentials:
+    """Signed-in credentials for one channel: the token in YT_REFRESH_TOKEN
+    unless another channel's token is passed."""
     creds = Credentials(
         token=None,
-        refresh_token=env("YT_REFRESH_TOKEN", required=True),
+        refresh_token=refresh_token or env("YT_REFRESH_TOKEN", required=True),
         client_id=env("YT_CLIENT_ID", required=True),
         client_secret=env("YT_CLIENT_SECRET", required=True),
         token_uri="https://oauth2.googleapis.com/token",
@@ -40,7 +42,12 @@ def client():
         # and an older one keeps working for uploads.
     )
     creds.refresh(Request())
-    return build("youtube", "v3", credentials=creds, cache_discovery=False)
+    return creds
+
+
+def client(refresh_token: str | None = None):
+    return build("youtube", "v3", credentials=credentials(refresh_token),
+                 cache_discovery=False)
 
 
 def slots(cfg: Config, kind: str = "long", count: int = 1,
