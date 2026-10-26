@@ -9,7 +9,15 @@
       "video_id": "ArfGcaZkG04",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-11T20:30:29.921991+00:00"
+      "created_at": "2026-10-11T20:30:29.921991+00:00",
+      "stats": {
+        "views": 104,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 19,
+        "avg_pct": 76.33,
+        "minutes": 8
+      }
     },
     {
       "company": "Gold and Silver Price Drop",
@@ -25,7 +33,15 @@
       "kind": "long",
       "runtime": "4:16",
       "warnings": [],
-      "created_at": "2026-10-12T20:41:37.943755+00:00"
+      "created_at": "2026-10-12T20:41:37.943755+00:00",
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 33,
+        "avg_pct": 13.04,
+        "minutes": 2
+      }
     },
     {
       "company": "Reliance Jio IPO Bid Surge",
@@ -36,7 +52,15 @@
       "video_id": "P99tS8PIWFw",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-13T18:02:38.067703+00:00"
+      "created_at": "2026-10-13T18:02:38.067703+00:00",
+      "stats": {
+        "views": 5,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 7,
+        "avg_pct": 31.129999999999995,
+        "minutes": 0
+      }
     },
     {
       "company": "India-China Ladakh Placenames Dispute",
@@ -47,7 +71,15 @@
       "video_id": "Ch87sEhNAqA",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-13T18:10:51.354718+00:00"
+      "created_at": "2026-10-13T18:10:51.354718+00:00",
+      "stats": {
+        "views": 170,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 16,
+        "avg_pct": 75.78,
+        "minutes": 14
+      }
     },
     {
       "company": "Canada's Strategy to Double Non-US Trade and India's Role",
@@ -58,7 +90,15 @@
       "video_id": "fAi8UZRH518",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-14T15:26:50.299162+00:00"
+      "created_at": "2026-10-14T15:26:50.299162+00:00",
+      "stats": {
+        "views": 99,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 12,
+        "avg_pct": 49.11,
+        "minutes": 9
+      }
     },
     {
       "company": "Anthropic's Landmark Cloud Computing Deal with IREN",
@@ -69,7 +109,15 @@
       "video_id": "C7yDnO27jB0",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-14T15:32:54.507639+00:00"
+      "created_at": "2026-10-14T15:32:54.507639+00:00",
+      "stats": {
+        "views": 368,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 21,
+        "avg_pct": 79.69,
+        "minutes": 53
+      }
     },
     {
       "company": "Yes Bank AT1 Bond Supreme Court Verdict",
@@ -85,7 +133,15 @@
       "kind": "long",
       "runtime": "2:52",
       "warnings": [],
-      "created_at": "2026-10-15T16:01:17.434374+00:00"
+      "created_at": "2026-10-15T16:01:17.434374+00:00",
+      "stats": {
+        "views": 10,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 27,
+        "avg_pct": 16.03,
+        "minutes": 1
+      }
     },
     {
       "company": "China's New Tech Export Curbs on AI and Solar",
@@ -96,7 +152,15 @@
       "video_id": "ztoUqbqcqBc",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-16T15:07:09.875337+00:00"
+      "created_at": "2026-10-16T15:07:09.875337+00:00",
+      "stats": {
+        "views": 113,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 15,
+        "avg_pct": 53.63,
+        "minutes": 11
+      }
     },
     {
       "company": "Pakistan to Chair IMF and World Bank Boards in 2027",
@@ -107,7 +171,15 @@
       "video_id": "1WD8IYp5MfI",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-16T15:13:07.062172+00:00"
+      "created_at": "2026-10-16T15:13:07.062172+00:00",
+      "stats": {
+        "views": 44,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 13,
+        "avg_pct": 55.71,
+        "minutes": 4
+      }
     },
     {
       "company": "Trump Russian Oil Sanctions Waiver",
@@ -123,7 +195,15 @@
       "kind": "long",
       "runtime": "4:21",
       "warnings": [],
-      "created_at": "2026-10-17T14:43:22.845839+00:00"
+      "created_at": "2026-10-17T14:43:22.845839+00:00",
+      "stats": {
+        "views": 2,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 5,
+        "avg_pct": 1.92,
+        "minutes": 0
+      }
     },
     {
       "company": "India Sugar Ethanol Ban",
@@ -134,7 +214,15 @@
       "video_id": "Fg2BIOYcVBk",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-18T14:15:36.687446+00:00"
+      "created_at": "2026-10-18T14:15:36.687446+00:00",
+      "stats": {
+        "views": 12,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 14,
+        "avg_pct": 40.65,
+        "minutes": 0
+      }
     },
     {
       "company": "SC Ruling on Children's Internet Rights",
@@ -145,7 +233,15 @@
       "video_id": "jbAszwGFzVo",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-18T14:22:34.216088+00:00"
+      "created_at": "2026-10-18T14:22:34.216088+00:00",
+      "stats": {
+        "views": 16,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 14,
+        "avg_pct": 56.67,
+        "minutes": 1
+      }
     },
     {
       "company": "China Cleantech Export Curbs on India",
@@ -161,7 +257,15 @@
       "kind": "long",
       "runtime": "2:28",
       "warnings": [],
-      "created_at": "2026-10-19T17:34:24.707133+00:00"
+      "created_at": "2026-10-19T17:34:24.707133+00:00",
+      "stats": {
+        "views": 123,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 53,
+        "avg_pct": 35.94,
+        "minutes": 27
+      }
     },
     {
       "company": "US-India Trade Agreement Talks",
@@ -172,7 +276,15 @@
       "video_id": "rtS6RnVDRfM",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-19T20:18:24.796206+00:00"
+      "created_at": "2026-10-19T20:18:24.796206+00:00",
+      "stats": {
+        "views": 51,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 19,
+        "avg_pct": 61.65999999999999,
+        "minutes": 4
+      }
     },
     {
       "company": "India-New Zealand Free Trade Agreement",
@@ -183,7 +295,15 @@
       "video_id": "mnGgoys3xJ0",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-20T09:01:29.714827+00:00"
+      "created_at": "2026-10-20T09:01:29.714827+00:00",
+      "stats": {
+        "views": 150,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 20,
+        "avg_pct": 54.77000000000001,
+        "minutes": 24
+      }
     },
     {
       "company": "US-India Trade Deal Progress",
@@ -194,7 +314,15 @@
       "video_id": "ZseWFspf3aA",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-20T09:11:19.205398+00:00"
+      "created_at": "2026-10-20T09:11:19.205398+00:00",
+      "stats": {
+        "views": 53,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 16,
+        "avg_pct": 47.37,
+        "minutes": 5
+      }
     },
     {
       "company": "China and Hong Kong Stock Market Crash",
@@ -207,7 +335,15 @@
       "kind": "long",
       "runtime": "8:27",
       "warnings": [],
-      "created_at": "2026-10-22T10:35:51.616114+00:00"
+      "created_at": "2026-10-22T10:35:51.616114+00:00",
+      "stats": {
+        "views": 74,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 138,
+        "avg_pct": 27.169999999999998,
+        "minutes": 48
+      }
     },
     {
       "company": "Uttarakhand 8.1 Megaquake Warning Study",
@@ -218,7 +354,15 @@
       "video_id": "J8rNgV68vDA",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-22T10:44:11.032044+00:00"
+      "created_at": "2026-10-22T10:44:11.032044+00:00",
+      "stats": {
+        "views": 91,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 20,
+        "avg_pct": 59.12,
+        "minutes": 12
+      }
     },
     {
       "company": "Barclays Slashes 5,000 Jobs in AI Efficiency Push",
@@ -229,7 +373,15 @@
       "video_id": "ET3DJTV1SJY",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-22T10:52:13.329403+00:00"
+      "created_at": "2026-10-22T10:52:13.329403+00:00",
+      "stats": {
+        "views": 41,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 22,
+        "avg_pct": 70.84,
+        "minutes": 5
+      }
     },
     {
       "company": "Gold and Silver Price Crash in India",
@@ -240,7 +392,15 @@
       "video_id": "nJ-0R2zt3Lw",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-23T09:16:31.995663+00:00"
+      "created_at": "2026-10-23T09:16:31.995663+00:00",
+      "stats": {
+        "views": 299,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 12,
+        "avg_pct": 30.11,
+        "minutes": 10
+      }
     },
     {
       "company": "OpenAI Scales Back Valuation Target to $1.25 Trillion",
@@ -251,7 +411,15 @@
       "video_id": "ZJpvtm9hEh0",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-23T09:32:42.414282+00:00"
+      "created_at": "2026-10-23T09:32:42.414282+00:00",
+      "stats": {
+        "views": 14,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 6,
+        "avg_pct": 19.09,
+        "minutes": 0
+      }
     },
     {
       "company": "RBI repo rate",
@@ -265,7 +433,12 @@
       "evergreen": "RBI repo rate",
       "runtime": "8:50",
       "warnings": [],
-      "created_at": "2026-10-24T10:22:56.859675+00:00"
+      "created_at": "2026-10-24T10:22:56.859675+00:00",
+      "stats": {
+        "views": 2,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "India Retail Rice Price Surge",
@@ -276,7 +449,12 @@
       "video_id": "4c_jJxIS_qg",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-24T10:35:17.850189+00:00"
+      "created_at": "2026-10-24T10:35:17.850189+00:00",
+      "stats": {
+        "views": 57,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "India-Russia $100 Billion Trade Target",
@@ -287,7 +465,12 @@
       "video_id": "oBYfq1PX4WQ",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-24T10:41:44.348592+00:00"
+      "created_at": "2026-10-24T10:41:44.348592+00:00",
+      "stats": {
+        "views": 81,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Vande Bharat Sleeper Launch on Delhi-Varanasi Route",
@@ -298,7 +481,12 @@
       "video_id": "42tImzJlGac",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-25T09:07:09.640911+00:00"
+      "created_at": "2026-10-25T09:07:09.640911+00:00",
+      "stats": {
+        "views": 24,
+        "likes": 1,
+        "comments": 0
+      }
     },
     {
       "company": "India Joins 24-Nation Global 6G Alliance",
@@ -309,9 +497,14 @@
       "video_id": "R0Cqw4wBbXI",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-25T09:32:35.580675+00:00"
+      "created_at": "2026-10-25T09:32:35.580675+00:00",
+      "stats": {
+        "views": 1,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": null
+  "channel_median_views": 52.0
 }
