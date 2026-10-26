@@ -503,6 +503,44 @@
         "likes": 0,
         "comments": 0
       }
+    },
+    {
+      "company": "Ather Energy Q2 Turnaround and Profit",
+      "angle": "How did Ather Energy swing to a profit in Q2 and trigger a 10% upper circuit on the stock market?",
+      "title": "ather energy q2 results: can volume growth sustain the new profitability?",
+      "region": "IN",
+      "language": "en",
+      "video_id": "jkoovZ_zWZU",
+      "short_ids": [],
+      "kind": "long",
+      "evergreen": "",
+      "runtime": "7:56",
+      "warnings": [
+        "Long video is only 7.9 min, under 8: no mid-roll ads on it"
+      ],
+      "created_at": "2026-10-26T11:36:38.366292+00:00"
+    },
+    {
+      "company": "Cyclone Arnab Threatens Eastern Coast",
+      "angle": "What preparations are underway as Cyclone Arnab approaches the eastern coast with 140 kmph winds?",
+      "title": "Cyclone Arnab causes and effects: 140 kmph winds #shorts",
+      "region": "IN",
+      "language": "en",
+      "video_id": "Zdpx8zos_pE",
+      "kind": "short",
+      "warnings": [],
+      "created_at": "2026-10-26T11:44:47.545945+00:00"
+    },
+    {
+      "company": "SpaceX $40B Debt Deal and AI GPUs",
+      "angle": "Why is Elon Musk's SpaceX securing a $40 billion debt financing deal specifically for AI GPUs?",
+      "title": "spacex current news on the 40 billion dollar deal #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "lRxTLqZy_sA",
+      "kind": "short",
+      "warnings": [],
+      "created_at": "2026-10-26T11:55:27.451692+00:00"
     }
   ],
   "rejected_topics": [],
