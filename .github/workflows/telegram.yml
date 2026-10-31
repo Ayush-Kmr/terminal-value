@@ -1,13 +1,12 @@
 name: Telegram bot
 
 # Answers the bot's slash commands (/status, /english, /tamil, ...). There is
-# no server: every run listens to Telegram for about five minutes, and a new
-# run starts every five minutes. GitHub sometimes starts scheduled runs late,
-# so a command can now and then wait a few minutes for its answer.
+# no server: one run listens to Telegram for 5 h 45 min, then starts the next.
+# GitHub delayed five-minute schedules by hours, which left commands unanswered.
+# The hourly schedule only restarts the bot if that chain ever breaks.
 on:
   schedule:
-    - cron: "*/5 * * * *"
-    - cron: "0 16 * * *"       # 21:30 IST: daily summary of both channels
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -15,13 +14,13 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  actions: read
+  actions: write
   contents: read
 
 jobs:
   bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,8 +37,10 @@ jobs:
           TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
           GITHUB_TOKEN:        ${{ github.token }}
-        run: |
-          if [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
-            python scripts/telegram_bot.py --digest
-          fi
-          python scripts/telegram_bot.py --poll 285
+        run: python scripts/telegram_bot.py --poll 20700
+
+      - name: Start the next run
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run telegram.yml --repo "$GITHUB_REPOSITORY" --ref main

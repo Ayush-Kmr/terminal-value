@@ -2,13 +2,13 @@
 """The Telegram bot: both channels' numbers and the pipeline's state, on
 demand, from slash commands.
 
-    python scripts/telegram_bot.py --poll 280   answer commands for 280 s
+    python scripts/telegram_bot.py --poll 20700  answer commands for 5 h 45 min
     python scripts/telegram_bot.py --digest     send the daily summary
     python scripts/telegram_bot.py --once /status   print one reply (testing)
 
-There is no server: .github/workflows/telegram.yml runs --poll every few
-minutes, each run long-polling Telegram until the next one starts, so replies
-come within seconds while a run is live. Only TELEGRAM_CHAT_ID is answered.
+There is no server: .github/workflows/telegram.yml keeps one --poll run alive,
+and each run starts the next as it ends, so replies come within seconds. The
+daily summary is sent from inside that run. Only TELEGRAM_CHAT_ID is answered.
 
 Read-only: every command reports; none of them changes anything.
 """
@@ -102,13 +102,30 @@ def esc(s) -> str:
     return html.escape(str(s or ""))
 
 
+_fresh: dict = {}
+FRESH_SECONDS = 60      # repeat commands answer at once; numbers stay current
+
+
+def remember(key: tuple, fetch):
+    """The last answer if it is under a minute old, otherwise a new one."""
+    saved = _fresh.get(key)
+    if saved and time.time() - saved[0] < FRESH_SECONDS:
+        return saved[1]
+    value = fetch()
+    _fresh[key] = (time.time(), value)
+    return value
+
+
 def channel_info(ch: dict) -> dict:
-    item = yt(ch).channels().list(part="snippet,statistics,contentDetails,status",
-                                  id=ch["id"]).execute()["items"][0]
-    return item
+    return remember(("info", ch["key"]), lambda: yt(ch).channels().list(
+        part="snippet,statistics,contentDetails,status", id=ch["id"]).execute()["items"][0])
 
 
 def videos(ch: dict, limit: int = 50) -> list[dict]:
+    return remember(("videos", ch["key"], limit), lambda: _videos(ch, limit))
+
+
+def _videos(ch: dict, limit: int) -> list[dict]:
     """Latest uploads (private and scheduled ones too, since we are the owner)."""
     info = channel_info(ch)
     pl = info["contentDetails"]["relatedPlaylists"]["uploads"]
@@ -336,10 +353,20 @@ def poll(seconds: int) -> None:
     tg("setMyCommands", commands=[{"command": c, "description": d} for c, d in COMMANDS])
     deadline = time.time() + seconds
     offset = None
+    digest_day = None
     while time.time() < deadline - 5:
+        now = datetime.now(timezone.utc)
+        if now.hour == 16 and now.minute < 10 and digest_day != now.date():
+            digest_day = now.date()          # 21:30 IST
+            digest(chs)
         wait = int(min(50, max(1, deadline - time.time() - 5)))
-        updates = tg("getUpdates", offset=offset, timeout=wait,
-                     allowed_updates=["message", "channel_post"]).get("result", [])
+        try:
+            updates = tg("getUpdates", offset=offset, timeout=wait,
+                         allowed_updates=["message", "channel_post"]).get("result", [])
+        except requests.RequestException as exc:   # a network blip must not end the run
+            print(f"getUpdates failed: {type(exc).__name__}", flush=True)
+            time.sleep(5)
+            continue
         for u in updates:
             offset = u["update_id"] + 1
             msg = u.get("message") or u.get("channel_post") or {}
@@ -347,9 +374,19 @@ def poll(seconds: int) -> None:
             if str(msg.get("chat", {}).get("id")) != chat or not text.startswith("/"):
                 continue
             print(f"command: {text.split()[0]}", flush=True)
-            send(reply(text, chs))
+            try:
+                tg("sendChatAction", chat_id=chat, action="typing")
+                send(reply(text, chs))
+            except requests.RequestException as exc:
+                print(f"reply failed: {type(exc).__name__}", flush=True)
     if offset:
         tg("getUpdates", offset=offset, timeout=0)     # mark everything as handled
+
+
+def digest(chs: list[dict]) -> None:
+    send("🌙 <b>Daily summary</b>\n\n" + cmd_status(chs))
+    send(cmd_today(chs))
+    send(cmd_schedule(chs))
 
 
 def main() -> int:
@@ -361,10 +398,7 @@ def main() -> int:
     if args.once:
         print(reply(args.once, _channels()))
     elif args.digest:
-        chs = _channels()
-        send("🌙 <b>Daily summary</b>\n\n" + cmd_status(chs))
-        send(cmd_today(chs))
-        send(cmd_schedule(chs))
+        digest(_channels())
     elif args.poll:
         poll(args.poll)
     return 0
