@@ -1,0 +1,95 @@
+# Stories that go ahead of the automatic picks, top first. A story leaves the
+# queue once it has been uploaded (tracked in data/history.json); then the
+# automatic picks carry on. Add stories at the bottom, or move them up.
+# A title is used only if every figure in it is in the research.
+long:
+  - topic: "AI bubble"
+    title: "Is the AI Bubble About to Pop? What It Means for Your Money"
+    angle: "Is the AI boom a bubble, and what happens to ordinary jobs and savings if it bursts?"
+    search_query: "AI bubble stocks investors"
+    keywords: [ai bubble explained, ai bubble burst, stock market crash 2026]
+  - topic: "Rising cost of living"
+    title: "Why Is Everything So Expensive Right Now?"
+    angle: "Why do groceries, rent and cars still cost so much, and who is actually getting the money?"
+    search_query: "US consumer prices cost of living"
+    keywords: [why is everything so expensive, why are groceries so expensive in the us, why is housing so expensive]
+  - topic: "Bernie Madoff"
+    history: true
+    title: "The Madoff Scheme: How One Man Stole Billions in Plain Sight"
+    angle: "How did Bernie Madoff fool investors and regulators for decades?"
+    search_query: "Bernie Madoff Ponzi scheme"
+    wiki_title: "Madoff investment scandal"
+    keywords: [madoff scheme, bernie madoff explained, madoff documentary]
+  - topic: "Car prices"
+    title: "Why Are Cars So Expensive Now?"
+    angle: "Why has a new car moved out of reach for so many Americans?"
+    search_query: "US new car prices affordability"
+    keywords: [why are cars so expensive now, why are cars so expensive, car market]
+  - topic: "Enron"
+    history: true
+    title: "Enron: The Biggest Fraud in American Business"
+    angle: "How did one of America's most admired companies turn out to be a fraud?"
+    search_query: "Enron collapse fraud"
+    wiki_title: "Enron scandal"
+    keywords: [enron scandal, enron explained, what happened to enron]
+  - topic: "John D. Rockefeller"
+    history: true
+    collapse: false
+    title: "How John D. Rockefeller Became the World's First Billionaire"
+    angle: "How did a bookkeeper's assistant come to control almost all of America's oil?"
+    search_query: "John D. Rockefeller Standard Oil history"
+    wiki_title: "John D. Rockefeller"
+    keywords: [how rockefeller became rich, rockefeller standard oil, first billionaire]
+  - topic: "WorldCom"
+    history: true
+    title: "WorldCom: The $11 Billion Accounting Lie"
+    angle: "How did WorldCom hide billions in its accounts, and who finally caught it?"
+    search_query: "WorldCom accounting scandal"
+    wiki_title: "MCI Inc."
+    keywords: [worldcom scandal explained, worldcom collapse, bernie ebbers]
+  - topic: "FTX"
+    history: true
+    title: "What Really Happened at FTX?"
+    angle: "How did FTX lose billions of its customers' money so quickly?"
+    search_query: "FTX collapse Sam Bankman-Fried trial"
+    wiki_title: "Bankruptcy of FTX"
+    keywords: [ftx collapse, ftx explained, ftx documentary]
+  - topic: "Rent prices"
+    title: "Why Is Rent So High in America?"
+    angle: "Why has rent climbed so far, and what would actually bring it down?"
+    search_query: "US rent prices housing shortage"
+    keywords: [why is rent so high in america, why is rent so expensive, why is housing unaffordable]
+  - topic: "Car loans"
+    title: "Is the Car Loan Crisis Real?"
+    angle: "Are more Americans falling behind on car payments, and what does that signal?"
+    search_query: "auto loan delinquencies US"
+    keywords: [car loan crisis, car loans explained]
+
+shorts:
+  - topic: "Is the AI bubble about to pop"
+    title: "Is the AI Bubble About to Pop?"
+    angle: "What would an AI crash mean for ordinary people?"
+    search_query: "AI bubble stocks investors"
+    keywords: [ai bubble, ai bubble burst]
+  - topic: "Egg prices"
+    title: "Why Are Eggs Still So Expensive?"
+    angle: "Why are eggs still costly for American shoppers?"
+    search_query: "US egg prices"
+    keywords: [why are eggs so expensive, egg prices]
+  - topic: "Kalshi"
+    title: "How Does Kalshi Actually Make Money?"
+    angle: "How does the prediction market Kalshi make its money?"
+    search_query: "Kalshi prediction market fees"
+    keywords: [how does kalshi make money, how does kalshi work]
+  - topic: "Gas prices"
+    title: "Why Is Gas So Expensive?"
+    angle: "What is pushing up the price of gas in the US?"
+    search_query: "US gas prices"
+    keywords: [why is gas so expensive, gas prices]
+  - topic: "How Madoff fooled everyone"
+    history: true
+    title: "How Did Madoff Fool Everyone?"
+    angle: "How did Bernie Madoff keep his fraud hidden for decades?"
+    search_query: "Bernie Madoff Ponzi scheme"
+    wiki_title: "Madoff investment scandal"
+    keywords: [madoff scheme, bernie madoff]

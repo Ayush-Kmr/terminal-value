@@ -100,7 +100,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     title_opts = seo.titles(cfg, company, angle, best_fact, language, facts=fact_lines,
                             style=title_style())
     best = title_opts[0]
-    title = best["title"]
+    title = set_title(story.get("title", ""), fact_lines, best["title"])
     series = (cfg.get_path("upload.series_playlist")
               if story.get("history") and story.get("collapse", True) else "")
     if series and len(title) + len(series) + 3 <= 100:
@@ -247,6 +247,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     keywords = [str(k) for k in story.get("keywords", [])]
     # The on-screen headline is the title itself: written to be understood
     # cold, where the 2-4 word thumbnail text often is not.
+    best["title"] = set_title(story.get("title", ""),
+                              [str(f.get("claim", "")) for f in fb.facts], best["title"])
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               headline, best["title"], language)
@@ -264,6 +266,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
                   "language": language, "region": story.get("region"),
                   "warnings": warnings, "angle": story.get("angle", ""),
                   "question": best.get("question", ""), "title_style": best.get("style", ""),
+                  "queue": story.get("queue", ""),
                   "parent_url": story.get("parent_url", "")})
     (workdir / "metadata.json").write_text(
         json.dumps(short, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -316,6 +319,33 @@ def history_story(cfg, args) -> dict | None:
         return None
     from src import viral
     return viral.history_story(cfg)
+
+
+def queued(args, kind: str, n: int) -> list[dict]:
+    """The next stories from data/queue.yaml not yet uploaded."""
+    import yaml
+
+    path = ROOT / "data" / "queue.yaml"
+    if args.topic or not path.exists():
+        return []
+    used = {e.get("queue") for e in state.load().get("episodes", [])}
+    out = []
+    for item in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get(kind, []):
+        key = f"{kind}:{item['topic']}"
+        if key in used:
+            continue
+        story = {"company": item["topic"], "region": "US", "language": "en", "wiki_title": "",
+                 **item, "queue": key}
+        story["history"] = item["topic"] if item.get("history") else ""
+        out.append(story)
+        if len(out) >= n:
+            break
+    return out
+
+
+def set_title(fixed: str, facts: list[str], best: str) -> str:
+    """A queued title stands only if the research supports every figure in it."""
+    return fixed if fixed and not seo._unsupported_numbers(fixed, " ".join(facts)) else best
 
 
 def evergreen_story(cfg, args) -> dict | None:
@@ -381,7 +411,7 @@ def lead_of(short: dict) -> str:
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
-    stories = candidates_for(cfg, args, n)
+    stories = queued(args, "shorts", n) + candidates_for(cfg, args, n)
     return make_shorts(cfg, args, stories[:n], stories[n:])
 
 
@@ -421,7 +451,7 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
                 "region": short["region"], "language": short["language"],
                 "video_id": sid, "kind": "short", "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
-                "title_style": short["title_style"],
+                "title_style": short["title_style"], "queue": short["queue"],
             })
             state.save(st)
             lines = [f"✅ Short: {short['title']}", f"https://youtu.be/{sid}",
@@ -464,7 +494,9 @@ def run(args) -> int:
 
     n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
     candidates = candidates_for(cfg, args, 4 + n_shorts)
-    story = history_story(cfg, args) or evergreen_story(cfg, args) or candidates[0]
+    first = queued(args, "long", 1)
+    story = (first[0] if first else None) or history_story(cfg, args) \
+        or evergreen_story(cfg, args) or candidates[0]
     if story.get("evergreen") or story.get("history"):
         log.info("Not today's news: %s", story["angle"])
     if do_gates and cfg.get_path("gates.topic_approval", False):
@@ -496,7 +528,7 @@ def run(args) -> int:
     # Shorts are their own stories (the next ones down today's list): they
     # outperformed cuts from the long video about five to one. A manual topic
     # has no other stories, so its Shorts are cut from the long video.
-    others = [c for c in candidates if c["topic"] != company]
+    others = queued(args, "shorts", n_shorts) + [c for c in candidates if c["topic"] != company]
     short_stories, spare_stories = others[:n_shorts], others[n_shorts:]
 
     if args.no_upload:
@@ -561,6 +593,7 @@ def run(args) -> int:
         "region": meta["region"], "language": meta["language"],
         "video_id": video_id, "short_ids": short_ids, "kind": "long",
         "question": meta["question"], "title_style": meta["title_style"],
+        "queue": story.get("queue", ""),
         "evergreen": story.get("evergreen", ""), "history": story.get("history", ""),
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })
