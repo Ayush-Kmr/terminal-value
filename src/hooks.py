@@ -36,7 +36,11 @@ Strongest surprising facts available:
 Narrator voice:
 {voice}
 
-Each cold open: 35-55 words, spoken aloud in about 15-20 seconds.
+Each cold open: 65-85 words, spoken aloud in about 30 seconds, in three parts:
+  0-5 seconds: the attention grab.
+  5-15 seconds: what is at stake for the viewer personally, and exactly what they
+  will know by the end. This promise is required.
+  15-30 seconds: why it matters now, ending on what the video answers next.
 
 Make the five genuinely different in STRATEGY, not just wording:
   1. Open on the single most absurd verifiable number.
@@ -45,6 +49,7 @@ Make the five genuinely different in STRATEGY, not just wording:
   4. Open on the thing the viewer thinks they know, then undercut it.
   5. Open on the ending, then rewind.
 
+Never compare a figure to anything unless the facts above make that comparison.
 Never begin with a rhetorical question. Never use: {banned}
 
 Return JSON array of objects: {{"strategy": "...", "text": "..."}}"""
@@ -52,11 +57,12 @@ Return JSON array of objects: {{"strategy": "...", "text": "..."}}"""
 SCORE_PROMPT = """Score each cold open 0-100 for a YouTube explainer audience.
 
 Rubric:
-  35  Curiosity gap — does the viewer now need the rest of the video?
-  25  Specificity — real numbers, names, dates beat abstractions every time
-  20  Pace — does it get to the point inside the first sentence?
-  15  Credibility — does it sound like someone who read the source material?
-   5  Freshness — does it avoid documentary cliché?
+  25  Curiosity gap — does the viewer now need the rest of the video?
+  20  Viewer stake — does it say what this means for the viewer's own money or life?
+  20  Clear promise — within 15 seconds, do they know what they will get?
+  15  Specificity — real numbers, names, dates beat abstractions every time
+  10  Pace — does it get to the point inside the first sentence?
+  10  Credibility — does it sound like someone who read the source material?
 
 Deduct 25 points for any rhetorical question. Deduct 20 for stacked adjectives.
 Deduct 15 if the first six words are generic scene-setting.
@@ -84,10 +90,10 @@ def _penalty(text: str) -> tuple[int, list[str]]:
         score -= 15
         issues.append("no concrete number")
     words = len(text.split())
-    if words > 65:
+    if words > 90:
         score -= 10
         issues.append(f"too long ({words} words)")
-    if words < 25:
+    if words < 55:
         score -= 10
         issues.append(f"too short ({words} words)")
     return score, issues

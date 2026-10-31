@@ -166,6 +166,55 @@ def blocked(cand: dict[str, Any], words: list[str]) -> str:
     return next((w for w in words if re.search(rf"\b{re.escape(w.lower())}\b", text)), "")
 
 
+STOCK_PROMPT = """Choose today's best stock move for a 28-second YouTube Short for
+American viewers. People search "<company> stock" the moment such news breaks, and
+big channels ignore smaller names.
+
+Headlines from the last day:
+{headlines}
+
+Choose ONE real, listed US company:
+- smaller or mid-sized: not Apple, Microsoft, Nvidia, Amazon, Alphabet, Meta or Tesla
+- the share price moved sharply for a clear reported reason
+- not a penny stock, a crypto token or a takeover rumour
+- not any of these, already covered: {covered}
+
+We explain what happened and why. We never say whether to buy, sell or hold.
+
+Return one JSON object:
+  company       - the name viewers search, 1-2 words
+  angle         - the one question the Short answers
+  search_query  - 3-6 words that find reporting on exactly this
+  why_trending  - what happened"""
+
+
+def stock_move(cfg: Config) -> dict[str, Any] | None:
+    """Today's stock story for a Short, or None: this is a bonus, never a reason
+    to lose a run."""
+    query = ('"stock soars" OR "stock plunges" OR "shares surge" OR "shares tumble" '
+             'OR "shares jump" OR "stock falls" when:1d')
+    try:
+        heads = news_headlines("en-US", "US", query, limit=30)
+        covered = state.covered_companies(state.load(), cfg.get_path("trending.cooldown_days", 10))
+        pick = llm.json_call(STOCK_PROMPT.format(
+            headlines="\n".join(f"- {h['title']} ({h['source']})" for h in heads),
+            covered=", ".join(sorted(covered)) or "none"), temperature=0.3)
+        name = str(pick.get("company") or "").strip()
+        topic = f"{name} stock"
+        if not name or topic.lower() in covered:
+            return None
+        if blocked(pick, cfg.get_path("trending.block_words", []) or []):
+            return None
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Stock pick unavailable: %s", str(exc)[:160])
+        return None
+    log.info("Stock Short today: %s", topic)
+    return {"topic": topic, "company": topic, "stock": name, "region": "MARKETS", "language": "en",
+            "angle": pick.get("angle", ""), "search_query": pick.get("search_query") or topic,
+            "why_trending": pick.get("why_trending", ""), "wiki_title": "",
+            "keywords": [topic, f"{topic} news", f"why is {topic} moving"]}
+
+
 def own_winners(st: dict[str, Any], limit: int = 6) -> str:
     """Best-performing US stories first, from the numbers the weekly report saves."""
     eps = [e for e in st.get("episodes", []) if (e.get("stats") or {}).get("views")

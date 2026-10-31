@@ -128,7 +128,7 @@ structure:
     - id: what_happened
       label: "What happened"
       share: 0.24
-      intent: "Exactly what happened, in order, with dates, names and numbers."
+      intent: "Exactly what happened, in order, with dates, names and numbers. Inside the first 60 seconds of this section, name the surprising thing the video will reveal later, so the viewer has a reason to stay."
     - id: background
       label: "How we got here"
       share: 0.24
@@ -151,7 +151,7 @@ structure:
     - id: rise
       label: "The rise"
       share: 0.24
-      intent: "Who built this and how, with dates, names and numbers. Make the viewer understand why people believed in it."
+      intent: "Who built this and how, with dates, names and numbers. Make the viewer understand why people believed in it. Inside the first 60 seconds of this section, tell the viewer what was hidden and that they will see how it was found."
     - id: crack
       label: "The crack"
       share: 0.24
@@ -174,7 +174,7 @@ structure:
     - id: beginnings
       label: "The beginning"
       share: 0.22
-      intent: "Where they came from and what shaped them, with dates, places and numbers."
+      intent: "Where they came from and what shaped them, with dates, places and numbers. Inside the first 60 seconds of this section, name the risky decision that is coming."
     - id: bet
       label: "The big bet"
       share: 0.26

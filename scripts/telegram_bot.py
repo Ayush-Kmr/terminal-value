@@ -394,7 +394,14 @@ def poll(seconds: int) -> None:
         tg("getUpdates", offset=offset, timeout=0)     # mark everything as handled
 
 
+REVIEW_ON = "2026-11-16"
+
+
 def digest(chs: list[dict]) -> None:
+    if date.today().isoformat() == REVIEW_ON:
+        send("📋 <b>Review day</b>\nThe US content now has real data. Run /youtube analyze in "
+             "Claude Code, and check click-through rate in YouTube Studio.\n"
+             "If long videos sit under 35% watched, shorten the rest to 8 minutes.")
     send("🌙 <b>Daily summary</b>\n\n" + cmd_status(chs))
     send(cmd_today(chs))
     send(cmd_schedule(chs))

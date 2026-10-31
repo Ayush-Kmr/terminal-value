@@ -249,6 +249,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     # cold, where the 2-4 word thumbnail text often is not.
     best["title"] = set_title(story.get("title", ""),
                               [str(f.get("claim", "")) for f in fb.facts], best["title"])
+    if story.get("stock") and "stock" not in best["title"].lower():
+        best["title"] = f"{story['stock']} Stock: {best['title']}"[:seo.SHORT_TITLE_MAX + 10]
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               headline, best["title"], language)
@@ -404,6 +406,17 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
     log.info("YouTube status for %s: %s", video_id, yt_status)
 
 
+def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
+    """The second Short of the day is a stock move: "iren stock" was the channel's
+    best search term by far."""
+    from src import trends
+
+    move = None if args.topic else trends.stock_move(cfg)
+    if move:
+        stories.insert(min(1, len(stories)), move)
+    return stories
+
+
 def lead_of(short: dict) -> str:
     return short["description"].split("\n\n")[0]
 
@@ -411,7 +424,7 @@ def lead_of(short: dict) -> str:
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
-    stories = queued(args, "shorts", n) + candidates_for(cfg, args, n)
+    stories = with_stock(cfg, args, queued(args, "shorts", n) + candidates_for(cfg, args, n))
     return make_shorts(cfg, args, stories[:n], stories[n:])
 
 
@@ -528,7 +541,8 @@ def run(args) -> int:
     # Shorts are their own stories (the next ones down today's list): they
     # outperformed cuts from the long video about five to one. A manual topic
     # has no other stories, so its Shorts are cut from the long video.
-    others = queued(args, "shorts", n_shorts) + [c for c in candidates if c["topic"] != company]
+    others = with_stock(cfg, args, queued(args, "shorts", n_shorts)
+                        + [c for c in candidates if c["topic"] != company])
     short_stories, spare_stories = others[:n_shorts], others[n_shorts:]
 
     if args.no_upload:
