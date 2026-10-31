@@ -218,7 +218,8 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         out.append({**o, "lint_score": adj, "issues": issues})
     if not out:
         raise RuntimeError("Title generator returned nothing usable")
-    out.sort(key=lambda t: (t.get("style") == style and t["lint_score"] > -20,
+    out.sort(key=lambda t: (len(t["title"]) <= maxlen,     # the limit comes before everything
+                            t.get("style") == style and t["lint_score"] > -20,
                             t["lint_score"], len(t["title"])), reverse=True)
     for t in out:
         t["searches"] = searches
