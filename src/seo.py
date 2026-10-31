@@ -54,6 +54,8 @@ Rules:
   the name of the person, company, place or event, plus the search word that
   goes with it ("Nvidia stock", "Boeing layoffs", "Fed rate cut",
   "US China trade deal"). Those words must be in the first 40 characters.
+- Normal headline capitalisation: capitalise names and the main words. Search
+  phrases arrive in lower case; never copy them that way.
 - State or imply a specific claim or question. Promise only what the video delivers.
 - No ALL CAPS words. No exclamation marks. No "shocking", "insane", "exposed".
 - A number in the title is good when it is a real number from the research.
@@ -112,6 +114,43 @@ def _lint(title: str, maxlen: int = TITLE_MAX) -> tuple[int, list[str]]:
     return score, issues
 
 
+SMALL_WORDS = {"a", "an", "and", "as", "at", "but", "by", "for", "in", "of", "on", "or",
+               "the", "to", "vs", "with", "from", "is", "its", "over"}
+ACRONYMS = {"ai", "ceo", "cfo", "ipo", "gdp", "cpi", "sec", "etf", "ev", "evs", "fbi", "irs",
+            "ibm", "amd", "tsmc", "ups", "ftc", "doj", "nyse", "opec", "imf", "usa", "uk", "eu",
+            "q1", "q2", "q3", "q4", "s&p", "at&t"}
+SPELLED = {"openai": "OpenAI", "xai": "xAI", "spacex": "SpaceX", "tiktok": "TikTok",
+           "youtube": "YouTube", "jpmorgan": "JPMorgan", "coreweave": "CoreWeave",
+           "iphone": "iPhone", "chatgpt": "ChatGPT", "paypal": "PayPal", "ebay": "eBay",
+           "bytedance": "ByteDance", "linkedin": "LinkedIn"}
+
+
+def headline_case(title: str) -> str:
+    """Search phrases come back in lower case and models copy them. A title that
+    is mostly lower case gets headline capitals; a cased one is left alone."""
+    words = title.split(" ")
+    alpha = [w for w in words if w[:1].isalpha()]
+    if not title.isascii() or not alpha:
+        return title
+    if sum(w[0].isupper() for w in alpha) * 2 >= len(alpha):
+        return title[:1].upper() + title[1:]
+
+    def fix(word: str, first: bool) -> str:
+        m = re.match(r"^([^\w&]*)([\w&.'-]*)(.*)$", word)
+        lead, core, tail = m[1], m[2], m[3]
+        low = core.lower().rstrip("'s") if core.lower().endswith("'s") else core.lower()
+        rest = core[len(low):] if core.lower().startswith(low) else ""
+        if low in SPELLED:
+            core = SPELLED[low] + rest
+        elif low in ACRONYMS:
+            core = low.upper() + rest
+        elif core.islower() and (first or core not in SMALL_WORDS):
+            core = core[:1].upper() + core[1:]
+        return lead + core + tail
+
+    return " ".join(fix(w, i == 0) for i, w in enumerate(words))
+
+
 STOP = {"the", "and", "for", "with", "near", "new", "over", "into", "from", "its",
         "why", "how", "what", "after", "amid", "says", "news"}
 
@@ -137,7 +176,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
     from . import keywords
 
     facts = [f for f in (facts or []) if f][:12]
-    evidence = " ".join([company, angle, best_fact, *facts])
+    evidence = " ".join(str(x) for x in [company, angle, best_fact, *facts])
     searches = keywords.for_story(company, language)
     options = llm.json_call(
         TITLE_PROMPT.format(
@@ -152,6 +191,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
     for o in options:
         if not isinstance(o, dict) or not o.get("title"):
             continue
+        o["title"] = headline_case(str(o["title"]).strip())
         adj, issues = _lint(o["title"], maxlen)
         if not _names_subject(o["title"], company):
             adj -= 30

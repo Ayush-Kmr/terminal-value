@@ -1,6 +1,8 @@
 """Narration, rendered per shot so audio and visuals stay locked.
 
-Three providers (voice.provider in config.yaml): "clone" speaks in the channel
+Four providers (voice.provider in config.yaml): "kokoro" is the open Kokoro-82M
+model, run on the build machine, clear American English at no cost per character;
+"clone" speaks in the channel
 owner's own cloned voice with an open model that runs on the build machine and
 costs nothing per character; "indic" is AI4Bharat's open Indic Parler-TTS, also
 run on the build machine, for languages the clone cannot speak (Tamil);
@@ -152,9 +154,40 @@ def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> 
         raw.unlink()
 
 
+def _kokoro_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None,
+                  audio_dir: Path) -> None:
+    """Speak every missing shot in one run of scripts/kokoro_tts.py (its own
+    virtualenv). Figures are spelled out first, and names the model gets wrong
+    are fixed by voice.kokoro.lexicon."""
+    python = (os.environ.get("KOKORO_PYTHON")
+              or str(ROOT / ".venv-kokoro" / "bin" / "python"))
+    if not Path(python).exists():
+        raise VoiceError(f"Kokoro environment not found at {python}. See SETUP.md.")
+    raws = [path.with_suffix(".wav") for _, path in todo]
+    jobs = audio_dir / "kokoro_jobs.json"
+    jobs.write_text(json.dumps({
+        "voice": cfg.get_path("voice.kokoro.voice", "af_heart"),
+        "speed": cfg.get_path("voice.kokoro.speed", 1.0),
+        "lexicon": cfg.get_path("voice.kokoro.lexicon", {}) or {},
+        "items": [{"text": spoken(text, language or "en"), "out": str(raw)}
+                  for (text, _), raw in zip(todo, raws)],
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("Kokoro voice: speaking %d shots", len(todo))
+    res = subprocess.run([python, str(ROOT / "scripts" / "kokoro_tts.py"), str(jobs)],
+                         stdout=sys.stderr, stderr=subprocess.STDOUT,
+                         env={**os.environ, "TQDM_DISABLE": "1"})
+    if res.returncode != 0:
+        raise VoiceError(f"Kokoro voice run failed with exit code {res.returncode}")
+    for (_, path), raw in zip(todo, raws):
+        _polish(raw, path)
+        raw.unlink()
+
+
 def _speak_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None,
                  audio_dir: Path) -> None:
-    if cfg.get_path("voice.provider") == "indic":
+    if cfg.get_path("voice.provider") == "kokoro":
+        _kokoro_batch(cfg, todo, language, audio_dir)
+    elif cfg.get_path("voice.provider") == "indic":
         _indic_batch(cfg, todo, audio_dir)
     else:
         _clone_batch(cfg, todo, language, audio_dir)
@@ -262,7 +295,8 @@ def duration(path: Path) -> float:
 def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
                   region: str | None = None, language: str | None = None) -> list[dict]:
     """Synthesise one audio file per shot; attach real durations."""
-    cloned = cfg.get_path("voice.provider", "elevenlabs") in ("clone", "indic")
+    provider = cfg.get_path("voice.provider", "elevenlabs")
+    cloned = provider in ("clone", "indic", "kokoro")
     audio_dir = outdir / "audio"
     audio_dir.mkdir(parents=True, exist_ok=True)
     if cloned:
@@ -271,7 +305,10 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
         missing = [(text, path) for text, path in todo if not path.exists()]
         if missing:
             _speak_batch(cfg, missing, language, audio_dir)
-        heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language)
+        # Kokoro says a line the same way every time, so a second take cannot help:
+        # its transcripts are still needed for the caption timings.
+        heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language,
+                             rounds=0 if provider == "kokoro" else 2)
                  if cfg.get_path("voice.check", True) else {})
         for shot in shots:
             t = heard.get(audio_dir / f"shot_{shot['index']:03d}.mp3")

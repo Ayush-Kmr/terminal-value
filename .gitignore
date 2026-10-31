@@ -8,3 +8,4 @@ data/token.json
 .venv-voice/
 assets/voice/sample_full.wav
 .venv-indic/
+.venv-kokoro/

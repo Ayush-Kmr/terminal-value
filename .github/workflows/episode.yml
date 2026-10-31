@@ -60,27 +60,27 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      # espeak-ng lets the voice pronounce names outside its dictionary.
       - name: Install ffmpeg
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu espeak-ng
 
       - run: pip install -r requirements.txt
 
-      # The cloned-voice model lives in its own environment (older torch/numpy).
+      # The voice model lives in its own environment.
       - name: Cache voice environment and model
         uses: actions/cache@v4
         with:
           path: |
-            .venv-voice
+            .venv-kokoro
             ~/.cache/huggingface
-            ~/.pkuseg
-          key: voice-${{ runner.os }}-${{ hashFiles('requirements-voice.txt') }}
+          key: kokoro-${{ runner.os }}-${{ hashFiles('requirements-kokoro.txt') }}
 
-      - name: Install cloned-voice model
+      - name: Install voice model
         run: |
-          if [ ! -x .venv-voice/bin/python ]; then
-            python -m venv .venv-voice
-            .venv-voice/bin/pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
-            .venv-voice/bin/pip install -q -r requirements-voice.txt
+          if [ ! -x .venv-kokoro/bin/python ]; then
+            python -m venv .venv-kokoro
+            .venv-kokoro/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+            .venv-kokoro/bin/pip install -q -r requirements-kokoro.txt
           fi
 
       - name: Produce episode

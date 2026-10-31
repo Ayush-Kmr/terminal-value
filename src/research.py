@@ -216,7 +216,7 @@ def validate(cfg: Config, fb: FactBase) -> list[str]:
 # Trending stories have no filings. The fact base comes from what outlets have
 # already published: a search-grounded briefing plus the day's headlines.
 
-def grounded_briefing(topic: str, angle: str) -> tuple[str, list[Source]]:
+def grounded_briefing(topic: str, angle: str, history: bool = False) -> tuple[str, list[Source]]:
     """Ask Gemini to brief the story using live Google Search. Returns the
     briefing text and the pages it was grounded on. Empty on any failure —
     the caller falls back to headlines."""
@@ -234,6 +234,15 @@ def grounded_briefing(topic: str, angle: str) -> tuple[str, list[Source]]:
         "and what happens next. Only include what reputable outlets have reported. "
         "Where reports conflict or something is unconfirmed, say so explicitly."
     )
+    if history:
+        prompt = (
+            f"Brief me on this piece of business history: {topic}\n"
+            f"The question to answer: {angle}\n\n"
+            "Search for reputable accounts: court records, regulators' reports, major "
+            "newspapers and books. Write a factual briefing of about 800 words: the people "
+            "(full names and roles), the dates in order, the key numbers, what went wrong, "
+            "who lost what, and what changed afterwards. Where accounts conflict, say so."
+        )
     # Each model has its own free daily allowance, so a spent main model
     # does not have to mean a headlines-only video.
     for model in llm.GEMINI_MODELS:
@@ -359,6 +368,13 @@ the material gives a real series of numbers that would make an honest chart;
 otherwise return an empty list. Include quotes only if they appear verbatim."""
 
 
+def _claim_text(value: Any) -> str:
+    """Models sometimes return a fact as an object instead of a sentence."""
+    if isinstance(value, dict):
+        value = value.get("claim") or value.get("fact") or value.get("text") or ""
+    return str(value or "").strip()
+
+
 def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     from datetime import datetime
     from . import trends
@@ -366,12 +382,13 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     topic, angle = story["topic"], story.get("angle", "")
     log.info("Researching story: %s", topic)
 
-    briefing, sources = grounded_briefing(topic, angle)
+    history = bool(story.get("history"))
+    briefing, sources = grounded_briefing(topic, angle, history)
     articles, article_sources = article_texts(
         [story.get("search_query"), topic, *[str(k) for k in story.get("keywords", [])[:2]]])
     sources = list(sources) + article_sources
 
-    query = (story.get("search_query") or topic) + " when:3d"
+    query = (story.get("search_query") or topic) + ("" if history else " when:3d")
     heads = trends.news_headlines("en-US", "US", query, limit=15)
     if story.get("language") == "hi":
         heads += trends.news_headlines("hi", "IN", story.get("search_query") or topic, limit=6)
@@ -392,7 +409,7 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
         wiki_text, wiki_src = wikipedia_summary(story["wiki_title"])
         if wiki_text:
             material += ("\n\nBACKGROUND (encyclopedia; may predate this week's events):\n"
-                         + wiki_text[:3000])
+                         + wiki_text[:9000 if history else 3000])
 
     if not briefing and not articles and len(heads) < 3:
         raise RuntimeError(f"Not enough reporting found on {topic!r} to make a video")
@@ -414,7 +431,10 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     fb.people = data.get("people", [])
     first_beat = beat_ids.split("|")[0] if beat_ids else "hook"
     for s in data.get("surprising_facts", []):
-        fb.facts.append({"claim": s, "beat": first_beat, "is_surprising": True})
+        fb.facts.append({"claim": _claim_text(s), "beat": first_beat, "is_surprising": True})
+    fb.facts = [{**f, "claim": _claim_text(f.get("claim"))} if isinstance(f, dict)
+                else {"claim": _claim_text(f)} for f in fb.facts]
+    fb.facts = [f for f in fb.facts if f["claim"]]
 
     # Publishers actually cited, deduplicated by outlet.
     fb.sources = list(sources)

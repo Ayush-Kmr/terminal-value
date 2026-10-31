@@ -121,9 +121,41 @@ def _number(raw: str, language: str, plain: bool) -> str:
     return words
 
 
+DECADES = {"10": "tens", "20": "twenties", "30": "thirties", "40": "forties", "50": "fifties",
+           "60": "sixties", "70": "seventies", "80": "eighties", "90": "nineties"}
+
+
+def _english(text: str) -> str:
+    """Finance shorthand a voice model reads wrongly if left as it is written."""
+    text = re.sub(r"\b401\(k\)s?", lambda m: "four oh one K" + ("s" if m[0][-1] == "s" else ""),
+                  text, flags=re.I)
+    text = re.sub(r"\b403\(b\)", "four oh three B", text, flags=re.I)
+    text = text.replace("AT&T", "A T and T").replace("S&P", "S and P")
+    text = re.sub(r"\b([A-Z])&([A-Z])\b", r"\1 and \2", text)
+    text = re.sub(r"\bQ([1-4])\b", lambda m: "Q " + num2words(int(m[1])), text)
+    text = re.sub(r"\bFY\s?(\d{2})\b", lambda m: "fiscal " + num2words(int(m[1])), text)
+    text = re.sub(r"\bFY\s?(\d{4})\b", r"fiscal \1", text)
+    text = re.sub(r"\bU\.?S\.?(?=\s|$|[,;:)])(?!\s[a-z]+\s[A-Z]\.)", "U.S.", text)
+    text = re.sub(r"\bP/E\b", "P E", text)
+    text = text.replace("24/7", "twenty four seven")
+    text = re.sub(r"\bvs\.?(?=\s)", "versus", text)
+    text = re.sub(r"(?<![\w.])(\d{1,3}(?:,\d{3})*|\d+)(st|nd|rd|th)\b",
+                  lambda m: num2words(int(m[1].replace(",", "")), to="ordinal"), text)
+    text = re.sub(r"\b(19|20)([1-9]0)s\b", lambda m: num2words(int(m[1]), lang="en") + " "
+                  + DECADES[m[2]], text)
+    text = re.sub(r"\$(\d+)\.(\d{2})(?!\d)(?!\s?(?:thousand|million|billion|trillion))",
+                  lambda m: f"{num2words(int(m[1]))} dollar{'' if m[1] == '1' else 's'} and "
+                            f"{num2words(int(m[2]))} cent{'' if m[2] == '01' else 's'}", text)
+    text = re.sub(r"(\d+(?:\.\d+)?)x\b", r"\1 times", text)
+    text = text.replace("~", "about ").replace(" & ", " and ")
+    return text
+
+
 def spoken(text: str, language: str) -> str:
     """Narration with every figure written out in words."""
     language = language if language in CURRENCY else "en"
+    if language == "en":
+        text = _english(text)
 
     def repl(m: re.Match) -> str:
         cur, pct, scale = m["cur"], m["pct"], (m["scale"] or "").strip()
@@ -137,4 +169,6 @@ def spoken(text: str, language: str) -> str:
         return " " + " ".join(out) + " "
 
     text = NUMBER.sub(repl, re.sub(r"(?<=\w)-(?=\d)", " ", text))
+    if language == "en":
+        text = re.sub(r"\bone dollars\b", "one dollar", text)
     return re.sub(r"\s+([,.।?!;:])", r"\1", re.sub(r"\s{2,}", " ", text)).strip()

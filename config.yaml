@@ -69,11 +69,14 @@ trending:
        news: {hl: en-US, gl: US, query: "stocks OR earnings OR layoffs OR \"Federal Reserve\" OR tariffs when:1d"}}
   # Stories an unattended pipeline must not narrate. These are also the
   # categories YouTube restricts ads on.
+  # Checked in code after the model picks: a story using any of these words is
+  # thrown out, whatever the model thought of it. Whole words, any case.
+  block_words: [election, elections, midterm, midterms, candidate, candidates, congressional race, senate race, governor race, ballot, ballots, exit poll, voters, primary election, nfl, nba, mlb, nhl, ufc, ipl, super bowl, world series, playoffs, draft pick]
   avoid:
     - Deaths, accidents, disasters, attacks or crimes where victims are still being counted or named
     - Accusations against a named individual that no court or regulator has ruled on
     - Communal, caste or religious conflict
-    - An election in its voting or counting period, and opinion-poll or exit-poll claims
+    - Elections and campaigns at any time: candidates, races, debates, polls, ballots and results
     - Medical or health advice, including outbreaks and treatments
     - Active military operations where the facts are contested between governments
     - Sexual content, suicide or self-harm
@@ -91,13 +94,16 @@ format:
     # Every 3rd long video is an evergreen explainer from data/evergreen.yaml
     # (searched for month after month) instead of today's news. 0 = never.
     evergreen_every: 3
+    # Every 2nd long video is a past business story already proven at a million
+    # views (src/viral.py), told from our own research. 0 = never.
+    history_every: 2
     # Over 8 minutes so the video can carry mid-roll ads once monetised.
     # The narration runs faster than 150 words a minute (a 9.5-minute script
     # came out at 8:28), so aim well above the line. A video that still ends
     # up under min_minutes is reported in Telegram.
     target_minutes: 10.5
     min_minutes: 8
-    words_per_minute: 150
+    words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["12:00"]    # ET, channel timezone. A starting point to test
   short:
     per_day: 2                  # two standalone Shorts every day, on the next
@@ -134,6 +140,48 @@ structure:
       share: 0.20
       intent: "What is confirmed to happen next, what is still unknown, and what to watch for. End on the open question, not on a moral. Do not ask for likes or subscriptions."
 
+  # Long videos about the past (src/viral.py) use this spine instead.
+  history_beats:
+    - id: hook
+      label: "The story"
+      share: 0.08
+      intent: "The single most striking verified fact of the story. Start at the moment it all went wrong. No greeting, no channel name."
+    - id: rise
+      label: "The rise"
+      share: 0.24
+      intent: "Who built this and how, with dates, names and numbers. Make the viewer understand why people believed in it."
+    - id: crack
+      label: "The crack"
+      share: 0.24
+      intent: "The decision or the flaw that started the fall, and who saw it first."
+    - id: fall
+      label: "The fall"
+      share: 0.26
+      intent: "How it came apart, in order, with dates and numbers, and who lost what."
+    - id: legacy
+      label: "What it changed"
+      share: 0.18
+      intent: "What changed afterwards for ordinary Americans: laws, jobs, prices, savings. End on what the story still explains today, not on a moral. Do not ask for likes or subscriptions."
+
+# ---------- proven demand on YouTube (src/viral.py) ----------
+# Used only to choose subjects. Nothing is ever copied from these videos.
+viral:
+  news_days: 7
+  news_min_views: 100000
+  news_queries: [stock market news, business news explained, ai stocks]
+  history_min_views: 1000000
+  history_queries: [rise and fall of company documentary, biggest corporate scandal documentary, stock market crash history documentary]
+  history_avoid:
+    - Anything mainly about a country other than the United States
+  # Used when the search finds nothing, in this order.
+  history_fallback:
+    - {topic: "Enron", angle: "How did one of America's most admired companies turn out to be a fraud?", search_query: "Enron collapse", wiki_title: "Enron scandal", keywords: [enron scandal, what happened to enron]}
+    - {topic: "Lehman Brothers", angle: "How did a 158-year-old bank collapse in a single weekend?", search_query: "Lehman Brothers bankruptcy", wiki_title: "Bankruptcy of Lehman Brothers", keywords: [lehman brothers collapse, 2008 financial crisis]}
+    - {topic: "Blockbuster", angle: "How did Blockbuster go from 9,000 stores to one?", search_query: "Blockbuster bankruptcy", wiki_title: "Blockbuster (retailer)", keywords: [what happened to blockbuster, blockbuster vs netflix]}
+    - {topic: "WorldCom", angle: "How did WorldCom hide billions in plain sight?", search_query: "WorldCom accounting scandal", wiki_title: "MCI Inc.", keywords: [worldcom scandal, bernie ebbers]}
+    - {topic: "Theranos", angle: "How did Theranos convince investors with technology that did not work?", search_query: "Theranos fraud trial", wiki_title: "Theranos", keywords: [theranos explained, elizabeth holmes]}
+    - {topic: "Long-Term Capital Management", angle: "How did a hedge fund run by Nobel winners nearly break Wall Street?", search_query: "Long-Term Capital Management collapse", wiki_title: "Long-Term Capital Management", keywords: [ltcm collapse, hedge fund collapse 1998]}
+
 # ---------- visual system ----------
 # Motion graphics first. AI video is a garnish, not the meal.
 visuals:
@@ -165,17 +213,40 @@ visuals:
 # ---------- sound ----------
 audio:
   music: true                  # background bed under the narration
-  music_volume: 0.7            # 0 to 1. It drops further whenever the voice speaks
+  music_volume: 0.55           # 0 to 1. It drops further whenever the voice speaks
   # Beds live in assets/music/*.mp3; one is picked per video. The three there
   # were generated by scripts/make_music.py, so the channel owns them. Replace
   # them with any tracks you hold the rights to.
 
 # ---------- voice ----------
 voice:
+  # kokoro     = Kokoro-82M, an open Apache-2.0 model run on the build machine.
+  #              Clear American English, faster than real time, no per-character cost.
   # clone      = the channel owner's own voice, cloned by an open model that
   #              runs on the build machine. No per-character cost.
   # elevenlabs = ElevenLabs API (needs a paid plan for daily videos).
-  provider: clone
+  provider: kokoro
+  kokoro:
+    voice: af_heart            # top-graded voice. Male alternative: am_michael
+    speed: 1.0
+    # Names the model gets wrong: word -> phonemes. Add new ones here.
+    lexicon:
+      Bloomberg: blˈumbəɹɡ
+      Satya: sˈʌtjə
+      Nadella: nədˈɛlə
+      Jensen: ʤˈɛnsən
+      Huang: hwˈɑŋ
+      Palantir: pˈælənˌtɪɹ
+      Powell: pˈWəl
+      Altman: ˈɔltmən
+      Zuckerberg: zˈʌkəɹbəɹɡ
+      Bezos: bˈAzOs
+      Dimon: dˈImən
+      Nasdaq: nˈæzdæk
+      Broadcom: bɹˈɔdkɑm
+      IREN: ˈIɹɛn
+      Bessent: bˈɛsənt
+      Lutnick: lˈʌtnɪk
   pause_after_beat_ms: 650
   clone:
     # Clips cut from the owner's recording, one per narration language, so

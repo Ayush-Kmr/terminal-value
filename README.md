@@ -27,8 +27,8 @@ today's top trend, or type a story and choose its region.
    picks the stories. `trending.avoid` in `config.yaml` lists what it must skip.
 2. `src/research.py` builds a fact base from a search-grounded briefing and the
    day's headlines. The script may only use facts from it.
-3. `src/script.py` writes five sections; `src/voice.py` narrates each shot in the
-   owner's cloned voice (an open model run by `scripts/clone_tts.py`); `src/assets.py` gathers a visual per shot (data cards, Wikimedia
+3. `src/script.py` writes five sections; `src/voice.py` narrates each shot with the
+   open Kokoro voice (`scripts/kokoro_tts.py`); `src/assets.py` gathers a visual per shot (data cards, Wikimedia
    photos of real people and places, AI stills for mood).
 4. `src/render.py` assembles the video (animated cards, dissolves, music ducked under the voice); `src/shorts.py` builds the Shorts natively at 9:16.
 5. `src/upload.py` uploads everything. A Telegram message reports the result,
@@ -36,11 +36,10 @@ today's top trend, or type a story and choose its region.
 
 ## Things you will want to change
 
-- **Voice.** Narration is cloned from `assets/voice/ref_hi.wav` (Hindi) and
-  `ref_en.wav` (English), cut from the owner's own recording. Replace those two
-  clips (10-20 s of clean speech each) to change the narrator; tune delivery
-  under `voice.clone.settings` in `config.yaml`. Set `voice.provider: elevenlabs`
-  to use ElevenLabs instead (paid plan needed for daily videos).
+- **Voice.** Narration uses Kokoro-82M, free and Apache-2.0. Change the narrator
+  or speed under `voice.kokoro` in `config.yaml`, and add any name it says wrongly
+  to `voice.kokoro.lexicon`. `voice.provider: clone` brings back the owner's cloned
+  voice; `elevenlabs` uses ElevenLabs (paid plan needed for daily videos).
 - **Tone.** `channel/voice.md` is pasted into every script prompt.
 - **Regions and priorities.** `trending.regions` in `config.yaml`.
 - **Review before publishing.** Set `gates.topic_approval` / `gates.final_review`

@@ -12,6 +12,7 @@ Sources (all keyless):
 from __future__ import annotations
 
 import logging
+import re
 import xml.etree.ElementTree as ET
 from typing import Any
 
@@ -119,6 +120,8 @@ How to rank:
   Fed, tariffs, big tech and AI deals. Region weight: {weights}. A foreign
   story qualifies only if it clearly moves American money, jobs or prices.
 - Prefer stories that are BOTH searched and covered by several outlets today.
+- A VIRAL line is a video already doing big numbers on YouTube this week. It proves
+  the subject has an audience: prefer that subject, covered from our own reporting.
 - Prefer stories with a "why" worth explaining for {minutes} minutes: a
   decision, a number, a conflict of interests, a consequence. A bare sports
   score, a film trailer, a celebrity birthday or a single-word search with no
@@ -146,6 +149,14 @@ Return a JSON array of {n} objects, best first:
   score         - 0-100"""
 
 
+def blocked(cand: dict[str, Any], words: list[str]) -> str:
+    """The first banned word in a story's text, or "". A hard stop behind the
+    model's own judgement, which has let a congressional race through."""
+    text = " ".join(str(cand.get(k, "")) for k in
+                    ("topic", "angle", "why_trending", "search_query", "keywords")).lower()
+    return next((w for w in words if re.search(rf"\b{re.escape(w.lower())}\b", text)), "")
+
+
 def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
     """Ranked candidate stories, each tagged with region and narration language."""
     from datetime import datetime
@@ -156,6 +167,12 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
         raise RuntimeError("No trend feeds responded")
 
     lines: list[str] = []
+    from . import viral
+    hits = viral.recent(cfg)
+    if hits:
+        lines.append("## Biggest videos on YouTube this week")
+        lines += [f"- VIRAL {v['views']:,} views: {v['title']}" for v in hits]
+        lines.append("")
     for b in blocks:
         lines.append(f"## {b['name']} ({b['region']}, weight {b['weight']})")
         for s in b["searches"]:
@@ -188,6 +205,10 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
     out = []
     for cand in ranked:
         if not cand.get("topic"):
+            continue
+        hit = blocked(cand, cfg.get_path("trending.block_words", []) or [])
+        if hit:
+            log.warning("Dropped %r: mentions %r", cand["topic"], hit)
             continue
         if cand["topic"].strip().lower() in covered:
             continue

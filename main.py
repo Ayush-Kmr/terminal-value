@@ -10,15 +10,16 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import logging
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from src import (assets, captions, follow, gate, hooks, reach, render, research,
                  script as script_mod, seo, shorts, state, thumbnail, upload, voice)
-from src.config import ROOT, latin_only, load, portrait
+from src.config import ROOT, Config, latin_only, load, portrait
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,6 +50,9 @@ def save_shots(shot_list: list[dict], workdir: Path) -> None:
 
 
 def produce(cfg, story: dict, workdir: Path) -> dict:
+    if story.get("history"):            # the story arc of the past, not of the news
+        cfg = Config(copy.deepcopy(dict(cfg)))
+        cfg["structure"]["beats"] = cfg["structure"]["history_beats"]
     company, angle = story["topic"], story.get("angle", "")
     language, region = story.get("language", "en"), story.get("region")
     kind = cfg.get_path("format.kind", "documentary")
@@ -258,6 +262,19 @@ def candidates_for(cfg, args, n: int) -> list[dict]:
     return candidates
 
 
+def history_story(cfg, args) -> dict | None:
+    """Every format.long.history_every-th long video: a past business story
+    already proven at a million views on YouTube."""
+    every = int(cfg.get_path("format.long.history_every", 0))
+    if args.topic or every <= 0:
+        return None
+    eps = [e for e in state.load().get("episodes", []) if e.get("kind", "long") == "long"]
+    if len(eps) % every != every - 1:
+        return None
+    from src import viral
+    return viral.history_story(cfg)
+
+
 def evergreen_story(cfg, args) -> dict | None:
     """Every format.long.evergreen_every-th long video: the next unused topic
     from data/evergreen.yaml, written as an explainer rather than news."""
@@ -293,11 +310,13 @@ def todays_kind(cfg, args) -> str:
     # Counted from the last long video actually uploaded, so a long day that
     # fails is retried the next day instead of being skipped.
     every = int(cfg.get_path("format.long.every_days", 1))
-    last = max((datetime.fromisoformat(e["created_at"]).astimezone(tz).date()
+    # Measured in hours, not calendar dates: GitHub starts the run anywhere from
+    # late evening to morning Eastern, which would otherwise shift the date.
+    last = max((datetime.fromisoformat(e["created_at"]).astimezone(tz)
                 for e in state.load().get("episodes", [])
                 if e.get("kind", "long") == "long" and e.get("created_at")),
                default=None)
-    if every > 1 and last and (datetime.now(tz).date() - last).days < every:
+    if every > 1 and last and datetime.now(tz) - last < timedelta(days=every, hours=-12):
         return "shorts"
     return "long"
 
@@ -315,21 +334,25 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
-    return make_shorts(cfg, args, candidates_for(cfg, args, n)[:n])
+    stories = candidates_for(cfg, args, n)
+    return make_shorts(cfg, args, stories[:n], stories[n:])
 
 
-def make_shorts(cfg, args, stories: list[dict]) -> int:
-    """One standalone Short per story, each at its own daily slot."""
+def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None) -> int:
+    """One standalone Short per story, each at its own daily slot. A story that
+    fails is replaced by the next spare, so one bad story does not lose a Short."""
     n = len(stories)
     times = upload.slots(cfg, "short", n)
+    queue = [*stories, *(spares or [])]
     st = state.load()
     done, failures = [], []
 
-    for i, story in enumerate(stories):
+    while queue and len(done) < n:
+        story, i = queue.pop(0), len(done)
         company = story["topic"]
         workdir = ROOT / "output" / f"{datetime.now():%Y-%m-%d}-short-{slug(company)}"
         workdir.mkdir(parents=True, exist_ok=True)
-        log.info("Short %d/%d: %s [%s/%s]", i + 1, len(stories), company,
+        log.info("Short %d/%d: %s [%s/%s]", i + 1, n, company,
                  story.get("region"), story.get("language"))
         try:
             short = produce_short(cfg, story, workdir)
@@ -362,9 +385,10 @@ def make_shorts(cfg, args, stories: list[dict]) -> int:
             log.exception("Short on %s failed", company)
             failures.append(f"{company}: {type(exc).__name__}: {str(exc)[:200]}")
 
+    if len(done) < n:
+        raise RuntimeError(f"{n - len(done)} of {n} Shorts not made — " + " | ".join(failures))
     if failures:
-        raise RuntimeError(f"{len(failures)} of {len(stories)} Shorts failed — "
-                           + " | ".join(failures))
+        gate.notify("⚠️ Replaced with a spare story: " + " | ".join(failures), markdown=False)
     log.info("Shorts day done: %s", ", ".join(done))
     return 0
 
@@ -387,28 +411,40 @@ def run(args) -> int:
 
     n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
     candidates = candidates_for(cfg, args, 4 + n_shorts)
-    story = evergreen_story(cfg, args) or candidates[0]
-    if story.get("evergreen"):
-        log.info("Evergreen explainer today: %s", story["angle"])
+    story = history_story(cfg, args) or evergreen_story(cfg, args) or candidates[0]
+    if story.get("evergreen") or story.get("history"):
+        log.info("Not today's news: %s", story["angle"])
     if do_gates and cfg.get_path("gates.topic_approval", False):
         story = gate.topic_gate(cfg, candidates)
     if story is None:
         log.info("No topic approved. Stopping — nothing produced.")
         return 0
-    company = story["topic"]
-
-    workdir = ROOT / "output" / f"{datetime.now():%Y-%m-%d}-{slug(company)}"
-    workdir.mkdir(parents=True, exist_ok=True)
-    log.info("Producing %s [%s/%s] -> %s", company, story.get("region"),
-             story.get("language"), workdir)
-
-    meta = produce(cfg, story, workdir)
+    # A story that cannot be made gives way to the next one rather than losing
+    # the day's video.
+    meta, last_error = None, None
+    for story in [story, *[c for c in candidates if c is not story][:2]]:
+        company = story["topic"]
+        workdir = ROOT / "output" / f"{datetime.now():%Y-%m-%d}-{slug(company)}"
+        workdir.mkdir(parents=True, exist_ok=True)
+        log.info("Producing %s [%s/%s] -> %s", company, story.get("region"),
+                 story.get("language"), workdir)
+        try:
+            meta = produce(cfg, story, workdir)
+            break
+        except voice.VoiceError:
+            raise                   # the next story would fail the same way
+        except Exception as exc:  # noqa: BLE001
+            log.exception("Long video on %s failed", company)
+            last_error = exc
+    if meta is None:
+        raise last_error
     shot_list = meta.pop("_shots")
     video = Path(meta["video"])
     # Shorts are their own stories (the next ones down today's list): they
     # outperformed cuts from the long video about five to one. A manual topic
     # has no other stories, so its Shorts are cut from the long video.
-    short_stories = [c for c in candidates if c["topic"] != company][:n_shorts]
+    others = [c for c in candidates if c["topic"] != company]
+    short_stories, spare_stories = others[:n_shorts], others[n_shorts:]
 
     if args.no_upload:
         if n_shorts and not short_stories:
@@ -416,7 +452,7 @@ def run(args) -> int:
                              meta["language"])
         log.info("Built %s (upload skipped)", video)
         if short_stories:
-            make_shorts(cfg, args, short_stories)
+            make_shorts(cfg, args, short_stories, spare_stories)
         return 0
 
     # ---- optional review gate -------------------------------------------
@@ -462,7 +498,7 @@ def run(args) -> int:
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
         "video_id": video_id, "short_ids": short_ids, "kind": "long",
-        "evergreen": story.get("evergreen", ""),
+        "evergreen": story.get("evergreen", ""), "history": story.get("history", ""),
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })
     state.save(st)
@@ -477,7 +513,7 @@ def run(args) -> int:
         lines.append("Research warnings: " + "; ".join(meta["warnings"]))
     report(lines, video_id, decision == "publish")
     if short_stories:
-        return make_shorts(cfg, args, short_stories)
+        return make_shorts(cfg, args, short_stories, spare_stories)
     return 0
 
 
