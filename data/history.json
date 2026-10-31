@@ -11,11 +11,11 @@
       "warnings": [],
       "created_at": "2026-10-11T20:30:29.921991+00:00",
       "stats": {
-        "views": 104,
+        "views": 105,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 19,
-        "avg_pct": 76.33,
+        "avg_duration_s": 18,
+        "avg_pct": 74.81,
         "minutes": 8
       }
     },
@@ -111,11 +111,11 @@
       "warnings": [],
       "created_at": "2026-10-14T15:32:54.507639+00:00",
       "stats": {
-        "views": 368,
+        "views": 371,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
-        "avg_pct": 79.69,
+        "avg_pct": 79.13,
         "minutes": 53
       }
     },
@@ -135,12 +135,12 @@
       "warnings": [],
       "created_at": "2026-10-15T16:01:17.434374+00:00",
       "stats": {
-        "views": 10,
+        "views": 11,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 27,
         "avg_pct": 16.03,
-        "minutes": 1
+        "minutes": 2
       }
     },
     {
@@ -216,7 +216,7 @@
       "warnings": [],
       "created_at": "2026-10-18T14:15:36.687446+00:00",
       "stats": {
-        "views": 12,
+        "views": 13,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 14,
@@ -235,7 +235,7 @@
       "warnings": [],
       "created_at": "2026-10-18T14:22:34.216088+00:00",
       "stats": {
-        "views": 16,
+        "views": 17,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 14,
@@ -259,12 +259,12 @@
       "warnings": [],
       "created_at": "2026-10-19T17:34:24.707133+00:00",
       "stats": {
-        "views": 123,
+        "views": 128,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 53,
-        "avg_pct": 35.94,
-        "minutes": 27
+        "avg_pct": 36.23,
+        "minutes": 35
       }
     },
     {
@@ -281,8 +281,8 @@
         "views": 51,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 19,
-        "avg_pct": 61.65999999999999,
+        "avg_duration_s": 18,
+        "avg_pct": 58.19,
         "minutes": 4
       }
     },
@@ -297,11 +297,11 @@
       "warnings": [],
       "created_at": "2026-10-20T09:01:29.714827+00:00",
       "stats": {
-        "views": 150,
+        "views": 152,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 20,
-        "avg_pct": 54.77000000000001,
+        "avg_pct": 54.36,
         "minutes": 24
       }
     },
@@ -337,12 +337,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 74,
-        "likes": 0,
+        "views": 128,
+        "likes": 1,
         "comments": 0,
-        "avg_duration_s": 138,
-        "avg_pct": 27.169999999999998,
-        "minutes": 48
+        "avg_duration_s": 115,
+        "avg_pct": 22.72,
+        "minutes": 102
       }
     },
     {
@@ -356,12 +356,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 91,
+        "views": 108,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 20,
-        "avg_pct": 59.12,
-        "minutes": 12
+        "avg_duration_s": 22,
+        "avg_pct": 62.9,
+        "minutes": 18
       }
     },
     {
@@ -375,12 +375,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:52:13.329403+00:00",
       "stats": {
-        "views": 41,
+        "views": 44,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 22,
-        "avg_pct": 70.84,
-        "minutes": 5
+        "avg_duration_s": 21,
+        "avg_pct": 66.63,
+        "minutes": 6
       }
     },
     {
@@ -394,12 +394,12 @@
       "warnings": [],
       "created_at": "2026-10-23T09:16:31.995663+00:00",
       "stats": {
-        "views": 299,
+        "views": 301,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 12,
-        "avg_pct": 30.11,
-        "minutes": 10
+        "avg_duration_s": 13,
+        "avg_pct": 31.010000000000005,
+        "minutes": 18
       }
     },
     {
@@ -413,12 +413,12 @@
       "warnings": [],
       "created_at": "2026-10-23T09:32:42.414282+00:00",
       "stats": {
-        "views": 14,
+        "views": 17,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 6,
-        "avg_pct": 19.09,
-        "minutes": 0
+        "avg_duration_s": 15,
+        "avg_pct": 42.96,
+        "minutes": 2
       }
     },
     {
@@ -435,9 +435,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:22:56.859675+00:00",
       "stats": {
-        "views": 2,
+        "views": 16,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 102,
+        "avg_pct": 19.25,
+        "minutes": 11
       }
     },
     {
@@ -451,9 +454,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 57,
+        "views": 105,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 22,
+        "avg_pct": 57.38999999999999,
+        "minutes": 13
       }
     },
     {
@@ -467,9 +473,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:41:44.348592+00:00",
       "stats": {
-        "views": 81,
+        "views": 94,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 10,
+        "avg_pct": 49.29,
+        "minutes": 7
       }
     },
     {
@@ -483,9 +492,12 @@
       "warnings": [],
       "created_at": "2026-10-25T09:07:09.640911+00:00",
       "stats": {
-        "views": 24,
+        "views": 59,
         "likes": 1,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 21,
+        "avg_pct": 49.53,
+        "minutes": 7
       }
     },
     {
@@ -499,9 +511,12 @@
       "warnings": [],
       "created_at": "2026-10-25T09:32:35.580675+00:00",
       "stats": {
-        "views": 1,
+        "views": 7,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 4,
+        "avg_pct": 10.24,
+        "minutes": 0
       }
     },
     {
@@ -518,7 +533,15 @@
       "warnings": [
         "Long video is only 7.9 min, under 8: no mid-roll ads on it"
       ],
-      "created_at": "2026-10-26T11:36:38.366292+00:00"
+      "created_at": "2026-10-26T11:36:38.366292+00:00",
+      "stats": {
+        "views": 19,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 89,
+        "avg_pct": 18.66,
+        "minutes": 12
+      }
     },
     {
       "company": "Cyclone Arnab Threatens Eastern Coast",
@@ -529,7 +552,15 @@
       "video_id": "Zdpx8zos_pE",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-26T11:44:47.545945+00:00"
+      "created_at": "2026-10-26T11:44:47.545945+00:00",
+      "stats": {
+        "views": 410,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 30,
+        "avg_pct": 79.59,
+        "minutes": 68
+      }
     },
     {
       "company": "SpaceX $40B Debt Deal and AI GPUs",
@@ -540,7 +571,15 @@
       "video_id": "lRxTLqZy_sA",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-26T11:55:27.451692+00:00"
+      "created_at": "2026-10-26T11:55:27.451692+00:00",
+      "stats": {
+        "views": 171,
+        "likes": 2,
+        "comments": 0,
+        "avg_duration_s": 27,
+        "avg_pct": 69.06,
+        "minutes": 33
+      }
     },
     {
       "company": "Jio Blockbuster IPO Market Debut",
@@ -556,7 +595,15 @@
       "warnings": [
         "Long video is only 7.7 min, under 8: no mid-roll ads on it"
       ],
-      "created_at": "2026-10-28T11:41:57.269368+00:00"
+      "created_at": "2026-10-28T11:41:57.269368+00:00",
+      "stats": {
+        "views": 2,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 63,
+        "avg_pct": 13.84,
+        "minutes": 1
+      }
     },
     {
       "company": "China AI Stock Bubble and Export Curbs",
@@ -567,7 +614,15 @@
       "video_id": "hLn3DYx3djk",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-28T11:51:46.930290+00:00"
+      "created_at": "2026-10-28T11:51:46.930290+00:00",
+      "stats": {
+        "views": 31,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 19,
+        "avg_pct": 58.53,
+        "minutes": 3
+      }
     },
     {
       "company": "Dollar General Overcharging Lawsuit",
@@ -578,7 +633,15 @@
       "video_id": "1MLzl_UvndU",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-28T12:02:05.990792+00:00"
+      "created_at": "2026-10-28T12:02:05.990792+00:00",
+      "stats": {
+        "views": 119,
+        "likes": 3,
+        "comments": 0,
+        "avg_duration_s": 21,
+        "avg_pct": 55.14,
+        "minutes": 16
+      }
     },
     {
       "company": "EPFO Minimum Pension Hike",
@@ -589,7 +652,15 @@
       "video_id": "pgL8HRdcwIE",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-29T10:30:27.753186+00:00"
+      "created_at": "2026-10-29T10:30:27.753186+00:00",
+      "stats": {
+        "views": 183,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 27,
+        "avg_pct": 81.33,
+        "minutes": 10
+      }
     },
     {
       "company": "Laurus Labs Q2 Financial Results",
@@ -600,7 +671,15 @@
       "video_id": "os8RGIBT5tw",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-29T10:38:46.805451+00:00"
+      "created_at": "2026-10-29T10:38:46.805451+00:00",
+      "stats": {
+        "views": 130,
+        "likes": 2,
+        "comments": 0,
+        "avg_duration_s": 10,
+        "avg_pct": 23.03,
+        "minutes": 3
+      }
     },
     {
       "company": "Tariffs",
@@ -614,7 +693,12 @@
       "evergreen": "Tariffs",
       "runtime": "10:31",
       "warnings": [],
-      "created_at": "2026-10-30T12:23:32.688274+00:00"
+      "created_at": "2026-10-30T12:23:32.688274+00:00",
+      "stats": {
+        "views": 10,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "World Bank: India's Extreme Poverty Drops to 2.6%",
@@ -625,7 +709,12 @@
       "video_id": "BkbirOhrjko",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-30T12:40:06.327737+00:00"
+      "created_at": "2026-10-30T12:40:06.327737+00:00",
+      "stats": {
+        "views": 86,
+        "likes": 1,
+        "comments": 0
+      }
     },
     {
       "company": "Supreme Court Mediates Reliance KG-D6 Gas Dispute",
@@ -636,7 +725,12 @@
       "video_id": "fLPjHC8xYGY",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-30T13:00:19.902734+00:00"
+      "created_at": "2026-10-30T13:00:19.902734+00:00",
+      "stats": {
+        "views": 55,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "IDBI Bank Strategic Disinvestment and Valuation Controversy",
@@ -647,7 +741,12 @@
       "video_id": "0Jx32_7WMlA",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-31T10:06:27.130994+00:00"
+      "created_at": "2026-10-31T10:06:27.130994+00:00",
+      "stats": {
+        "views": 75,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "IPL 2027 Auction and Player Retention Deadline",
@@ -658,9 +757,14 @@
       "video_id": "clLdqM_A164",
       "kind": "short",
       "warnings": [],
-      "created_at": "2026-10-31T10:15:20.875549+00:00"
+      "created_at": "2026-10-31T10:15:20.875549+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 52.0
+  "channel_median_views": 59.0
 }
