@@ -15,32 +15,32 @@ channel:
   tagline: "The story behind the headline."
   schedule_line: "NEW VIDEO EVERY DAY"
   language: en                     # channel default; each video sets its own
-  country: IN                      # audience country shown on the About page
-  timezone: Asia/Kolkata
+  country: US                      # audience country shown on the About page
+  timezone: America/New_York        # publish_times below are in this zone
   # The About box. Applied by scripts/brand_channel.py. The first two lines
   # are what search shows, so they carry the keywords.
   about: |
-    India and world business news, explained properly. The story behind the headline: what happened, how we got here, and what it means for your money, your job and the economy.
+    US business and markets news, explained properly. The story behind the headline: what happened at America's biggest companies, how we got here, and what it means for your money, your job and the economy.
 
-    Every day we pick the story India and the world are searching for, read all the coverage, and explain it in plain English with the numbers, the dates and the people involved.
+    We follow the stories Americans are searching for, from earnings and layoffs to the Fed, tariffs and AI deals, read the coverage, and explain each one in plain English with the numbers, the dates and the people involved.
 
-    New explainer every other day at 7 PM IST. New Shorts every day at 8 AM and 8:30 PM IST.
+    New explainer every other day at 12 PM ET. New Shorts every day at 9 AM and 5 PM ET.
 
-    Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments and we will correct it.
-  # From YouTube search suggestions (what people actually type), 2026-10-22.
+    Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. Nothing here is financial advice. If we get something wrong, tell us in the comments and we will correct it.
+  # What Americans search for. Check against YouTube search suggestions.
   keywords:
-    - business news india
-    - business news today
+    - business news
     - stock market news today
-    - share market news today english
-    - economy explained
-    - india us trade deal latest news
+    - us economy explained
+    - earnings explained
+    - federal reserve explained
+    - interest rates explained
     - tariffs explained
-    - gold price news
-    - china economy explained
-    - india inflation latest news
-    - layoffs in india
-    - rbi repo rate news today
+    - ai stocks news
+    - tech layoffs
+    - wall street news
+    - inflation explained
+    - company news today
   # Appended to every description. Keep it accurate: it tells viewers (and
   # YouTube) how the video was made.
   # Links shown under the call to action in every description, e.g.
@@ -50,7 +50,7 @@ channel:
   links: []
   # Closes every description, before the sources.
   cta: >-
-    New explainer every other day at 7 PM IST and two Shorts every day.
+    New explainer every other day at 12 PM ET and two Shorts every day.
     Subscribe so you never miss the story behind the headline.
   disclosure: >-
     This video was produced with AI: the script was written and the narration
@@ -63,16 +63,10 @@ trending:
   # weight = priority. trends_geo = Google Trends country (not available for
   # China). news = Google News edition, or a search query for that region.
   regions:
-    - {code: IN, name: India, weight: 1.0, language: en, trends_geo: IN,
-       news: {hl: en-IN, gl: IN}}
-    - {code: US, name: United States, weight: 0.8, language: en, trends_geo: US,
+    - {code: US, name: United States, weight: 1.0, language: en, trends_geo: US,
        news: {hl: en-US, gl: US}}
-    - {code: CN, name: China, weight: 0.65, language: en,
-       news: {hl: en-IN, gl: IN, query: "China when:1d"}}
-    - {code: RU, name: Russia, weight: 0.65, language: en, trends_geo: RU,
-       news: {hl: en-IN, gl: IN, query: "Russia when:1d"}}
-    - {code: WORLD, name: Rest of world, weight: 0.5, language: en,
-       news: {hl: en-IN, gl: IN, query: "world news when:1d"}}
+    - {code: MARKETS, name: US business and markets, weight: 1.0, language: en,
+       news: {hl: en-US, gl: US, query: "stocks OR earnings OR layoffs OR \"Federal Reserve\" OR tariffs when:1d"}}
   # Stories an unattended pipeline must not narrate. These are also the
   # categories YouTube restricts ads on.
   avoid:
@@ -83,7 +77,9 @@ trending:
     - Medical or health advice, including outbreaks and treatments
     - Active military operations where the facts are contested between governments
     - Sexual content, suicide or self-harm
-    - Pure celebrity gossip, film trailers, sports fixtures and match scores
+    - Pure celebrity gossip, film trailers, and sports of any kind, including fixtures, scores, drafts, auctions and transfers
+    - Stories about another country unless they clearly move American companies, markets, jobs or prices
+    - Which stock, fund or coin a viewer should buy, sell or hold
     - Stories with no clear effect on money, prices, jobs, companies, markets or the economy, such as natural hazards, science and space, engineering curiosities, and border or territorial disputes
 
 # ---------- format ----------
@@ -102,7 +98,7 @@ format:
     target_minutes: 10.5
     min_minutes: 8
     words_per_minute: 150
-    publish_times: ["19:00"]    # IST. Evening is the daily viewing peak in India
+    publish_times: ["12:00"]    # ET, channel timezone. A starting point to test
   short:
     per_day: 2                  # two standalone Shorts every day, on the next
                                 # stories after the long video's. Standalone
@@ -111,7 +107,7 @@ format:
     # 30-45 s is the length where completion drops most (Shorts playbook).
     target_seconds: 28
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
-    publish_times: ["08:00", "20:30"]   # IST
+    publish_times: ["09:00", "17:00"]   # ET
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.
@@ -132,7 +128,7 @@ structure:
     - id: stakes
       label: "Why it matters"
       share: 0.24
-      intent: "What this changes, and for whom. Make it concrete for an ordinary viewer in India: prices, jobs, money, travel, security."
+      intent: "What this changes, and for whom. Make it concrete for an ordinary American: prices, paychecks, jobs, mortgages, car loans, 401(k)s."
     - id: whats_next
       label: "What happens next"
       share: 0.20
@@ -259,7 +255,8 @@ upload:
   # in its subject, title or tags (whole words, any case). Keeps viewers
   # watching the next video on the same subject.
   topic_playlists:
-    "Stock Market & Companies": [stock, stocks, share, shares, sensex, nifty, ipo, market, markets, investors, earnings, profit, layoffs, jobs, ceo, startup, valuation, bear, bull]
-    "Banking, RBI & the Rupee": [rbi, bank, banks, banking, repo, rate, rates, rupee, inflation, loan, loans, sebi, credit, gold]
-    "Trade, Tariffs & Deals": [trade, tariff, tariffs, export, exports, import, imports, fta, sanctions, oil, wto]
-    "China & Global Economy": [china, chinese, us, usa, america, russia, europe, imf, global, world, recession, fed, dollar]
+    "Stock Market & Companies": [stock, stocks, share, shares, nasdaq, dow, ipo, market, markets, investors, earnings, profit, layoffs, ceo, startup, valuation, bear, bull]
+    "AI & Big Tech": [ai, nvidia, openai, anthropic, microsoft, google, apple, amazon, meta, tesla, chip, chips, semiconductor, spacex]
+    "Fed, Banks & Interest Rates": [fed, federal, powell, bank, banks, banking, rate, rates, mortgage, inflation, loan, loans, credit, treasury, gold]
+    "Trade, Tariffs & Deals": [trade, tariff, tariffs, export, exports, import, imports, sanctions, oil, wto]
+    "Economy & Jobs": [economy, economic, recession, jobs, unemployment, wages, gdp, consumer, dollar, debt, deficit]

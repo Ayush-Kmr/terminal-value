@@ -1,8 +1,8 @@
 # Terminal Value
 
-Automated YouTube channel: every day it finds the story India and the world are
-searching for, explains it in a 6-minute video, and cuts two Shorts from it.
-India stories are narrated in Hindi, everything else in English.
+Automated YouTube channel for a US audience: it finds the American business
+stories people are searching for and explains them in English: a 10-minute video
+every other day and two standalone Shorts a day. The Tamil channel is paused.
 
 Channel: <https://www.youtube.com/@terminalvaluedoc>
 
@@ -10,22 +10,21 @@ Channel: <https://www.youtube.com/@terminalvaluedoc>
 
 | Workflow | When | What it does |
 |---|---|---|
-| **Episode** | daily 16:00 IST | alternate days: top story → research → script → voice → 1 long video + 2 Shorts cut from it. Other days: 2 standalone Shorts on the top two stories |
+| **Episode** | daily 03:30 UTC | alternate days: top story → research → script → voice → 1 long video. Every day: 2 standalone Shorts on the next stories |
 | **Reach report** | Mondays 08:45 IST | pulls view counts into `reports/` and `data/history.json` |
 | **Doctor** | on demand | tests every API key with one small call each |
 | **Brand channel** | on demand | applies `assets/brand/` and the About text in `config.yaml` |
 
-Every video goes public as soon as it uploads. To hold videos for fixed times
-instead, set `upload.publish: slot` in `config.yaml` (times are under `format`).
+Videos go public at fixed Eastern times (`format` in `config.yaml`). To publish
+on upload instead, set `upload.publish: now`.
 
 Run one by hand: **Actions → Episode → Run workflow**. Leave *topic* blank for
 today's top trend, or type a story and choose its region.
 
 ## How a video is made
 
-1. `src/trends.py` reads Google Trends and Google News for India, the US, China,
-   Russia and the rest of the world, and the model picks one story. India is
-   weighted highest. `trending.avoid` in `config.yaml` lists what it must skip.
+1. `src/trends.py` reads Google Trends and Google News for the US, and the model
+   picks the stories. `trending.avoid` in `config.yaml` lists what it must skip.
 2. `src/research.py` builds a fact base from a search-grounded briefing and the
    day's headlines. The script may only use facts from it.
 3. `src/script.py` writes five sections; `src/voice.py` narrates each shot in the
@@ -52,5 +51,5 @@ today's top trend, or type a story and choose its region.
 
 ```bash
 .venv/bin/python main.py --no-upload                       # needs a filled-in .env
-.venv/bin/python main.py --topic "RBI repo rate" --region IN --no-upload
+.venv/bin/python main.py --topic "Fed rate cut" --region US --no-upload
 ```

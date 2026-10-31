@@ -307,9 +307,9 @@ def cmd_next(_: list[dict]) -> str:
             f"🛠 Next daily run starts: {run:%a %d %b, %I:%M %p} IST "
             "(GitHub sometimes starts it late)\n"
             f"🎬 Long video: every {cfg['format']['long']['every_days']} days, "
-            f"public at {long_times} IST\n"
-            f"📱 Shorts: {cfg['format']['short']['per_day']} a day, public at {short_times} IST\n"
-            "🇮🇳 The Tamil channel gets the same videos, in Tamil, at the same times.")
+            f"public at {long_times} ET\n"
+            f"📱 Shorts: {cfg['format']['short']['per_day']} a day, public at {short_times} ET\n"
+            "⏸ The Tamil channel is paused.")
 
 
 def reply(text: str, chs: list[dict]) -> str:

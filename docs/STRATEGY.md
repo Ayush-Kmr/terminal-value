@@ -1,5 +1,8 @@
 # Strategy
 
+> Written for the original documentary format. Since 2026-11-01 the channel is
+> fully automated US business news; the India wedge below no longer applies.
+
 ## The maths you're actually playing against
 
 YouTube Partner Programme needs **1,000 subscribers** and **4,000 public watch

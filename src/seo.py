@@ -52,8 +52,8 @@ Rules:
   words people search for.
 - Lead with the exact words people type into YouTube search for this story:
   the name of the person, company, place or event, plus the search word that
-  goes with it ("IREN stock", "Yes Bank share price", "RBI repo rate",
-  "India US trade deal"). Those words must be in the first 40 characters.
+  goes with it ("Nvidia stock", "Boeing layoffs", "Fed rate cut",
+  "US China trade deal"). Those words must be in the first 40 characters.
 - State or imply a specific claim or question. Promise only what the video delivers.
 - No ALL CAPS words. No exclamation marks. No "shocking", "insane", "exposed".
 - A number in the title is good when it is a real number from the research.
@@ -73,9 +73,9 @@ Return a JSON array of objects:
   thumb_text    - 2-3 words for the thumbnail, in English (Latin letters). The
                   title already gives the facts; the thumbnail gives the STAKE or
                   the emotion, in words NOT used in the title (e.g. "BEAR MARKET",
-                  "WHO PAYS?", "YOUR EMI RISES", "JOBS AT RISK").
+                  "WHO PAYS?", "YOUR RATE RISES", "JOBS AT RISK").
   thumb_entity  - who or where, 1-2 words, shown small as context ("CHINA",
-                  "RBI", "IREN", "INDIA-US")
+                  "THE FED", "NVIDIA", "US-CHINA")
   thumb_figure  - one real figure from the research, at most 6 characters
                   ("-94%", "$4B", "37"), that is NOT already in the title, or ""
   summary       - two plain sentences describing the story, in the title's

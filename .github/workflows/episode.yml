@@ -2,12 +2,12 @@ name: Episode
 
 on:
   schedule:
-    # Every day 03:30 UTC = 09:00 IST. Alternate days: one long video on the
+    # Every day 03:30 UTC. Alternate days: one long video on the
     # top story; every day: two standalone Shorts on the next stories.
     # Uploads are scheduled for fixed slots (format.*.publish_times in
-    # config.yaml: long 19:00, Shorts 08:00 and 20:30 IST). GitHub often
+    # config.yaml: long 12:00, Shorts 09:00 and 17:00 ET). GitHub often
     # starts scheduled runs hours late, so this fires early enough to finish
-    # before the 19:00 slot even then.
+    # before the noon slot even then.
     - cron: "30 3 * * *"
   workflow_dispatch:
     inputs:
@@ -17,8 +17,8 @@ on:
       region:
         description: "Region for a manual topic (all narrated in English)"
         type: choice
-        options: [IN, US, CN, RU, WORLD]
-        default: IN
+        options: [US, MARKETS]
+        default: US
       kind:
         description: "auto = follow config.yaml (long video on alternate days, two Shorts daily)"
         type: choice
@@ -37,7 +37,7 @@ on:
         type: boolean
         default: false
       tamil_only:
-        description: "Upload only the Tamil version (the English one is built but not uploaded)"
+        description: "Upload only the Tamil version (needs the TAMIL_ENABLED variable; otherwise nothing uploads)"
         type: boolean
         default: false
 
@@ -111,7 +111,7 @@ jobs:
           NO_UPLOAD:                 ${{ inputs.no_upload || inputs.tamil_only }}
         run: |
           args=()
-          [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-IN}")
+          [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-US}")
           [ -n "$KIND" ] && args+=(--kind "$KIND")
           [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
           [ -n "$COUNT" ] && args+=(--count "$COUNT")
@@ -156,9 +156,12 @@ jobs:
   # The Tamil channel: the same videos, translated and narrated in Tamil
   # (src/follow.py), uploaded with the Tamil channel's own token. Skipped
   # until the YT_REFRESH_TOKEN_TA secret exists.
+  # PAUSED 2026-11-01: the main channel is US-only and Tamil skips US stories.
+  # To resume, set the repository variable TAMIL_ENABLED to true and take US
+  # out of follow.skip_regions in channels/ta.yaml.
   tamil:
     needs: produce
-    if: ${{ !cancelled() && needs.produce.result != 'skipped' }}
+    if: ${{ vars.TAMIL_ENABLED == 'true' && !cancelled() && needs.produce.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:

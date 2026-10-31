@@ -18,9 +18,9 @@ URL = "https://suggestqueries.google.com/complete/search"
 OTHER_LANGUAGES = ("hindi", "telugu", "malayalam", "kannada", "marathi", "bengali", "gujarati")
 
 
-def suggestions(query: str, hl: str = "en") -> list[str]:
+def suggestions(query: str, hl: str = "en", gl: str = "US") -> list[str]:
     try:
-        r = requests.get(URL, params={"client": "firefox", "ds": "yt", "hl": hl, "gl": "IN",
+        r = requests.get(URL, params={"client": "firefox", "ds": "yt", "hl": hl, "gl": gl,
                                       "q": query}, timeout=8)
         r.raise_for_status()
         return [str(s) for s in r.json()[1]]
@@ -50,7 +50,7 @@ def for_story(subject: str, language: str = "en", limit: int = 8) -> list[str]:
             queries.insert(0, (f"{core} stock", "en"))
     out: list[str] = []
     for q, hl in queries:
-        for s in suggestions(q, hl):
+        for s in suggestions(q, hl, "IN" if language == "ta" else "US"):
             low = s.lower()
             if not re.search(rf"(?<![\w]){re.escape(key)}(?![\w])", low):
                 continue                       # about something else ("irene ...")

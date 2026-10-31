@@ -116,9 +116,10 @@ LANGUAGE_RULES = {
         "ALL ON-SCREEN TEXT stays in ENGLISH using Latin letters only."
     ),
     "en": (
-        "LANGUAGE: Write narration in clear international English that a viewer in "
-        "India, the US or anywhere else follows on first listen. Explain any local "
-        "term the first time it appears. All on-screen text in English."
+        "LANGUAGE: Write narration in clear American English for a general US viewer, "
+        "who follows it on first listen. Use US spelling, dollars and American terms. "
+        "Explain any financial term the first time it appears. All on-screen text "
+        "in English."
     ),
 }
 

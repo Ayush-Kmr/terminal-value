@@ -153,7 +153,7 @@ SHORT_BEAT = {
     "intent": ("A complete {seconds}-second explainer of this one story for someone who has "
                "not heard of it. FIRST SENTENCE: at most 8 words, the single most striking "
                "verified fact or the open question it raises, so a scrolling viewer needs "
-               "the rest (e.g. 'India just lost its cheapest oil.'). Then what happened, "
+               "the rest (e.g. 'Boeing just lost its biggest order.'). Then what happened, "
                "then why it matters to the viewer. 6-9 shots of ONE sentence each, so the "
                "picture changes every few seconds. LAST SENTENCE: short, and it leads "
                "straight back into the first one (it names what the opening line was "
@@ -234,7 +234,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
 
 def manual_story(cfg, args) -> dict:
     regions = {r["code"]: r for r in cfg.get_path("trending.regions", [])}
-    region = (args.region or next(iter(regions), "IN")).upper()
+    region = (args.region or next(iter(regions), "US")).upper()
     return {
         "topic": args.topic, "company": args.topic,
         "angle": args.angle or f"What is happening with {args.topic}, and why does it matter?",
@@ -274,7 +274,7 @@ def evergreen_story(cfg, args) -> dict | None:
     for t in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("topics", []):
         if t["topic"].lower() not in used:
             return {"topic": t["topic"], "company": t["topic"], "angle": t["angle"],
-                    "region": "IN", "language": "en", "search_query": t["topic"],
+                    "region": "US", "language": "en", "search_query": t["topic"],
                     "wiki_title": "", "keywords": list(t.get("search", []))[:4] or [t["topic"]],
                     "evergreen": t["topic"]}
     log.warning("Every evergreen topic has been used: add more to %s", path)
@@ -485,7 +485,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--topic")
     ap.add_argument("--angle", default="")
-    ap.add_argument("--region", help="IN, US, CN, RU or WORLD (with --topic)")
+    ap.add_argument("--region", help="US or MARKETS (with --topic)")
     ap.add_argument("--language", choices=["hi", "en"], help="override narration language")
     ap.add_argument("--publish", choices=["slot", "now"],
                     help="now: public as soon as it uploads; slot: schedule for the next "

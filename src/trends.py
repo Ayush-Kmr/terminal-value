@@ -103,7 +103,7 @@ def gather(cfg: Config) -> list[dict[str, Any]]:
         news = region.get("news") or {}
         if news:
             block["headlines"] = news_headlines(
-                news.get("hl", "en-IN"), news.get("gl", "IN"), news.get("query"))
+                news.get("hl", "en-US"), news.get("gl", "US"), news.get("query"))
         log.info("Trends %s: %d searches, %d headlines",
                  code, len(block["searches"]), len(block["headlines"]))
         blocks.append(block)
@@ -111,13 +111,13 @@ def gather(cfg: Config) -> list[dict[str, Any]]:
 
 
 PICK_PROMPT = """You are the commissioning editor of a YouTube explainer channel
-whose main audience is in India. Today is {today}. Choose the {n} best stories
+whose audience is in the United States. Today is {today}. Choose the {n} best stories
 for today's video from the live signals below.
 
 How to rank:
-- Region weight matters: {weights}. An India story beats an equally strong
-  story elsewhere. A foreign story ranks high only if Indians will care
-  (money, jobs, visas, tech, geopolitics touching India, a global first).
+- Choose American business stories: US companies, markets, jobs, prices, the
+  Fed, tariffs, big tech and AI deals. Region weight: {weights}. A foreign
+  story qualifies only if it clearly moves American money, jobs or prices.
 - Prefer stories that are BOTH searched and covered by several outlets today.
 - Prefer stories with a "why" worth explaining for {minutes} minutes: a
   decision, a number, a conflict of interests, a consequence. A bare sports
