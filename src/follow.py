@@ -62,6 +62,8 @@ The title is {minlen} to {maxlen} characters. No exclamation marks, no clickbait
 Return JSON:
 {{"title": "...",
   "subject": "<the story's subject in {name} script, 1-3 words>",
+  "search_head": "<the one phrase from the search list above that best fits this story,
+                  copied word for word in English letters; the only English allowed>",
   "summary": "<two plain sentences in {name}; the first STARTS with the subject>",
   "facts": ["<the {nfacts} most important facts above, each one short sentence in {name}>"],
   "thumb_text": "<2-3 words in {name} for the thumbnail: the stake or emotion,
@@ -245,6 +247,11 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
         minlen=maxlen * 2 // 3, nfacts=nfacts),
         temperature=0.5)
     title = _drawable(str(pkg.get("title") or subject).strip())[:maxlen + 10]
+    # The title opens with what Tamil viewers type into search; the headline on
+    # the picture stays Tamil only, and the Tamil font has no English letters.
+    head = str(pkg.get("search_head") or "").strip()
+    head = next((s for s in english if s.lower() == head.lower() and len(s) <= 40), hashhead)
+    full_title = f"{seo.headline_case(head)} | {title}"[:100]
     summary = str(pkg.get("summary") or "").strip()
     local_facts = [str(f) for f in pkg.get("facts") or [] if f][:nfacts]
     # Real search phrases first, then the model's {name}-script ones.
@@ -267,11 +274,11 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
            "captions": str(captions.srt(shots, workdir / "captions.srt"))}
     if is_short:
         short = shorts.standalone(cfg, video, shots, workdir, title, title, language)
-        out.update(short, kind="short", title=title, description=seo.description(
+        out.update(short, kind="short", title=full_title, description=seo.description(
             cfg, summary, "", sources[:6], keywords, language,
             facts=local_facts, tags_extra=search, topic_text=topic_text))
     else:
-        out.update(kind="long", title=title, video=str(video),
+        out.update(kind="long", title=full_title, video=str(video),
                    description=seo.description(cfg, summary, seo.chapters(cfg, shots),
                                                sources, keywords, language, facts=local_facts,
                                                tags_extra=search, topic_text=topic_text),
