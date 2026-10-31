@@ -177,15 +177,15 @@ SHORT_BEAT = {
     "label": "Short",
     "share": 1.0,
     "intent": ("A complete {seconds}-second explainer of this one story for someone who has "
-               "not heard of it. FIRST SENTENCE: at most 8 words, the single most striking "
-               "verified fact or the open question it raises, so a scrolling viewer needs "
-               "the rest (e.g. 'Boeing just lost its biggest order.'). Then what happened, "
+               "not heard of it. FIRST SENTENCE: at most 8 words, spoken in the first 3 seconds: "
+               "the story's biggest number or sharpest conflict, so a scrolling viewer needs "
+               "the rest (e.g. 'Boeing just lost its biggest order.'). Use everyday words, "
+               "never jargon like 'free cash flow'. Then what happened, "
                "then why it matters to the viewer. 6-9 shots of ONE sentence each, under 12 "
                "words, so the picture changes every few seconds. Stay on one subject, with a "
                "real number in the first or second sentence, as the Shorts that held "
-               "viewers best did. LAST SENTENCE: short, and it leads "
-               "straight back into the first one (it names what the opening line was "
-               "about, or asks the question the opening answers), so the Short loops. "
+               "viewers best did. LAST SENTENCE: short, repeating the opening's key word or number, and leading "
+               "straight back into the first sentence, so the Short loops without a pause. "
                "No greeting, no sign-off, no 'subscribe'."),
 }
 
@@ -196,6 +196,19 @@ def hook_words(sc: dict) -> int:
     first = next((s.get("narration", "") for b in sc.get("beats", []) for s in b.get("shots", [])
                   if (s.get("narration") or "").strip()), "")
     return len(re.split(r"(?<=[.?!।])\s+", first.strip())[0].split())
+
+
+def loops(sc: dict) -> bool:
+    """The last line picks up a word or number from the first, so the Short replays."""
+    import re
+
+    lines = [s.get("narration", "") for b in sc.get("beats", []) for s in b.get("shots", [])
+             if (s.get("narration") or "").strip()]
+    if len(lines) < 2:
+        return True
+    key = lambda text: {w for w in re.findall(r"[a-z0-9]+", text.lower())
+                        if len(w) > 4 or w.isdigit()}
+    return bool(key(lines[0]) & key(lines[-1]))
 
 
 def produce_short(cfg, story: dict, workdir: Path) -> dict:
@@ -219,13 +232,14 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         sc = script_mod.write(tall, fb, "", language, beats=[beat],
                               total_words=int(seconds / 60 * wpm))
         limit = int(seconds / 60 * wpm * 1.2)
-        if hook_words(sc) <= 10 and sc["word_count"] <= limit:
+        if hook_words(sc) <= 10 and sc["word_count"] <= limit and loops(sc):
             break
-        log.info("Short has a %d-word opening and %d words; rewriting (%d)",
-                 hook_words(sc), sc["word_count"], attempt + 1)
+        log.info("Short has a %d-word opening, %d words, loop %s; rewriting (%d)",
+                 hook_words(sc), sc["word_count"], loops(sc), attempt + 1)
         beat = {**beat, "intent": beat["intent"] + f" YOUR LAST DRAFT RAN {sc['word_count']} "
                 f"WORDS WITH A {hook_words(sc)}-WORD FIRST SENTENCE. THE LIMIT IS {limit} WORDS "
-                "IN ALL AND 8 IN THE FIRST SENTENCE."}
+                "IN ALL AND 8 IN THE FIRST SENTENCE. THE LAST SENTENCE MUST REPEAT A KEY WORD OR "
+                "NUMBER FROM THE FIRST."}
     for b_ in sc["beats"]:              # a silent shot in a Short is dead air
         b_["shots"] = [s for s in b_.get("shots", []) if (s.get("narration") or "").strip()]
     (workdir / "script.json").write_text(
@@ -251,7 +265,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     best["title"] = set_title(story.get("title", ""),
                               [str(f.get("claim", "")) for f in fb.facts], best["title"])
     if story.get("stock") and "stock" not in best["title"].lower():
-        best["title"] = f"{story['stock']} Stock: {best['title']}"[:seo.SHORT_TITLE_MAX + 10]
+        full = f"{story['stock']} Stock: {best['title']}"
+        best["title"] = full if len(full) <= seo.SHORT_TITLE_MAX else f"Why {story['stock']} Stock Moved"
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               headline, best["title"], language)
