@@ -37,7 +37,7 @@ on:
         type: boolean
         default: false
       tamil_only:
-        description: "Upload only the Tamil version (needs the TAMIL_ENABLED variable; otherwise nothing uploads)"
+        description: "Upload only the Tamil version (the English one is built but not uploaded)"
         type: boolean
         default: false
 
@@ -156,12 +156,9 @@ jobs:
   # The Tamil channel: the same videos, translated and narrated in Tamil
   # (src/follow.py), uploaded with the Tamil channel's own token. Skipped
   # until the YT_REFRESH_TOKEN_TA secret exists.
-  # PAUSED 2026-11-01: the main channel is US-only and Tamil skips US stories.
-  # To resume, set the repository variable TAMIL_ENABLED to true and take US
-  # out of follow.skip_regions in channels/ta.yaml.
   tamil:
     needs: produce
-    if: ${{ vars.TAMIL_ENABLED == 'true' && !cancelled() && needs.produce.result != 'skipped' }}
+    if: ${{ !cancelled() && needs.produce.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -186,6 +183,15 @@ jobs:
           cache: pip
 
       # libraqm + libfribidi let Pillow shape Tamil script for the captions.
+      # Every long Tamil run was killed about an hour into narration. Extra swap
+      # and a memory log guard against, and show, running out of memory.
+      - name: Add swap and log memory
+        if: steps.on.outputs.go
+        run: |
+          sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2
+          sudo mkswap /swapfile2 && sudo swapon /swapfile2
+          (while true; do echo "MEM $(free -m | awk 'NR==2{print $3"/"$2}') swap $(free -m | awk 'NR==3{print $3}')"; sleep 300; done) &
+
       - name: Install ffmpeg
         if: steps.on.outputs.go
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu libraqm0 libfribidi0

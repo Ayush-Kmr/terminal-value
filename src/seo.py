@@ -221,6 +221,7 @@ def chapters(cfg: Config, shots: list[dict]) -> str:
     """Chapter marks at beat boundaries. YouTube needs 00:00 as the first."""
     labels = {b["id"]: b.get("label", b["id"].replace("_", " ").capitalize())
               for b in cfg.get_path("structure.beats", [])}
+    labels.update(cfg.get_path("labels.chapters", {}) or {})
     lines, t, seen = [], 0.0, set()
     for shot in shots:
         beat = shot.get("beat")
@@ -241,30 +242,32 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
     tags = []
     # Phrases with figures in them make unreadable hashtags (#Rbi550Repo).
     keywords = [k for k in keywords if not re.search(r"\d", k)] or keywords
-    # The shortest phrase is the subject itself; long ones make unreadable tags.
-    for k in sorted(keywords[:6], key=len)[:1]:
+    # The first short phrase, the subject; long ones make unreadable tags.
+    for k in [k for k in keywords if len(k.split()) <= 3][:1] or keywords[:1]:
         word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title() if k.isascii() else k)
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
     names = cfg.get_path("upload.hashtags", {}) or {}
     topic = next((names[n] for n in upload.topic_playlists(cfg, text, *keywords)
-                  if n in names), "#business")
+                  if n in names), cfg.get_path("upload.hashtag_default", "#business"))
     if topic not in tags:
         tags.append(topic)
-    tags.append({"hi": "#hindinews", "ta": "#tamilnews"}.get(language, "#businessnews"))
+    tags.append({"hi": "#hindinews", "ta": "#தமிழ்செய்திகள்"}.get(language, "#businessnews"))
     return " ".join(tags)
 
 
 def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict],
                 keywords: list[str], language: str = "en", facts: list[str] | None = None,
-                credits: str = "", tags_extra: list[str] | None = None) -> str:
+                credits: str = "", tags_extra: list[str] | None = None,
+                topic_text: str = "") -> str:
     """Built from parts rather than generated: the sources and the disclosure
     must be exact, and a model asked to copy them verbatim sometimes does not.
     Order: summary, chapters, key facts, call to action, sources, credits,
     disclosure, then the hashtags last."""
+    heads = cfg.get_path("labels.description", {}) or {}
     parts = [summary.strip()]
     if chapter_text:
-        parts.append("CHAPTERS\n" + chapter_text)
+        parts.append(heads.get("chapters", "CHAPTERS") + "\n" + chapter_text)
     facts = [f.strip() for f in (facts or []) if f and f.strip()]
     if facts:
         # The facts the video is built on: real words for search to match,
@@ -281,12 +284,12 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
         # News-aggregator redirect links run to hundreds of characters.
         lines.append(f"- {title}" + (f" — {url}" if url and len(url) < 120 else ""))
     if lines:
-        parts.append("SOURCES\n" + "\n".join(lines))
+        parts.append(heads.get("sources", "SOURCES") + "\n" + "\n".join(lines))
     if credits:
         parts.append("IMAGE CREDITS\n" + credits)
 
     parts.append(cfg.get_path("channel.disclosure", "").strip())
-    tail = hashtags(cfg, list(tags_extra or []) + keywords, language, summary)
+    tail = hashtags(cfg, keywords + list(tags_extra or []), language, f"{summary} {topic_text}")
     body = "\n\n".join(p for p in parts if p)
     # Trim the body, never the hashtags: they must close the description.
     return body[:4880 - len(tail)] + "\n\n" + tail
@@ -297,11 +300,13 @@ def tags(company: str, keywords: list[str], language: str = "en",
     """A handful of distinct terms. Tags barely affect ranking any more; the
     old "<topic> explained / news / hindi" variants only padded the list.
     `extra` (search phrases in the channel's own script) goes first."""
-    base = [*(extra or [])[:6], company, *keywords[:6], "news explained"]
+    base = [*(extra or [])[:6], company, *keywords[:6]]
+    if language != "ta":
+        base.append("news explained")
     if language == "hi":
         base += ["hindi news"]
     elif language == "ta":
-        base += ["tamil news", "tamil news explained"]
+        base += ["தமிழ் செய்திகள்", "வணிகச் செய்திகள்"]
     out, total, seen = [], 0, set()
     for t in base[:14]:
         t = str(t).strip()[:60]

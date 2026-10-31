@@ -1,55 +1,49 @@
 # ============================================================
-#  The Tamil channel.
-#  Laid over config.yaml when CHANNEL=ta, so only what differs is here.
-#  It publishes the main channel's videos again, translated and narrated in
-#  Tamil (src/follow.py): same stories, same visuals, same day.
+#  The Tamil channel. Laid over config.yaml when CHANNEL=ta, so only what differs
+#  is here. It publishes every main-channel video again, entirely in Tamil
+#  (src/follow.py): narration, cards, titles, descriptions, tags and hashtags.
 # ============================================================
 
 channel:
   name: "Terminal Value Tamil"
   handle: "@TerminalValueTamil"
-  channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads
-                                   # refuse to go anywhere else when it is set
+  channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads refuse to go anywhere else
   url: "https://www.youtube.com/@TerminalValueTamil"
   tagline: "செய்திக்குப் பின்னால் இருக்கும் கதை."
   language: ta
+  country: IN
+  timezone: Asia/Kolkata
   about: |
-    இந்தியா மற்றும் உலக வணிகச் செய்திகள், தமிழில் தெளிவாக. என்ன நடந்தது, எப்படி இங்கு வந்தோம், உங்கள் பணம், வேலை, பொருளாதாரத்திற்கு இது என்ன அர்த்தம் என்பதை எளிமையாக விளக்குகிறோம்.
+    அமெரிக்க வணிகம் மற்றும் பங்குச் சந்தை செய்திகள், தமிழில் தெளிவாக. என்ன நடந்தது, எப்படி இங்கு வந்தோம், உங்கள் பணம், வேலை, பொருளாதாரத்திற்கு இது என்ன அர்த்தம் என்பதை எளிமையாக விளக்குகிறோம்.
 
-    India and world business news explained in Tamil. Every day we pick the story India and the world are searching for and explain it with the numbers, dates and people involved.
+    உலகமே பேசும் செய்திகளையும், வரலாற்றில் இடம்பிடித்த வணிகக் கதைகளையும் எண்கள், தேதிகள், சம்பந்தப்பட்ட நபர்களுடன் விளக்குகிறோம்.
 
-    New explainer every other day at 7 PM IST. New Shorts every day at 8 AM and 8:30 PM IST.
+    ஒவ்வொரு இரண்டு நாளுக்கும் இரவு 7:30 மணிக்கு ஒரு முழு விளக்க வீடியோ. தினமும் காலை 9 மணிக்கும் இரவு 9 மணிக்கும் குறுவீடியோக்கள்.
 
-    Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. If we get something wrong, tell us in the comments.
-  # From YouTube search suggestions (what Tamil viewers actually type),
-  # 2026-10-22: mostly English + "tamil", plus Tamil-script questions.
+    ஒவ்வொரு வீடியோவின் விளக்கத்திலும் ஆதாரங்கள் உள்ளன. ஸ்கிரிப்ட்டும் குரலும் வெளியான செய்திகளிலிருந்து செயற்கை நுண்ணறிவு மூலம் உருவாக்கப்படுகின்றன. இது நிதி ஆலோசனை அல்ல. தவறு இருந்தால் கருத்துகளில் சொல்லுங்கள், திருத்துவோம்.
   keywords:
-    - business news tamil
-    - share market news today in tamil
-    - stock market tamil news
-    - gold rate tamil news
-    - economy explained in tamil
-    - rbi repo rate news today tamil
-    - china economy in tamil
-    - layoffs tamil
-    - tamil nadu business news
+    - வணிகச் செய்திகள்
+    - பங்குச் சந்தை செய்திகள்
+    - இன்றைய பங்குச் சந்தை
+    - அமெரிக்க பொருளாதாரம்
+    - பொருளாதாரம் தமிழில்
     - தங்கம் விலை நிலவரம்
     - ஷேர் மார்க்கெட் நிலவரம்
-    - பொருளாதாரம்
+    - வணிக வரலாறு
+    - பொருளாதார விளக்கம்
+    - செயற்கை நுண்ணறிவு செய்திகள்
+  links:
+    - "சந்தா செலுத்த: https://www.youtube.com/@TerminalValueTamil?sub_confirmation=1"
   cta: >-
-    ஒவ்வொரு இரண்டு நாளுக்கும் ஒரு முழு விளக்க வீடியோ, தினமும் Shorts.
-    செய்திக்குப் பின்னால் இருக்கும் கதையைத் தவறவிடாமல் இருக்க Subscribe செய்யுங்கள்.
+    ஒவ்வொரு இரண்டு நாளுக்கும் ஒரு முழு விளக்க வீடியோ, தினமும் குறுவீடியோக்கள்.
+    செய்திக்குப் பின்னால் இருக்கும் கதையைத் தவறவிடாமல் இருக்க சந்தா செலுத்துங்கள்.
   disclosure: >-
-    இந்த வீடியோ AI மூலம் தயாரிக்கப்பட்டது: மேலே உள்ள செய்தி அறிக்கைகளிலிருந்து
-    ஸ்கிரிப்ட் எழுதப்பட்டு, குரல் AI மூலம் உருவாக்கப்பட்டது. This video was
-    produced with AI from the news reports listed above. Corrections are welcome
-    in the comments.
+    இந்த வீடியோ செயற்கை நுண்ணறிவு மூலம் தயாரிக்கப்பட்டது: மேலே உள்ள செய்தி அறிக்கைகளிலிருந்து
+    ஸ்கிரிப்ட் எழுதப்பட்டு, குரல் உருவாக்கப்பட்டது. திருத்தங்களை கருத்துகளில் வரவேற்கிறோம்.
 
 voice:
-  # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine like the
-  # cloned voice. The cloned voice cannot speak Tamil. The description picks
-  # the narrator: Jaya is the model's recommended Tamil speaker (Kavitha is
-  # the other one).
+  # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine. The English
+  # voice cannot speak Tamil. Jaya is the model's recommended Tamil speaker.
   provider: indic
   match_ok: 0.5                # Whisper hears Tamil less exactly than English
   indic:
@@ -58,31 +52,49 @@ voice:
       moderate pace, with a moderate pitch. The recording is of very high
       quality, with the speaker's voice sounding clear and very close up.
 
+labels:
+  chapters: {hook: கதை, what_happened: என்ன நடந்தது, background: எப்படி இங்கு வந்தோம், stakes: ஏன் முக்கியம், whats_next: அடுத்து என்ன, rise: எழுச்சி, crack: விரிசல், fall: வீழ்ச்சி, legacy: என்ன மாறியது}
+  description: {chapters: அத்தியாயங்கள், sources: ஆதாரங்கள்}
+
 upload:
   playlists:
-    ta: "தமிழில் — Explained"
+    ta: "தமிழ் விளக்கங்கள்"
+  hashtag_default: "#வணிகம்"
+  hashtags:
+    "பங்குச் சந்தை & நிறுவனங்கள்": "#பங்குச்சந்தை"
+    "செயற்கை நுண்ணறிவு & தொழில்நுட்பம்": "#தொழில்நுட்பம்"
+    "வங்கி & வட்டி விகிதங்கள்": "#வட்டிவிகிதம்"
+    "வர்த்தகம் & வரிகள்": "#வர்த்தகம்"
+    "பொருளாதாரம் & வேலைகள்": "#பொருளாதாரம்"
   topic_playlists:
-    "பங்குச் சந்தை & நிறுவனங்கள் | Stock Market": [stock, stocks, share, shares, sensex, nifty, ipo, market, markets, investors, earnings, profit, layoffs, jobs, ceo, startup, valuation, bear, bull]
-    "வங்கி, RBI & ரூபாய் | Banking": [rbi, bank, banks, banking, repo, rate, rates, rupee, inflation, loan, loans, sebi, credit, gold]
-    "வர்த்தகம் & வரிகள் | Trade & Tariffs": [trade, tariff, tariffs, export, exports, import, imports, fta, sanctions, oil, wto]
-    "உலகப் பொருளாதாரம் | Global Economy": [china, chinese, us, usa, america, russia, europe, imf, global, world, recession, fed, dollar]
+    "பங்குச் சந்தை & நிறுவனங்கள்": [stock, stocks, share, shares, nasdaq, dow, ipo, market, markets, investors, earnings, profit, layoffs, ceo, startup, valuation, bear, bull]
+    "செயற்கை நுண்ணறிவு & தொழில்நுட்பம்": [ai, nvidia, openai, anthropic, microsoft, google, apple, amazon, meta, tesla, chip, chips, semiconductor, spacex]
+    "வங்கி & வட்டி விகிதங்கள்": [fed, federal, powell, bank, banks, banking, rate, rates, mortgage, inflation, loan, loans, credit, treasury, gold]
+    "வர்த்தகம் & வரிகள்": [trade, tariff, tariffs, export, exports, import, imports, sanctions, oil, wto]
+    "பொருளாதாரம் & வேலைகள்": [economy, economic, recession, jobs, unemployment, wages, gdp, consumer, dollar, debt, deficit]
 
-# Which of the main channel's videos get a Tamil version. A Tamil channel
-# that republishes every English video is a translated copy channel, which
-# YouTube's mass-produced-content rule targets; and US stock stories mean
-# little to Tamil viewers. So: no US-only stories, and one Short a day.
+# Every story the main channel makes gets a Tamil version.
 follow:
-  skip_regions: [US]
-  max_shorts: 1
+  skip_regions: []
+  max_shorts: 2
 
-# Offset from the English channel's 08:00 / 20:30 / 19:00 so the two channels
-# never publish the same story in the same minute.
 format:
   long:
-    publish_times: ["19:30"]
+    publish_times: ["19:30"]   # India time
   short:
     publish_times: ["09:00", "21:00"]
 
 visuals:
-  fonts:
-    caption: "assets/fonts/NotoSansTamil-Bold.ttf"   # Shorts word captions in Tamil (OFL)
+  fonts:                       # every text on every card, in Tamil (OFL)
+    display: "assets/fonts/NotoSansTamil-Bold.ttf"
+    body:    "assets/fonts/NotoSansTamil-Bold.ttf"
+    mono:    "assets/fonts/NotoSansTamil-Bold.ttf"
+    caption: "assets/fonts/NotoSansTamil-Bold.ttf"
+  labels:
+    source: ஆதாரம்
+    number: முக்கிய எண்
+    quote: அவர்கள் சொன்னது
+    timeline: காலவரிசை
+    data: தரவு
+    document: ஆவணம்
+    wordmark: டெர்மினல் வேல்யூ தமிழ்

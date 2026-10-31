@@ -59,8 +59,8 @@ Return JSON:
          "quote": "<quote_card only: the supplied quote, verbatim, max 25 words>",
          "chart": {{"kind":"line|bar","title":"...","x":[...],"y":[...],"y_label":"..."}},
          "events": [{{"year":"<date or year>","event":"<max 8 words>","pivotal":false}}],
-         "search_terms": "<for photo of a REAL named person, place or thing: just its name, 1-4 words, as on Wikipedia>",
-         "stock_terms": "<for photo of a generic scene: 2-4 plain words with NO proper names, e.g. 'stock exchange trading floor'>",
+         "search_terms": "<ONLY when the shot must show one REAL named person, place or thing: just its name, 1-4 words, as on Wikipedia>",
+         "stock_terms": "<for every other photo, a scene with movement: 2-4 plain words with NO proper names, e.g. 'stock exchange trading floor'>",
          "prompt": "<for ai_still: image prompt. NO logos, NO text, NO real faces>"
       }},
       "emphasis": "<normal|hold>"
@@ -86,8 +86,8 @@ Rules:
   on a production line). Use ai_still only for what no footage can show.
 - Never use the same visual_type three shots in a row, and make at least half of
   the shots photo. Cards land hardest between pieces of footage.
-- Every photo shot needs "search_terms" (a real, named subject) or
-  "stock_terms" (a generic scene), never a sentence. Also give every photo
+- Every photo shot needs either "search_terms" (one real, named subject) or
+  "stock_terms" (a generic scene), not both, never a sentence. Also give every photo
   shot a "prompt" as a fallback illustration."""
 
 

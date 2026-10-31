@@ -106,7 +106,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     desc = seo.description(
         cfg, best.get("summary") or fb.summary, chapter_text,
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources],
-        keywords or [company], language, facts=fact_lines, credits=attribution)
+        [company, *keywords], language, facts=fact_lines, credits=attribution)
 
     srt = captions.srt(shot_list, workdir / "captions.srt")
 
@@ -194,11 +194,14 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     for attempt in range(3):
         sc = script_mod.write(tall, fb, "", language, beats=[beat],
                               total_words=int(seconds / 60 * wpm))
-        if hook_words(sc) <= 10:
+        limit = int(seconds / 60 * wpm * 1.2)
+        if hook_words(sc) <= 10 and sc["word_count"] <= limit:
             break
-        log.info("Short opening is %d words; rewriting (%d)", hook_words(sc), attempt + 1)
-        beat = {**beat, "intent": beat["intent"] + " YOUR LAST DRAFT'S FIRST SENTENCE WAS "
-                f"{hook_words(sc)} WORDS. IT MUST BE 8 OR FEWER."}
+        log.info("Short has a %d-word opening and %d words; rewriting (%d)",
+                 hook_words(sc), sc["word_count"], attempt + 1)
+        beat = {**beat, "intent": beat["intent"] + f" YOUR LAST DRAFT RAN {sc['word_count']} "
+                f"WORDS WITH A {hook_words(sc)}-WORD FIRST SENTENCE. THE LIMIT IS {limit} WORDS "
+                "IN ALL AND 8 IN THE FIRST SENTENCE."}
     for b_ in sc["beats"]:              # a silent shot in a Short is dead air
         b_["shots"] = [s for s in b_.get("shots", []) if (s.get("narration") or "").strip()]
     (workdir / "script.json").write_text(
@@ -224,7 +227,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     short["description"] = seo.description(
         cfg, best.get("summary") or fb.summary, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
-        keywords or [company], language,
+        [company, *keywords], language,
         facts=[str(f.get("claim", "")) for f in fb.facts][:4]) + " #shorts"
     short["captions"] = str(captions.srt(shot_list, workdir / "captions.srt"))
     short.update({"company": company,

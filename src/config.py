@@ -109,11 +109,11 @@ LANGUAGE_RULES = {
         "LANGUAGE: Write all NARRATION in Tamil, in Tamil script, as spoken by a "
         "Tamil news explainer: natural everyday Tamil, not stiff written Tamil. Keep "
         "common English terms and proper names the way Tamil speakers say them, but "
-        "spelled in Tamil script (கம்பெனி, டெக்னாலஜி, ஆர்.பி.ஐ). The narrator reads "
-        "Tamil script only, so no Latin letters in narration. Write numbers, years, "
+        "spelled in Tamil script (கம்பெனி, டெக்னாலஜி, என்விடியா, ராய்ட்டர்ஸ்). The narrator reads "
+        "Tamil script only, so no English letters at all, even in names. Write numbers, years, "
         "percentages and amounts as digits with their symbol (2026, 5.5%, ₹500, "
         "$4 பில்லியன்): they are read out in Tamil automatically. "
-        "ALL ON-SCREEN TEXT stays in ENGLISH using Latin letters only."
+        "Every word is in Tamil script, on screen too: no English letters anywhere."
     ),
     "en": (
         "LANGUAGE: Write narration in clear American English for a general US viewer, "

@@ -120,8 +120,10 @@ How to rank:
   Fed, tariffs, big tech and AI deals. Region weight: {weights}. A foreign
   story qualifies only if it clearly moves American money, jobs or prices.
 - Prefer stories that are BOTH searched and covered by several outlets today.
-- A VIRAL line is a video already doing big numbers on YouTube this week. It proves
-  the subject has an audience: prefer that subject, covered from our own reporting.
+- A VIRAL line is a video already doing big numbers on YouTube this week. If one
+  with 1,000,000 views or more is about an American business story and breaks none
+  of the rules below, its subject goes FIRST, then the next biggest. We cover the
+  subject from our own reporting and never reuse the video, its script or its title.
 - Prefer stories with a "why" worth explaining for {minutes} minutes: a
   decision, a number, a conflict of interests, a consequence. A bare sports
   score, a film trailer, a celebrity birthday or a single-word search with no

@@ -2,7 +2,7 @@
 
 Automated YouTube channel for a US audience: it finds the American business
 stories people are searching for and explains them in English: a 10-minute video
-every other day and two standalone Shorts a day. The Tamil channel is paused.
+every other day and two standalone Shorts a day. The Tamil channel republishes every video, entirely in Tamil (`src/follow.py`).
 
 Channel: <https://www.youtube.com/@terminalvaluedoc>
 

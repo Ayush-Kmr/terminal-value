@@ -309,7 +309,7 @@ def cmd_next(_: list[dict]) -> str:
             f"🎬 Long video: every {cfg['format']['long']['every_days']} days, "
             f"public at {long_times} ET\n"
             f"📱 Shorts: {cfg['format']['short']['per_day']} a day, public at {short_times} ET\n"
-            "⏸ The Tamil channel is paused.")
+            "🇮🇳 The Tamil channel gets every video, in Tamil, at its own times.")
 
 
 def reply(text: str, chs: list[dict]) -> str:

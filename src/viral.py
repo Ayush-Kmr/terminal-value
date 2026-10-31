@@ -22,14 +22,14 @@ log = logging.getLogger(__name__)
 
 
 def _search(yt, query: str, order: str = "relevance", after: datetime | None = None,
-            long_only: bool = False) -> list[dict[str, Any]]:
+            duration: str = "") -> list[dict[str, Any]]:
     """Up to 25 US English results with their view counts."""
     params: dict[str, Any] = {"part": "id", "q": query, "type": "video", "maxResults": 25,
                               "order": order, "regionCode": "US", "relevanceLanguage": "en"}
     if after:
         params["publishedAfter"] = after.strftime("%Y-%m-%dT%H:%M:%SZ")
-    if long_only:
-        params["videoDuration"] = "long"       # over 20 minutes
+    if duration:
+        params["videoDuration"] = duration     # "short" is under 4 minutes
     ids = [i["id"]["videoId"] for i in yt.search().list(**params).execute().get("items", [])]
     if not ids:
         return []
@@ -56,10 +56,13 @@ def recent(cfg: Config, limit: int = 12) -> list[dict[str, Any]]:
     is a hint for the picker, never a reason to lose a run."""
     days = int(cfg.get_path("viral.news_days", 7))
     try:
-        hits = _gather(cfg, cfg.get_path("viral.news_queries", []),
-                       int(cfg.get_path("viral.news_min_views", 100000)),
-                       order="viewCount",
-                       after=datetime.now(timezone.utc) - timedelta(days=days))
+        queries = cfg.get_path("viral.news_queries", [])
+        floor = int(cfg.get_path("viral.news_min_views", 100000))
+        after = datetime.now(timezone.utc) - timedelta(days=days)
+        full = _gather(cfg, queries, floor, order="viewCount", after=after)
+        short = _gather(cfg, queries, floor, order="viewCount", after=after, duration="short")
+        hits = sorted({v["id"]: v for v in full + short}.values(),
+                      key=lambda v: v["views"], reverse=True)
     except Exception as exc:  # noqa: BLE001
         log.warning("Viral search unavailable: %s", str(exc)[:160])
         return []

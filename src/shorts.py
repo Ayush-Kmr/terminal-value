@@ -69,7 +69,8 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
         d.text((540, y), line, font=font, fill=pal.get("accent", "#E8B931"), anchor="ma",
                stroke_width=8, stroke_fill="#0B0E13")
         y += line_h
-    d.text((540, 1920 - 272), cfg.get_path("channel.name", "").upper(),
+    d.text((540, 1920 - 272), (cfg.get_path("visuals.labels.wordmark")
+                               or cfg.get_path("channel.name", "")).upper(),
            font=_font(vcfg, "mono", 30, "Bold"), fill=pal.get("muted", "#8B949E"), anchor="ma")
     img.save(out)
     return out

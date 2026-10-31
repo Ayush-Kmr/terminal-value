@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import assets, captions, gate, llm, render, seo, shorts, state, thumbnail, upload, voice
-from .config import ROOT, Config, language_rules, latin_only, portrait
+from .config import ROOT, Config, language_rules, portrait
 
 log = logging.getLogger(__name__)
 
@@ -51,35 +51,41 @@ English summary: {summary}
 Facts in the video (any number in the title must come from these):
 {facts}
 
-WHAT {name} VIEWERS TYPE INTO YOUTUBE SEARCH about this story (real search
-suggestions; they mostly search in English with "tamil" added):
+WHAT {name} VIEWERS SEARCH for about this story (for meaning only; do not copy
+any English from it):
 {searches}
 
-Write the title in {name} script, but START it with the best-fitting search
-phrase above in English letters, followed by " | " (e.g. "Gold Rate Tamil |
-தங்கம் விலை குறையுமா?", "RBI Repo Rate Tamil | உங்கள் EMI உயருமா?"). If
-none fits, start with the subject's name as {name} viewers type it. Between
-{minlen} and {maxlen} characters. No ALL CAPS, no exclamation marks, no
-clickbait.
+Write everything in {name} script only: no English letters at all, not even in
+names, and spell every name the way {name} speakers say it. Digits, % and $ are fine.
+The title is {minlen} to {maxlen} characters. No exclamation marks, no clickbait.
 
 Return JSON:
 {{"title": "...",
+  "subject": "<the story's subject in {name} script, 1-3 words>",
   "summary": "<two plain sentences in {name}; the first STARTS with the subject>",
   "facts": ["<the {nfacts} most important facts above, each one short sentence in {name}>"],
   "thumb_text": "<2-3 words in {name} for the thumbnail: the stake or emotion,
-                 not words from the title (e.g. 'உங்கள் EMI உயரும்')>",
-  "search": ["<6 short phrases {name} viewers would type into YouTube search to find
-             this story, in {name} script, e.g. the subject + news / share price / explained>"]}}"""
+                 not words from the title (e.g. 'உங்கள் வேலை ஆபத்தில்')>",
+  "thumb_entity": "<who or where, 1-2 words in {name}>",
+  "search": ["<8 short phrases {name} viewers would type into YouTube search to find
+             this story, in {name} script only>"]}}"""
+
+SCREEN_NOTE = """These lines are short text printed on the picture of the video, not speech.
+Keep each one as short as the English. Digits, %, $ and dates as digits stay; every
+word, name, month and unit goes into Tamil script ("$4 billion" -> "4 பில்லியன் டாலர்",
+"Reuters" -> "ராய்ட்டர்ஸ்", "Mar 2026" -> "மார்ச் 2026")."""
 
 
 def builds(root: Path) -> list[Path]:
-    """Every finished build folder under `root`, long videos first."""
+    """Every finished build folder under `root`, Shorts first: the long video
+    takes far longer to voice, and if it fails the Shorts are already out."""
     found = [p.parent for p in root.rglob("shots.json")
              if (p.parent / "metadata.json").exists()]
-    return sorted(found, key=lambda d: ("short" in d.name, d.name))
+    return sorted(found, key=lambda d: ("short" not in d.name, d.name))
 
 
-def translate(cfg: Config, title: str, lines: list[str], language: str) -> list[str]:
+def translate(cfg: Config, title: str, lines: list[str], language: str,
+              note: str = "", latin: str = r"[A-Za-z]{2,}") -> list[str]:
     name = LANGUAGE_NAMES.get(language, language)
     out: list[str] = []
     for start in range(0, len(lines), BATCH):
@@ -87,13 +93,13 @@ def translate(cfg: Config, title: str, lines: list[str], language: str) -> list[
         listing = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(part))
         for attempt in range(3):
             got = llm.json_call(TRANSLATE_PROMPT.format(
-                name=name, title=title, rules=language_rules(language),
+                name=name, title=title, rules=f"{language_rules(language)}\n{note}",
                 lines=listing, n=len(part)), temperature=0.3)
             got = got.get("lines") if isinstance(got, dict) else got
             # Latin letters are read badly by the Tamil voice ("பinflation").
             if isinstance(got, list) and len(got) == len(part) \
                     and all(isinstance(t, str) and t.strip() for t in got) \
-                    and (attempt == 2 or not any(re.search(r"[A-Za-z]{2,}", t) for t in got)):
+                    and (attempt == 2 or not any(re.search(latin, t) for t in got)):
                 out += [t.strip() for t in got]
                 break
             log.warning("Translation of lines %d-%d came back wrong (attempt %d)",
@@ -101,6 +107,49 @@ def translate(cfg: Config, title: str, lines: list[str], language: str) -> list[
         else:
             raise RuntimeError(f"Could not translate lines {start + 1}-{start + len(part)}")
     return out
+
+
+def _drawable(text: str) -> str:
+    """The Tamil font has no $ sign: "$4.2 பில்லியன்" -> "4.2 பில்லியன் டாலர்"."""
+    def money(m: re.Match) -> str:
+        return f"{m[1]}{m[2] or ''} டாலர்"
+    text = re.sub(r"\$\s?(\d[\d,.]*)(\s?(?:மில்லியன்|பில்லியன்|டிரில்லியன்|ஆயிரம்))?", money, str(text))
+    return text.replace("·", ":").replace("$", "").replace("&", " மற்றும் ")
+
+
+def _screen_slots(spec: dict) -> list[tuple]:
+    """Every piece of text a card prints, as (container, key)."""
+    slots = [(spec, k) for k in ("headline", "value", "caption", "quote") if spec.get(k)]
+    chart = spec.get("chart")
+    if isinstance(chart, dict):
+        slots += [(chart, k) for k in ("title", "y_label") if chart.get(k)]
+        slots += [(chart["x"], i) for i in range(len(chart.get("x") or []))]
+    for ev in spec.get("events") or []:
+        if isinstance(ev, dict):
+            slots += [(ev, k) for k in ("year", "event") if ev.get(k)]
+    return slots
+
+
+def translate_screen(cfg: Config, title: str, shots: list[dict], language: str) -> None:
+    """Everything printed on a card goes into the channel's language. Anything
+    still in English afterwards is dropped from captions, where it can go."""
+    every = [(c, k) for s in shots for c, k in _screen_slots(s.get("visual_spec") or {})]
+    slots = [(c, k) for c, k in every if re.search(r"[A-Za-z]", str(c[k]))]
+    texts = list(dict.fromkeys(str(c[k]) for c, k in slots))
+    done = {} if not texts else dict(zip(texts, translate(cfg, title, texts, language, SCREEN_NOTE, r"[A-Za-z]")))
+    for c, k in every:
+        if str(c[k]) in done:
+            continue
+        c[k] = _drawable(c[k])
+    left = 0
+    for c, k in slots:
+        c[k] = _drawable(done[str(c[k])])
+        if re.search(r"[A-Za-z]", c[k]):
+            left += 1
+            if k == "caption":
+                c[k] = ""
+    if left:
+        log.warning("%d on-screen text(s) still have English letters", left)
 
 
 def _load_shots(src: Path, workdir: Path) -> list[dict]:
@@ -124,26 +173,13 @@ def _load_shots(src: Path, workdir: Path) -> list[dict]:
     return shots
 
 
-ACRONYMS = {"rbi", "us", "usa", "uk", "ipo", "gdp", "emi", "sebi", "gst", "imf", "ai", "it", "ev",
-            "cpi", "fd", "sip", "nse", "bse", "tcs", "hdfc", "sbi", "lic", "upi", "iren"}
-
-
-def _head_case(title: str) -> str:
-    """"gold price tamil | ..." -> "Gold Price Tamil | ...": search phrases
-    come back in lower case."""
-    head, sep, rest = title.partition(" | ")
-    if not sep or not head.isascii():
-        return title
-    head = " ".join(w.upper() if w.lower() in ACRONYMS else w[:1].upper() + w[1:]
-                    for w in head.split())
-    return f"{head} | {rest}"
-
-
 def _thumbnail(cfg: Config, meta: dict, pkg: dict, title: str, shots: list[dict],
                src: Path, workdir: Path) -> Path:
     """The channel's own thumbnail: its words over the same picture, with the
     English video's figure and direction. Falls back to the English one."""
     en = (meta.get("title_options") or [{}])[0]
+    figure = str(en.get("thumb_figure", ""))
+    figure = "" if re.search(r"[A-Za-z]", figure) else figure.replace("$", "")
     stills = [s for s in shots if s.get("visual_type") in {"photo", "ai_still"}
               and s.get("asset") and Path(s["asset"]).suffix.lower() != ".mp4"]
     stills.sort(key=lambda s: (s.get("visual_type") == "photo"
@@ -152,8 +188,8 @@ def _thumbnail(cfg: Config, meta: dict, pkg: dict, title: str, shots: list[dict]
     try:
         return thumbnail.generate(cfg, {
             "title": title, "thumb_words": str(pkg.get("thumb_text") or en.get("thumb_text", "")),
-            "thumb_entity": en.get("thumb_entity", ""), "thumb_figure": en.get("thumb_figure", ""),
-            "direction": thumbnail.direction(en.get("thumb_figure", ""), meta.get("title", "")),
+            "thumb_entity": str(pkg.get("thumb_entity") or ""), "thumb_figure": figure,
+            "direction": thumbnail.direction(figure, meta.get("title", "")),
         }, Path(stills[0]["asset"]) if stills else None, workdir / "thumbnail.jpg")
     except Exception as exc:  # noqa: BLE001
         log.warning("Own thumbnail failed (%s); using the main channel's", exc)
@@ -177,9 +213,12 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     (workdir / "script.json").write_text(
         json.dumps(shots, indent=2, ensure_ascii=False), encoding="utf-8")
 
+    translate_screen(cfg, en_title, shots, language)
+    subject = translate(cfg, en_title, [company], language)[0]
+
     frame = portrait(cfg) if is_short else cfg
-    assets.redraw_cards(frame, shots, workdir / "assets", company)
-    assets.gather(frame, shots, workdir, company)      # anything that did not copy
+    assets.redraw_cards(frame, shots, workdir / "assets", subject)
+    assets.gather(frame, shots, workdir, subject)      # anything that did not copy
     shots = voice.narrate_shots(cfg, shots, workdir, meta.get("region"), language)
     clips = render.build_shot_clips(frame, shots, workdir)
     video = render.concat_with_audio(frame, clips, shots, workdir,
@@ -199,31 +238,36 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
         facts="\n".join(f"- {f}" for f in facts[:25]) or "-", maxlen=maxlen,
         minlen=maxlen * 2 // 3, nfacts=nfacts),
         temperature=0.5)
-    title = _head_case(str(pkg.get("title") or en_title).strip())[:maxlen + 10]
+    title = _drawable(str(pkg.get("title") or subject).strip())[:maxlen + 10]
     summary = str(pkg.get("summary") or "").strip()
     local_facts = [str(f) for f in pkg.get("facts") or [] if f][:nfacts]
     # Real search phrases first, then the model's {name}-script ones.
-    search = list(dict.fromkeys(searches[:4] + [str(t) for t in pkg.get("search") or [] if t]))[:8]
-    sources = research.get("sources", [])
-    keywords = [t for t in meta.get("tags", []) if t != "news explained"][:4]
+    native = lambda t: not re.search(r"[A-Za-z]", str(t))      # nothing English anywhere
+    search = [str(t) for t in pkg.get("search") or [] if t and native(t)][:8]
+    sources = [dict(s) for s in research.get("sources", [])[:12]]
+    if sources:
+        names = translate(cfg, en_title, [str(s.get("title", "")) for s in sources], language,
+                          SCREEN_NOTE)
+        for s, n in zip(sources, names):
+            s["title"] = n
+    keywords = [str(pkg.get("subject") or subject)]
+    topic_text = " ".join([en_title, *meta.get("tags", [])])
 
     out = {"company": company, "angle": meta.get("angle", ""), "region": meta.get("region"),
            "language": language, "warnings": meta.get("warnings", []),
-           "tags": seo.tags(company, keywords, language, extra=search), "source": src.name,
+           "tags": [t for t in seo.tags(keywords[0], keywords, language, extra=search) if native(t)],
+           "source": src.name,
            "captions": str(captions.srt(shots, workdir / "captions.srt"))}
     if is_short:
-        # The headline over the Short stays the English one: on-screen text
-        # is drawn in Latin letters, like the rest of the pictures.
-        short = shorts.standalone(cfg, video, shots, workdir,
-                                  latin_only(en_title) or company, title, language)
-        out.update(short, kind="short", description=seo.description(
-            cfg, summary, "", sources[:6], keywords or [company], language,
-            facts=local_facts, tags_extra=search) + " #shorts")
+        short = shorts.standalone(cfg, video, shots, workdir, title, title, language)
+        out.update(short, kind="short", title=title, description=seo.description(
+            cfg, summary, "", sources[:6], keywords, language,
+            facts=local_facts, tags_extra=search, topic_text=topic_text))
     else:
         out.update(kind="long", title=title, video=str(video),
                    description=seo.description(cfg, summary, seo.chapters(cfg, shots),
-                                               sources, keywords or [company], language,
-                                               facts=local_facts, tags_extra=search),
+                                               sources, keywords, language, facts=local_facts,
+                                               tags_extra=search, topic_text=topic_text),
                    thumbnail=str(_thumbnail(cfg, meta, pkg, title, shots, src, workdir)),
                    runtime=f"{int(sum(s['duration'] for s in shots) // 60)}:"
                            f"{int(sum(s['duration'] for s in shots) % 60):02d}")

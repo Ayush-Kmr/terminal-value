@@ -53,6 +53,11 @@ def _font(cfg: dict, role: str, size: int, weight: str | None = None) -> ImageFo
     return ImageFont.load_default()
 
 
+def _label(cfg: dict, key: str, default: str) -> str:
+    """Words printed on cards. A channel in another language sets visuals.labels."""
+    return (cfg.get("labels") or {}).get(key, default)
+
+
 def _palette(cfg: dict) -> dict[str, str]:
     return {**PALETTE_DEFAULT, **(cfg.get("palette") or {})}
 
@@ -206,7 +211,8 @@ class Scene:
         if caption:
             room = self.right - self.left - (d.textlength(name, font=f) + self.px(60)
                                              if name and not self.portrait else 0)
-            text = _wrap(d, f"SOURCE · {caption}".upper(), f, room, 1)[0]
+            head = _label(self.cfg, "source", "Source")
+            text = _wrap(d, f"{head}: {caption}".upper(), f, room, 1)[0]
             d.text((self.left, y), text, font=f, fill=self.pal["muted"])
 
     def glow(self, layer: Image.Image, radius: float, strength: float) -> Image.Image:
@@ -319,7 +325,7 @@ def stat_reveal(spec: dict, cfg: dict, out: Path) -> Path:
     falling = value.startswith("-") or "−" in value
     colour = pal["danger"] if falling else pal["accent"]
     s = Scene(cfg, tint=colour)
-    s.kicker("The number", colour)
+    s.kicker(_label(cfg, "number", "The number"), colour)
     s.footer(spec.get("caption", ""))
 
     max_w = s.right - s.left
@@ -365,7 +371,7 @@ def quote_card(spec: dict, cfg: dict, out: Path) -> Path:
     """A real quote, with attribution on screen. Never used for invented text."""
     s = Scene(cfg)
     pal = s.pal
-    s.kicker("On the record")
+    s.kicker(_label(cfg, "quote", "On the record"))
     s.footer()
     text = str(spec.get("quote") or spec.get("headline") or spec.get("value") or "")
     text = text.strip().strip('"“”')
@@ -402,7 +408,7 @@ def timeline(spec: dict, cfg: dict, out: Path) -> Path:
         return stat_reveal(spec, cfg, out)
     s = Scene(cfg)
     pal = s.pal
-    s.kicker("Timeline")
+    s.kicker(_label(cfg, "timeline", "Timeline"))
     s.footer(spec.get("caption", ""))
     fy = s.font("display", 54)
     fe = s.font("body", 38 if s.portrait else 34, "Medium")
@@ -472,7 +478,7 @@ def chart(spec: dict, cfg: dict, out: Path) -> Path:
     declining = len(ys) > 1 and ys[-1] < ys[0]
     colour = pal["danger"] if declining else pal["accent"]
     s = Scene(cfg, tint=colour)
-    s.kicker("The data", colour)
+    s.kicker(_label(cfg, "data", "The data"), colour)
     s.footer(spec.get("caption", ""))
 
     title = str(data.get("title", "")).strip()
@@ -497,7 +503,13 @@ def chart(spec: dict, cfg: dict, out: Path) -> Path:
         ax.fill_between(range(len(xs)), ys, min(ys), color=colour, alpha=0.14)
         ax.set_xticks(range(len(xs)))
         ax.set_xticklabels([str(x) for x in xs])
-    ax.set_ylabel(data.get("y_label", ""), color=pal["muted"], fontsize=22 * k)
+    # Matplotlib cannot join Tamil letters, so those labels are drawn by Pillow.
+    native = bool((cfg.get("fonts") or {}).get("caption"))
+    if native:
+        ax.set_xticks(range(len(xs)))
+        ax.set_xticklabels([""] * len(xs))
+    else:
+        ax.set_ylabel(data.get("y_label", ""), color=pal["muted"], fontsize=22 * k)
     ax.tick_params(colors=pal["muted"], labelsize=21 * k, length=0, pad=10 * k)
     if s.portrait and len(xs) > 5:
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
@@ -507,6 +519,11 @@ def chart(spec: dict, cfg: dict, out: Path) -> Path:
     ax.grid(axis="y", color="#FFFFFF", alpha=0.08, linewidth=1.4 * k)
     ax.set_axisbelow(True)
     fig.tight_layout()
+    if native:
+        fig.subplots_adjust(bottom=0.15)
+    fig.canvas.draw()
+    ticks = [ax.transData.transform((i, min(ys)))[0] for i in range(len(xs))]
+    floor_px = ax.get_window_extent().y0
     buf = io.BytesIO()
     fig.savefig(buf, format="png", transparent=True)
     plt.close(fig)
@@ -514,6 +531,14 @@ def chart(spec: dict, cfg: dict, out: Path) -> Path:
     plot = Image.open(buf).convert("RGBA")
     layer, _ = s.layer(0.45, WIPE, 1.3)
     layer.alpha_composite(plot, (s.left, int(y)))
+    if native:
+        _, d = s.layer(0.45, FADE, 0.6)
+        ftick = s.font("body", 30 if s.portrait else 28)
+        room = w / max(len(xs), 1) - s.px(10)
+        for px, label in zip(ticks, xs):
+            d.text((s.left + px, y + h - floor_px + s.px(10)),
+                   _wrap(d, str(label), ftick, room, 1)[0], font=ftick, fill=pal["muted"],
+                   anchor="ma")
     return s.save(out)
 
 
@@ -521,7 +546,7 @@ def document_card(spec: dict, cfg: dict, out: Path) -> Path:
     """A filing excerpt with the one line that matters picked out in amber."""
     s = Scene(cfg)
     pal = s.pal
-    s.kicker("From the record")
+    s.kicker(_label(cfg, "document", "From the record"))
     s.footer(spec.get("caption", ""))
     body = str(spec.get("headline", "")).strip()
     highlight = str(spec.get("value", "")).strip()

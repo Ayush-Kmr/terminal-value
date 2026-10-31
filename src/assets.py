@@ -19,7 +19,8 @@ MOTION_TYPES = {"stat_reveal", "chart", "timeline", "quote_card", "document"}
 
 
 def _vis(cfg: Config) -> dict:
-    return {**cfg.get("visuals", {}), "wordmark": cfg.get_path("channel.name", "")}
+    return {**cfg.get("visuals", {}), "wordmark": cfg.get_path("visuals.labels.wordmark")
+            or cfg.get_path("channel.name", "")}
 
 
 def redraw_cards(cfg: Config, shots: list[dict], img_dir: Path, company: str) -> None:
@@ -87,9 +88,15 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             base = img_dir / f"shot_{shot['index']:03d}"
             # A named person or place comes from Wikimedia Commons or not at
             # all: a generic stock photo passed off as a real person is a lie.
-            name = (spec.get("search_terms") or company).strip()
-            found = (stock.wikimedia_image(name, base)
-                     or stock.wikimedia_image(" ".join(name.split()[:3]), base))
+            # A generic scene goes to moving footage first.
+            name = (spec.get("search_terms") or "").strip()
+            found = None
+            if spec.get("stock_terms") and not name:
+                found = stock.find(spec["stock_terms"], base)
+            if not found:
+                name = name or company.strip()
+                found = (stock.wikimedia_image(name, base)
+                         or stock.wikimedia_image(" ".join(name.split()[:3]), base))
             if not found and spec.get("stock_terms"):
                 found = stock.find(spec["stock_terms"], base)
             if found:

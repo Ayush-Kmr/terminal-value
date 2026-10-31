@@ -16,6 +16,7 @@ jobs.json:
 """
 from __future__ import annotations
 
+import gc
 import json
 import os
 import re
@@ -29,7 +30,7 @@ import torch
 
 MODEL = "ai4bharat/indic-parler-tts"
 MAX_CHARS = 220        # trained on clips under ~30 s; split longer lines
-BATCH = 6              # chunks generated together; sorted by length to limit padding
+BATCH = 4              # chunks generated together; sorted by length to limit padding
 PAUSE_S = 0.2          # between chunks of one line
 
 
@@ -84,8 +85,10 @@ def main() -> int:
                                  return_dict_in_generate=True)
         for row, (i, j, _) in enumerate(batch):
             n = int(gen.audios_length[row])
-            audio[(i, j)] = gen.sequences[row, :n].float().cpu().numpy()
+            audio[(i, j)] = gen.sequences[row, :n].float().cpu().numpy().copy()
         secs = sum(len(audio[(i, j)]) for i, j, _ in batch) / sr
+        del gen, d, p               # long videos ran out of room near the end
+        gc.collect()
         print(f"[batch {b // BATCH + 1}/{-(-len(order) // BATCH)}] {secs:.1f}s of speech "
               f"in {time.time() - t0:.0f}s", flush=True)
 
