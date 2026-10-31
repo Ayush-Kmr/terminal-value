@@ -96,6 +96,25 @@ def main() -> int:
         failures += 1
         print(f"FAIL made-for-kids status: {exc}")
 
+    # ---- home page: a row per topic ----------------------------------------
+    try:
+        names = list(cfg.get_path("upload.topic_playlists", {}) or {})
+        mine = {p["snippet"]["title"]: p["id"] for p in yt.playlists().list(
+            part="snippet", mine=True, maxResults=50).execute().get("items", [])}
+        shown = {pid for s in yt.channelSections().list(part="contentDetails", mine=True)
+                 .execute().get("items", [])
+                 for pid in (s.get("contentDetails") or {}).get("playlists", [])}
+        added = 0
+        for name in names:
+            if name in mine and mine[name] not in shown:
+                yt.channelSections().insert(part="snippet,contentDetails", body={
+                    "snippet": {"type": "singlePlaylist", "style": "horizontalRow"},
+                    "contentDetails": {"playlists": [mine[name]]}}).execute()
+                added += 1
+        print(f"OK   home page rows added: {added}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARN home page rows: {str(exc)[:200]}")
+
     # ---- watermark -------------------------------------------------------
     try:
         # Raw multipart request: the client library's upload path crashes on

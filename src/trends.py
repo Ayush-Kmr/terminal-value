@@ -134,6 +134,10 @@ How to rank:
 Never choose (these are unsafe to cover without a human editor):
 {avoid}
 
+What this channel's own viewers watched most (same kinds of subject do well;
+never repeat the story itself):
+{own}
+
 Already covered recently, do not repeat:
 {covered}
 
@@ -157,6 +161,15 @@ def blocked(cand: dict[str, Any], words: list[str]) -> str:
     text = " ".join(str(cand.get(k, "")) for k in
                     ("topic", "angle", "why_trending", "search_query", "keywords")).lower()
     return next((w for w in words if re.search(rf"\b{re.escape(w.lower())}\b", text)), "")
+
+
+def own_winners(st: dict[str, Any], limit: int = 6) -> str:
+    """Best-performing US stories first, from the numbers the weekly report saves."""
+    eps = [e for e in st.get("episodes", []) if (e.get("stats") or {}).get("views")
+           and e.get("region") in ("US", "MARKETS")]
+    eps.sort(key=lambda e: e["stats"]["views"], reverse=True)
+    return "\n".join(f"- {e['stats']['views']:,} views: {e.get('title', '')}"
+                     for e in eps[:limit]) or "- (no numbers yet)"
 
 
 def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
@@ -196,6 +209,7 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
             weights=", ".join(f"{c} {r.get('weight', 0.5)}" for c, r in regions.items()),
             avoid="\n".join(f"- {a}" for a in cfg.get_path("trending.avoid", [])),
             covered="\n".join(f"- {c}" for c in covered) or "- (nothing yet)",
+            own=own_winners(st),
             signals="\n".join(lines)[:24000],
             codes=", ".join(regions),
         ),

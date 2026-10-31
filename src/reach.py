@@ -91,6 +91,32 @@ def retention(cfg: Config, days: int = 28) -> dict[str, dict]:
         return {}
 
 
+def drop_off(cfg: Config, videos: list[dict], count: int = 3) -> list[str]:
+    """For the newest long videos: the share of viewers left at each quarter."""
+    from googleapiclient.discovery import build
+
+    longs = [v for v in sorted(videos, key=lambda x: x["published"], reverse=True)
+             if v["privacy"] == "public" and "M" in v["duration"]][:count]
+    out = []
+    try:
+        ya = build("youtubeAnalytics", "v2", credentials=upload.credentials(),
+                   cache_discovery=False)
+        for v in longs:
+            rows = ya.reports().query(
+                ids=f"channel=={cfg.get_path('channel.channel_id')}",
+                startDate=v["published"][:10], endDate=str(date.today()),
+                metrics="audienceWatchRatio", dimensions="elapsedVideoTimeRatio",
+                filters=f"video=={v['id']}").execute().get("rows", [])
+            marks = {25: "1st quarter", 50: "half", 75: "3rd quarter"}
+            kept = [f"{name} {row[1] * 100:.0f}%" for pct, name in marks.items()
+                    for row in rows if abs(row[0] * 100 - pct) < 0.51]
+            if kept:
+                out.append(f"- {v['title'][:60]}: " + ", ".join(kept))
+    except Exception as exc:  # noqa: BLE001
+        log.info("Drop-off data unavailable: %s", str(exc)[:160])
+    return out
+
+
 def report(cfg: Config) -> Path:
     videos = fetch_stats(cfg)
     ret = retention(cfg)
@@ -132,6 +158,10 @@ def report(cfg: Config) -> Path:
             flag = f"🔒 {v['privacy']}"
         lines.append(f"| {v['title'][:60]} | {v['views']:,} | {pct} | {flag} |")
 
+    leaving = drop_off(cfg, videos)
+    if leaving:
+        lines += ["", "## Viewers still watching (newest long videos)", "", *leaving]
+
     lines += ["", "## What to do next", ""]
     weak = [v for v in videos if median and v["views"] < median * 0.4
             and v["privacy"] == "public"]
@@ -148,7 +178,8 @@ def report(cfg: Config) -> Path:
         lines.append(
             f"- {4000 - hours:,.0f} watch hours still needed for the Partner Programme.")
 
-    out = ROOT / "reports" / "reach-report.md"
+    lang = cfg.get_path("channel.language", "en")
+    out = ROOT / "reports" / ("reach-report.md" if lang == "en" else f"reach-report.{lang}.md")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")
     log.info("Reach report written to %s", out)
