@@ -67,11 +67,16 @@ Rules:
   not seen the news.
 
 Vary the strategy across the eight: the claim, the specific number, the open
-question, the contradiction, the consequence for an ordinary viewer.
+question, the contradiction, the consequence for an ordinary viewer. Write five
+"search" titles by the rules above, and three "curious" ones for the feed: a short
+plain question or statement under 60 characters that names the subject and makes
+people need the answer, usually with no number ("Can Meta Actually Survive This?",
+"Why Buffets Suddenly Disappeared").
 
 Return a JSON array of objects:
   title         - the title
   strategy      - which strategy
+  style         - "search" or "curious"
   thumb_text    - 2-3 words for the thumbnail, in English (Latin letters). The
                   title already gives the facts; the thumbnail gives the STAKE or
                   the emotion, in words NOT used in the title (e.g. "BEAR MARKET",
@@ -177,7 +182,7 @@ def _unsupported_numbers(text: str, evidence: str) -> list[str]:
 
 def titles(cfg: Config, company: str, angle: str, best_fact: str,
            language: str = "en", maxlen: int = TITLE_MAX,
-           facts: list[str] | None = None) -> list[dict[str, Any]]:
+           facts: list[str] | None = None, style: str = "search") -> list[dict[str, Any]]:
     from . import keywords
 
     facts = [f for f in (facts or []) if f][:12]
@@ -213,7 +218,8 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         out.append({**o, "lint_score": adj, "issues": issues})
     if not out:
         raise RuntimeError("Title generator returned nothing usable")
-    out.sort(key=lambda t: (t["lint_score"], len(t["title"])), reverse=True)
+    out.sort(key=lambda t: (t.get("style") == style and t["lint_score"] > -20,
+                            t["lint_score"], len(t["title"])), reverse=True)
     for t in out:
         t["searches"] = searches
         t["summary"] = re.sub(r"^(this|the) video (\w+ )?", "", t.get("summary", ""),

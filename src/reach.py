@@ -162,6 +162,16 @@ def report(cfg: Config) -> Path:
     if leaving:
         lines += ["", "## Viewers still watching (newest long videos)", "", *leaving]
 
+    styles: dict[str, list[int]] = {}
+    for ep in st.get("episodes", []):
+        if ep.get("title_style") and ep.get("stats"):
+            styles.setdefault(ep["title_style"], []).append(ep["stats"].get("views", 0))
+    if styles:
+        from statistics import median as mid
+        lines += ["", "## Title styles", ""]
+        lines += [f"- {name}: {len(v)} videos, median {mid(v):,.0f} views"
+                  for name, v in sorted(styles.items())]
+
     lines += ["", "## What to do next", ""]
     weak = [v for v in videos if median and v["views"] < median * 0.4
             and v["privacy"] == "public"]

@@ -64,7 +64,7 @@ localize:
 
 labels:
   full_story: முழு கதை
-  chapters: {hook: கதை, what_happened: என்ன நடந்தது, background: எப்படி இங்கு வந்தோம், stakes: ஏன் முக்கியம், whats_next: அடுத்து என்ன, rise: எழுச்சி, crack: விரிசல், fall: வீழ்ச்சி, legacy: என்ன மாறியது}
+  chapters: {hook: கதை, what_happened: என்ன நடந்தது, background: எப்படி இங்கு வந்தோம், stakes: ஏன் முக்கியம், whats_next: அடுத்து என்ன, rise: எழுச்சி, crack: விரிசல், fall: வீழ்ச்சி, legacy: என்ன மாறியது, beginnings: தொடக்கம், bet: பெரிய முடிவு, empire: சாம்ராஜ்யம்}
   description: {chapters: அத்தியாயங்கள், sources: ஆதாரங்கள்}
 
 upload:

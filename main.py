@@ -52,7 +52,8 @@ def save_shots(shot_list: list[dict], workdir: Path) -> None:
 def produce(cfg, story: dict, workdir: Path) -> dict:
     if story.get("history"):            # the story arc of the past, not of the news
         cfg = Config(copy.deepcopy(dict(cfg)))
-        cfg["structure"]["beats"] = cfg["structure"]["history_beats"]
+        arc = "history_beats" if story.get("collapse", True) else "biography_beats"
+        cfg["structure"]["beats"] = cfg["structure"][arc]
     company, angle = story["topic"], story.get("angle", "")
     language, region = story.get("language", "en"), story.get("region")
     kind = cfg.get_path("format.kind", "documentary")
@@ -96,10 +97,12 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     # ---- packaging ------------------------------------------------------
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
     fact_lines = [str(f.get("claim", "")) for f in fb.facts]
-    title_opts = seo.titles(cfg, company, angle, best_fact, language, facts=fact_lines)
+    title_opts = seo.titles(cfg, company, angle, best_fact, language, facts=fact_lines,
+                            style=title_style())
     best = title_opts[0]
     title = best["title"]
-    series = cfg.get_path("upload.series_playlist") if story.get("history") else ""
+    series = (cfg.get_path("upload.series_playlist")
+              if story.get("history") and story.get("collapse", True) else "")
     if series and len(title) + len(series) + 3 <= 100:
         title = f"{title} | {series}"
     keywords = [str(k) for k in story.get("keywords", [])]
@@ -151,7 +154,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     meta = {
         "company": company, "angle": angle, "title": title,
         "region": region, "language": language, "series": bool(series),
-        "question": best.get("question", ""),
+        "question": best.get("question", ""), "title_style": best.get("style", ""),
         "category_id": cfg.get_path("upload.category_explainer")
         if story.get("history") or story.get("evergreen") else None,
         "title_options": title_opts, "description": desc,
@@ -239,7 +242,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
 
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
     best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language,
-                      maxlen=seo.SHORT_TITLE_MAX,
+                      maxlen=seo.SHORT_TITLE_MAX, style=title_style(),
                       facts=[str(f.get("claim", "")) for f in fb.facts])[0]
     keywords = [str(k) for k in story.get("keywords", [])]
     # The on-screen headline is the title itself: written to be understood
@@ -260,11 +263,16 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
                   "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
                   "language": language, "region": story.get("region"),
                   "warnings": warnings, "angle": story.get("angle", ""),
-                  "question": best.get("question", ""),
+                  "question": best.get("question", ""), "title_style": best.get("style", ""),
                   "parent_url": story.get("parent_url", "")})
     (workdir / "metadata.json").write_text(
         json.dumps(short, indent=2, ensure_ascii=False), encoding="utf-8")
     return short
+
+
+def title_style() -> str:
+    """Search titles and curious titles in turn, so the report can compare them."""
+    return "curious" if len(state.load().get("episodes", [])) % 2 else "search"
 
 
 def desc_lead(meta: dict) -> str:
@@ -413,6 +421,7 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
                 "region": short["region"], "language": short["language"],
                 "video_id": sid, "kind": "short", "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
+                "title_style": short["title_style"],
             })
             state.save(st)
             lines = [f"✅ Short: {short['title']}", f"https://youtu.be/{sid}",
@@ -551,7 +560,7 @@ def run(args) -> int:
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
         "video_id": video_id, "short_ids": short_ids, "kind": "long",
-        "question": meta["question"],
+        "question": meta["question"], "title_style": meta["title_style"],
         "evergreen": story.get("evergreen", ""), "history": story.get("history", ""),
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })
