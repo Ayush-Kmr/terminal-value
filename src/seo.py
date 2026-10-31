@@ -254,7 +254,10 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
                   if n in names), cfg.get_path("upload.hashtag_default", "#business"))
     if topic not in tags:
         tags.append(topic)
-    tags.append({"hi": "#hindinews", "ta": "#தமிழ்செய்திகள்"}.get(language, "#businessnews"))
+    if language == "ta":                  # searched English tags come first
+        tags.insert(1, "#tamilnews")
+    else:
+        tags.append({"hi": "#hindinews"}.get(language, "#businessnews"))
     return " ".join(tags)
 
 
@@ -302,13 +305,13 @@ def tags(company: str, keywords: list[str], language: str = "en",
     """A handful of distinct terms. Tags barely affect ranking any more; the
     old "<topic> explained / news / hindi" variants only padded the list.
     `extra` (search phrases in the channel's own script) goes first."""
-    base = [*(extra or [])[:6], company, *keywords[:6]]
+    base = [*(extra or [])[:10], company, *keywords[:6]]
     if language != "ta":
         base.append("news explained")
     if language == "hi":
         base += ["hindi news"]
     elif language == "ta":
-        base += ["தமிழ் செய்திகள்", "வணிகச் செய்திகள்"]
+        base += ["tamil news", "business news tamil", "தமிழ் செய்திகள்"]
     out, total, seen = [], 0, set()
     for t in base[:14]:
         t = str(t).strip()[:60]

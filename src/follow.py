@@ -230,6 +230,12 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     nfacts = 4 if is_short else 7
     from . import keywords
     searches = keywords.for_story(company, language)
+    # Tamil viewers mostly search in English plus "tamil", so those phrases lead
+    # the tags and hashtags. Everything the viewer reads stays in Tamil.
+    core = keywords._core(company)
+    english = list(dict.fromkeys([s for s in searches if s.isascii()]
+                                 + [f"{core} tamil", f"{core} news tamil"]))
+    hashhead = next((s for s in english if len(s.split()) <= 3), " ".join(core.split()[:2]) + " tamil")
     pkg = llm.json_call(PACKAGE_PROMPT.format(
         searches="\n".join(f"- {s}" for s in searches) or "(none found)",
         kind="Short" if is_short else "video", name=name, title=en_title,
@@ -250,12 +256,13 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
                           SCREEN_NOTE)
         for s, n in zip(sources, names):
             s["title"] = n
-    keywords = [str(pkg.get("subject") or subject)]
+    keywords = [hashhead]
+    tamil_subject = str(pkg.get("subject") or subject)
     topic_text = " ".join([en_title, *meta.get("tags", [])])
 
     out = {"company": company, "angle": meta.get("angle", ""), "region": meta.get("region"),
            "language": language, "warnings": meta.get("warnings", []),
-           "tags": [t for t in seo.tags(keywords[0], keywords, language, extra=search) if native(t)],
+           "tags": seo.tags(tamil_subject, [], language, extra=[*english[:6], *search[:4]]),
            "source": src.name,
            "captions": str(captions.srt(shots, workdir / "captions.srt"))}
     if is_short:
