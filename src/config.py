@@ -107,7 +107,8 @@ LANGUAGE_RULES = {
     ),
     "ta": (
         "LANGUAGE: Write all NARRATION in Tamil, in Tamil script, as spoken by a "
-        "Tamil news explainer: natural everyday Tamil, not stiff written Tamil. Keep "
+        "Tamil news explainer: simple everyday Tamil a family at home follows easily, "
+        "not stiff written Tamil. Explain any hard money word in plain words. Keep "
         "common English terms and proper names the way Tamil speakers say them, but "
         "spelled in Tamil script (கம்பெனி, டெக்னாலஜி, என்விடியா, ராய்ட்டர்ஸ்). The narrator reads "
         "Tamil script only, so no English letters at all, even in names. Write numbers, years, "

@@ -118,7 +118,7 @@ SMALL_WORDS = {"a", "an", "and", "as", "at", "but", "by", "for", "in", "of", "on
                "the", "to", "vs", "with", "from", "is", "its", "over"}
 ACRONYMS = {"ai", "ceo", "cfo", "ipo", "gdp", "cpi", "sec", "etf", "ev", "evs", "fbi", "irs",
             "ibm", "amd", "tsmc", "ups", "ftc", "doj", "nyse", "opec", "imf", "usa", "uk", "eu",
-            "q1", "q2", "q3", "q4", "s&p", "at&t"}
+            "q1", "q2", "q3", "q4", "s&p", "at&t", "rbi", "idbi", "epfo", "ipl", "hdfc", "sbi"}
 SPELLED = {"openai": "OpenAI", "xai": "xAI", "spacex": "SpaceX", "tiktok": "TikTok",
            "youtube": "YouTube", "jpmorgan": "JPMorgan", "coreweave": "CoreWeave",
            "iphone": "iPhone", "chatgpt": "ChatGPT", "paypal": "PayPal", "ebay": "eBay",
@@ -136,6 +136,8 @@ def headline_case(title: str) -> str:
         return title[:1].upper() + title[1:]
 
     def fix(word: str, first: bool) -> str:
+        if word.startswith("#"):
+            return word
         m = re.match(r"^([^\w&]*)([\w&.'-]*)(.*)$", word)
         lead, core, tail = m[1], m[2], m[3]
         low = core.lower().rstrip("'s") if core.lower().endswith("'s") else core.lower()

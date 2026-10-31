@@ -33,6 +33,21 @@ minutes, not more anxious.
 10. **Explain, never advise.** Never say or hint what a viewer should buy, sell or
     hold. Explain what happened and why. No price targets or predictions of your own.
 
+## Make it easy for anyone
+
+The viewer may know nothing about finance. If a 14-year-old would lose the
+thread, rewrite it.
+
+- Use the everyday word: "borrowing costs", not "yields"; "profit", not "margin".
+- When a financial term matters, say what it means in the same sentence, with
+  something familiar: "a tariff, a tax paid on goods coming into the country".
+- One idea per sentence. Under 20 words is the normal length.
+- Turn big numbers into something a person can picture: per person, per day, or
+  compared with something they know.
+- After a complicated point, say what it means in one plain sentence.
+- End each section with the question the next section answers, so the viewer
+  knows why to stay.
+
 ## Banned phrases
 
 "little did they know" · "the rest is history" · "buckle up" · "let that sink in" ·
