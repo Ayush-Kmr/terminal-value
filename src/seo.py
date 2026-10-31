@@ -76,6 +76,9 @@ Return a JSON array of objects:
                   title already gives the facts; the thumbnail gives the STAKE or
                   the emotion, in words NOT used in the title (e.g. "BEAR MARKET",
                   "WHO PAYS?", "YOUR RATE RISES", "JOBS AT RISK").
+  question      - one specific question to pin under the video, inviting viewers to
+                  answer from their own life or opinion, in the title's language,
+                  never financial advice (e.g. "Has a price rise changed what you buy?")
   thumb_entity  - who or where, 1-2 words, shown small as context ("CHINA",
                   "THE FED", "NVIDIA", "US-CHINA")
   thumb_figure  - one real figure from the research, at most 6 characters

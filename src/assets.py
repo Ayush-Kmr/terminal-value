@@ -93,8 +93,7 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             found = None
             if spec.get("stock_terms") and not name:
                 found = stock.find(spec["stock_terms"], base)
-            if not found:
-                name = name or company.strip()
+            if not found and name:     # named shots only: never a search on the story
                 found = (stock.wikimedia_image(name, base)
                          or stock.wikimedia_image(" ".join(name.split()[:3]), base))
             if not found and spec.get("stock_terms"):

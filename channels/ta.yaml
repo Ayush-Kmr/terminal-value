@@ -59,11 +59,16 @@ voice:
       moderate pace, with a moderate pitch. The recording is of very high
       quality, with the speaker's voice sounding clear and very close up.
 
+localize:
+  languages: {}
+
 labels:
+  full_story: முழு கதை
   chapters: {hook: கதை, what_happened: என்ன நடந்தது, background: எப்படி இங்கு வந்தோம், stakes: ஏன் முக்கியம், whats_next: அடுத்து என்ன, rise: எழுச்சி, crack: விரிசல், fall: வீழ்ச்சி, legacy: என்ன மாறியது}
   description: {chapters: அத்தியாயங்கள், sources: ஆதாரங்கள்}
 
 upload:
+  series_playlist: "அது எப்படி வீழ்ந்தது"
   playlists:
     ta: "தமிழ் விளக்கங்கள்"
   hashtag_default: "#வணிகம்"

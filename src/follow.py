@@ -18,7 +18,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from . import assets, captions, gate, llm, render, seo, shorts, state, thumbnail, upload, voice
+from . import assets, captions, engage, gate, llm, render, seo, shorts, state, thumbnail, upload, voice
 from .config import ROOT, Config, language_rules, portrait
 
 log = logging.getLogger(__name__)
@@ -69,6 +69,7 @@ Return JSON:
   "thumb_text": "<2-3 words in {name} for the thumbnail: the stake or emotion,
                  not words from the title (e.g. 'உங்கள் வேலை ஆபத்தில்')>",
   "thumb_entity": "<who or where, 1-2 words in {name}>",
+  "question": "<one specific question for viewers to answer in the comments, in {name}>",
   "search": ["<8 short phrases {name} viewers would type into YouTube search to find
              this story, in {name} script only>"]}}"""
 
@@ -190,7 +191,9 @@ def _thumbnail(cfg: Config, meta: dict, pkg: dict, title: str, shots: list[dict]
     try:
         return thumbnail.generate(cfg, {
             "title": title, "thumb_words": str(pkg.get("thumb_text") or en.get("thumb_text", "")),
-            "thumb_entity": str(pkg.get("thumb_entity") or ""), "thumb_figure": figure,
+            "thumb_entity": str(cfg.get_path("upload.series_playlist")
+                                if meta.get("series") else pkg.get("thumb_entity") or ""),
+            "thumb_figure": figure,
             "direction": thumbnail.direction(figure, meta.get("title", "")),
         }, Path(stills[0]["asset"]) if stills else None, workdir / "thumbnail.jpg")
     except Exception as exc:  # noqa: BLE001
@@ -269,6 +272,9 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
 
     out = {"company": company, "angle": meta.get("angle", ""), "region": meta.get("region"),
            "language": language, "warnings": meta.get("warnings", []),
+           "category_id": meta.get("category_id"), "series": bool(meta.get("series")),
+           "question": str(pkg.get("question") or ""),
+           "parent_url": meta.get("parent_url", ""),
            "tags": seo.tags(tamil_subject, [], language, extra=[*english[:6], *search[:4]]),
            "source": src.name,
            "captions": str(captions.srt(shots, workdir / "captions.srt"))}
@@ -342,10 +348,13 @@ def run(cfg: Config, root: Path, publish: str = "slot", no_upload: bool = False)
             # Topic playlists match on the English subject and tags.
             upload.add_to_playlists(cfg, vid, meta["language"], meta["company"],
                                     src_meta.get("title", ""), " ".join(src_meta.get("tags", [])))
+            if meta["series"]:
+                upload.add_to_playlist(vid, cfg.get_path("upload.series_playlist"))
             state.record_episode(st, {
                 "company": meta["company"], "angle": meta["angle"], "title": meta["title"],
                 "region": meta["region"], "language": meta["language"], "video_id": vid,
                 "kind": meta["kind"], "source": src.name, "warnings": meta["warnings"],
+                "question": meta["question"],
             })
             state.save(st)
             gate.notify("\n".join([

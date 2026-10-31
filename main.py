@@ -17,8 +17,8 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from src import (assets, captions, follow, gate, hooks, reach, render, research,
-                 script as script_mod, seo, shorts, state, thumbnail, upload, voice)
+from src import (assets, captions, engage, factcheck, follow, gate, hooks, reach, render,
+                 research, script as script_mod, seo, shorts, state, thumbnail, upload, voice)
 from src.config import ROOT, Config, latin_only, load, portrait
 
 logging.basicConfig(
@@ -74,9 +74,11 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
 
     # ---- script ---------------------------------------------------------
     sc = script_mod.write(cfg, fb, hook["winner"]["text"], language)
+    sc, checked = factcheck.check(sc, fb)
+    warnings = [*warnings, *checked]
     (workdir / "script.json").write_text(
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
-    shot_list = script_mod.all_shots(sc)
+    shot_list = script_mod.all_shots(sc, int(cfg.get_path("format.long.max_shot_words", 20)))
 
     # ---- narration (sets real shot durations) ---------------------------
     shot_list = voice.narrate_shots(cfg, shot_list, workdir, region, language)
@@ -97,6 +99,9 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     title_opts = seo.titles(cfg, company, angle, best_fact, language, facts=fact_lines)
     best = title_opts[0]
     title = best["title"]
+    series = cfg.get_path("upload.series_playlist") if story.get("history") else ""
+    if series and len(title) + len(series) + 3 <= 100:
+        title = f"{title} | {series}"
     keywords = [str(k) for k in story.get("keywords", [])]
     chapter_text = seo.chapters(cfg, shot_list)
     # Each picture credited once, however many shots used it.
@@ -125,8 +130,18 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
         cfg,
         {"company": company, "thumb_figure": best.get("thumb_figure", ""),
          "thumb_words": best.get("thumb_text") or company, "title": title,
-         "thumb_entity": best.get("thumb_entity", "")},
+         "thumb_entity": series.upper() or best.get("thumb_entity", "")},
         backdrop, workdir / "thumbnail.jpg")
+    # Two more to try in YouTube Studio's Test & Compare (it has no API).
+    for n, option in enumerate(title_opts[1:3], 2):
+        try:
+            thumbnail.generate(cfg, {"company": company, "title": option["title"],
+                                     "thumb_figure": option.get("thumb_figure", ""),
+                                     "thumb_words": option.get("thumb_text") or company,
+                                     "thumb_entity": series.upper() or option.get("thumb_entity", "")},
+                               backdrop, workdir / f"thumbnail_{n}.jpg")
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Spare thumbnail failed: %s", exc)
 
     runtime = sum(s["duration"] for s in shot_list)
     floor = float(cfg.get_path("format.long.min_minutes", 0))
@@ -135,7 +150,10 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
                                f"{floor:g}: no mid-roll ads on it"]
     meta = {
         "company": company, "angle": angle, "title": title,
-        "region": region, "language": language,
+        "region": region, "language": language, "series": bool(series),
+        "question": best.get("question", ""),
+        "category_id": cfg.get_path("upload.category_explainer")
+        if story.get("history") or story.get("evergreen") else None,
         "title_options": title_opts, "description": desc,
         "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
         "chapters": chapter_text,
@@ -158,8 +176,10 @@ SHORT_BEAT = {
                "not heard of it. FIRST SENTENCE: at most 8 words, the single most striking "
                "verified fact or the open question it raises, so a scrolling viewer needs "
                "the rest (e.g. 'Boeing just lost its biggest order.'). Then what happened, "
-               "then why it matters to the viewer. 6-9 shots of ONE sentence each, so the "
-               "picture changes every few seconds. LAST SENTENCE: short, and it leads "
+               "then why it matters to the viewer. 6-9 shots of ONE sentence each, under 12 "
+               "words, so the picture changes every few seconds. Stay on one subject, with a "
+               "real number in the first or second sentence, as the Shorts that held "
+               "viewers best did. LAST SENTENCE: short, and it leads "
                "straight back into the first one (it names what the opening line was "
                "about, or asks the question the opening answers), so the Short loops. "
                "No greeting, no sign-off, no 'subscribe'."),
@@ -206,8 +226,11 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         b_["shots"] = [s for s in b_.get("shots", []) if (s.get("narration") or "").strip()]
     (workdir / "script.json").write_text(
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
-    shot_list = voice.narrate_shots(tall, script_mod.all_shots(sc), workdir,
-                                    story.get("region"), language)
+    sc, checked = factcheck.check(sc, fb)
+    warnings = [*warnings, *checked]
+    shot_list = voice.narrate_shots(
+        tall, script_mod.all_shots(sc, int(cfg.get_path("format.short.max_shot_words", 12))),
+        workdir, story.get("region"), language)
     assets.gather(tall, shot_list, workdir, company)
     clips = render.build_shot_clips(tall, shot_list, workdir)
     video = render.concat_with_audio(tall, clips, shot_list, workdir,
@@ -224,8 +247,11 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               headline, best["title"], language)
+    lead = best.get("summary") or fb.summary
+    if story.get("parent_url"):
+        lead += f"\n\nWatch the full story: {story['parent_url']}"
     short["description"] = seo.description(
-        cfg, best.get("summary") or fb.summary, "",
+        cfg, lead, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
         [company, *keywords], language,
         facts=[str(f.get("claim", "")) for f in fb.facts][:4]) + " #shorts"
@@ -233,10 +259,16 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     short.update({"company": company,
                   "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
                   "language": language, "region": story.get("region"),
-                  "warnings": warnings, "angle": story.get("angle", "")})
+                  "warnings": warnings, "angle": story.get("angle", ""),
+                  "question": best.get("question", ""),
+                  "parent_url": story.get("parent_url", "")})
     (workdir / "metadata.json").write_text(
         json.dumps(short, indent=2, ensure_ascii=False), encoding="utf-8")
     return short
+
+
+def desc_lead(meta: dict) -> str:
+    return meta["description"].split("\n\n")[0]
 
 
 def manual_story(cfg, args) -> dict:
@@ -334,6 +366,10 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
     log.info("YouTube status for %s: %s", video_id, yt_status)
 
 
+def lead_of(short: dict) -> str:
+    return short["description"].split("\n\n")[0]
+
+
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
@@ -371,10 +407,12 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
             upload.upload_captions(sid, Path(short["captions"]), short["language"])
             upload.add_to_playlists(cfg, sid, short["language"], company, short["title"],
                                     " ".join(short["tags"]))
+            engage.localise(cfg, sid, short["title"], lead_of(short))
             state.record_episode(st, {
                 "company": company, "angle": short["angle"], "title": short["title"],
                 "region": short["region"], "language": short["language"],
                 "video_id": sid, "kind": "short", "warnings": short["warnings"],
+                "question": short["question"], "parent_url": short["parent_url"],
             })
             state.save(st)
             lines = [f"✅ Short: {short['title']}", f"https://youtu.be/{sid}",
@@ -405,6 +443,9 @@ def run(args) -> int:
         path = reach.report(cfg)
         print(path.read_text(encoding="utf-8"))
         return 0
+
+    if not args.no_upload:
+        engage.post_questions(cfg)
 
     if args.follow:
         return follow.run(cfg, Path(args.follow), args.publish, args.no_upload)
@@ -474,6 +515,15 @@ def run(args) -> int:
     upload.upload_captions(video_id, Path(meta["captions"]), meta["language"])
     upload.add_to_playlists(cfg, video_id, meta["language"], company, meta["title"],
                             " ".join(meta["tags"]))
+    if meta["series"]:
+        upload.add_to_playlist(video_id, cfg.get_path("upload.series_playlist"))
+    engage.localise(cfg, video_id, meta["title"], desc_lead(meta), Path(meta["captions"]))
+    # A history film also gets a Short that sends viewers to it.
+    if story.get("history") and n_shorts:
+        short_stories.insert(min(1, len(short_stories)),
+                             {**story, "parent_url": f"https://youtu.be/{video_id}"})
+        spare_stories = short_stories[n_shorts:] + spare_stories
+        short_stories = short_stories[:n_shorts]
 
     # ---- shorts ----------------------------------------------------------
     short_ids = []
@@ -501,6 +551,7 @@ def run(args) -> int:
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
         "video_id": video_id, "short_ids": short_ids, "kind": "long",
+        "question": meta["question"],
         "evergreen": story.get("evergreen", ""), "history": story.get("history", ""),
         "runtime": meta["runtime"], "warnings": meta["warnings"],
     })

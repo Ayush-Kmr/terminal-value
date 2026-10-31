@@ -20,6 +20,8 @@ sys.path.insert(0, str(ROOT))
 from src.config import PALETTE_DEFAULT, load  # noqa: E402
 
 OUT = ROOT / "assets" / "brand"
+TAMIL_FONT = ROOT / "assets" / "fonts" / "NotoSansTamil-Bold.ttf"
+TAMIL_OUT = OUT / "ta"
 
 # A share price that climbs, peaks and collapses. The channel's whole subject
 # in one line; used as the backdrop of the banner and the avatar's mark.
@@ -139,12 +141,47 @@ def watermark(pal) -> Path:
     return out
 
 
+def tamil(pal) -> None:
+    """The Tamil channel's own banner and watermark. Needs Pillow with libraqm."""
+    W, H = 2048, 1152
+    src = Image.open(OUT / "banner.png").convert("RGB")
+    d = ImageDraw.Draw(src)
+    cx, cy = W // 2, H // 2
+    d.rectangle([cx - 640, cy - 150, cx + 640, cy + 190], fill=pal["bg"])
+    d.text((cx, cy - 30), "டெர்மினல் வேல்யூ தமிழ்", font=ImageFont.truetype(str(TAMIL_FONT), 104),
+           fill=pal["ink"], anchor="mm")
+    d.rectangle([cx - 50, cy + 44, cx + 50, cy + 50], fill=pal["accent"])
+    d.text((cx, cy + 100), "செய்திக்குப் பின்னால் இருக்கும் கதை",
+           font=ImageFont.truetype(str(TAMIL_FONT), 44), fill=pal["muted"], anchor="mm")
+    d.text((cx, cy + 158), "தினமும் புதிய வீடியோ",
+           font=ImageFont.truetype(str(TAMIL_FONT), 34), fill=pal["accent"], anchor="mm")
+    TAMIL_OUT.mkdir(parents=True, exist_ok=True)
+    src.save(TAMIL_OUT / "banner.png", optimize=True)
+
+    S = 4
+    n = 150 * S
+    img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    m = ImageDraw.Draw(img)
+    m.text((n / 2, n * 0.44), "த", font=ImageFont.truetype(str(TAMIL_FONT), int(n * 0.62)),
+           fill=pal["ink"], anchor="mm", stroke_width=S * 2, stroke_fill="#06080B")
+    w = int(n * 0.04)
+    m.line([(n * 0.22, n * 0.80), (n * 0.56, n * 0.80)], fill=pal["accent"], width=w)
+    m.line([(n * 0.56, n * 0.80), (n * 0.78, n * 0.90)], fill=pal["danger"], width=w)
+    img.resize((150, 150), Image.LANCZOS).save(TAMIL_OUT / "watermark.png", optimize=True)
+    for size, path in ((800, TAMIL_OUT / "avatar.png"),):
+        bg = Image.new("RGBA", (n, n), pal["bg"])
+        bg.alpha_composite(img)
+        bg.convert("RGB").resize((size, size), Image.LANCZOS).save(path, optimize=True)
+    print(f"{TAMIL_OUT.relative_to(ROOT)}: banner, watermark, avatar")
+
+
 def main() -> int:
     cfg = load()
     pal = {**PALETTE_DEFAULT, **(cfg.get_path("visuals.palette") or {})}
     OUT.mkdir(parents=True, exist_ok=True)
     for path in (banner(cfg, pal), avatar(pal), watermark(pal)):
         print(f"{path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
+    tamil(pal)
     return 0
 
 

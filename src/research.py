@@ -41,6 +41,7 @@ class FactBase:
     quotes: list[dict[str, Any]] = field(default_factory=list)
     people: list[dict[str, Any]] = field(default_factory=list)
     sources: list[Source] = field(default_factory=list)
+    material: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -277,8 +278,16 @@ def _grounded(key: str, model: str, prompt: str) -> tuple[str, list[Source]]:
     return text, sources
 
 
+def outlet_rank(text: str, cfg: Config) -> int:
+    """0 a trusted outlet, 1 unknown, 2 one we refuse to rely on."""
+    low = str(text).lower()
+    if any(w in low for w in cfg.get_path("research.blocked_sources", [])):
+        return 2
+    return 0 if any(w in low for w in cfg.get_path("research.trusted_sources", [])) else 1
+
+
 def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
-                  total: int = 11000) -> tuple[str, list[Source]]:
+                  total: int = 11000, cfg: Config | None = None) -> tuple[str, list[Source]]:
     """The reporting itself, not just its headlines: the full text of the
     latest articles on the story. Bing's news feed links straight to the
     publisher (Google News links are redirects), and trafilatura strips each
@@ -313,6 +322,9 @@ def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
         if len(items) >= limit * 2:
             break
 
+    if cfg:      # trusted reporting is read first; junk is not read at all
+        ranked = [(outlet_rank(u, cfg), n, it, u) for n, (it, u) in enumerate(items)]
+        items = [(it, u) for r, _, it, u in sorted(ranked, key=lambda x: x[:2]) if r < 2]
     parts, sources, size = [], [], 0
     for it, url in items[:limit * 3]:
         title = (it.findtext("title") or "").strip()
@@ -385,7 +397,8 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     history = bool(story.get("history"))
     briefing, sources = grounded_briefing(topic, angle, history)
     articles, article_sources = article_texts(
-        [story.get("search_query"), topic, *[str(k) for k in story.get("keywords", [])[:2]]])
+        [story.get("search_query"), topic, *[str(k) for k in story.get("keywords", [])[:2]]],
+        cfg=cfg)
     sources = list(sources) + article_sources
 
     query = (story.get("search_query") or topic) + ("" if history else " when:3d")
@@ -422,7 +435,7 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
         temperature=0.2,
     )
 
-    fb = FactBase(company=topic, angle=angle)
+    fb = FactBase(company=topic, angle=angle, material=material[:16000])
     fb.summary = data.get("summary", "")
     fb.facts = data.get("facts", [])
     fb.timeline = data.get("timeline", [])
@@ -446,6 +459,14 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
                                      h["date"][:16]))
     if wiki_src:
         fb.sources.append(wiki_src)
+
+    # Trusted outlets first in the description, the rest dropped or demoted.
+    labelled = [(outlet_rank(f"{s.title} {s.url}", cfg), n, s) for n, s in enumerate(fb.sources)]
+    fb.sources = [s for r, _, s in sorted(labelled, key=lambda x: x[:2]) if r < 2]
+    trusted = sum(r == 0 for r, _, _ in labelled)
+    need = 1 if history else int(cfg.get_path("research.min_trusted", 2))
+    if trusted < need:
+        raise RuntimeError(f"Only {trusted} trusted source(s) on {topic!r}; {need} needed")
     return fb
 
 

@@ -59,6 +59,7 @@ COMMANDS = [
     ("top", "Best videos so far on each channel"),
     ("runs", "Latest pipeline runs on GitHub"),
     ("next", "When the next videos are made and published"),
+    ("review", "The newest long videos to check by hand"),
     ("help", "All commands"),
 ]
 
@@ -329,12 +330,22 @@ def cmd_next(_: list[dict]) -> str:
             "🇮🇳 The Tamil channel gets every video, in Tamil, at its own times.")
 
 
+def cmd_review(chs: list[dict]) -> str:
+    out = ["🔎 <b>TO REVIEW</b>\nWatch one a week. Fix or remove anything wrong.\n"
+           "Spare thumbnails are in the run's files on GitHub, for Studio's Test &amp; Compare."]
+    for ch in chs:
+        vids = [v for v in videos(ch, 25) if not is_short(v)][:3]
+        out.append(f"\n<b>{esc(ch['name'])}</b>\n"
+                   + ("\n".join(video_line(v) for v in vids) or "no long videos yet"))
+    return "\n".join(out)
+
+
 def reply(text: str, chs: list[dict]) -> str:
     word = text.strip().split()[0].split("@")[0].lstrip("/").lower() if text.strip() else ""
     by_key = {c["key"]: c for c in chs}
     handlers = {"start": cmd_help, "help": cmd_help, "status": cmd_status,
                 "today": cmd_today, "schedule": cmd_schedule, "week": cmd_week,
-                "top": cmd_top, "runs": cmd_runs, "next": cmd_next}
+                "top": cmd_top, "runs": cmd_runs, "next": cmd_next, "review": cmd_review}
     try:
         if word in by_key:
             return cmd_channel(by_key[word])

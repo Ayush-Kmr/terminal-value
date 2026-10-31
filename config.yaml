@@ -102,6 +102,7 @@ format:
     # The narration runs faster than 150 words a minute (a 9.5-minute script
     # came out at 8:28), so aim well above the line. A video that still ends
     # up under min_minutes is reported in Telegram.
+    max_shot_words: 20          # longer shots are split, so the picture keeps moving
     target_minutes: 10.5
     min_minutes: 8
     words_per_minute: 140       # measured for the Kokoro voice
@@ -112,6 +113,7 @@ format:
                                 # Shorts outperformed cuts from the long ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
+    max_shot_words: 12
     target_seconds: 28
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     publish_times: ["09:00", "17:00"]   # ET
@@ -279,6 +281,9 @@ voice:
 # ---------- research ----------
 research:
   min_news_sources: 3          # trending mode: distinct outlets reporting the story
+  min_trusted: 2               # a story needs this many outlets from the list below
+  trusted_sources: [reuters, associated press, apnews, bloomberg, cnbc, wsj, wall street journal, financial times, ft.com, new york times, nytimes, washington post, marketwatch, barron, forbes, fortune, yahoo finance, finance.yahoo, sec.gov, federalreserve, bls.gov, bbc, guardian, axios, business insider, businessinsider, techcrunch, the verge, npr, cnn, abc news, nbc news, cbs news, fox business, economist, investopedia, wikipedia]
+  blocked_sources: [crypto, coin, altcoin, biggo, blockchain, bitcoin, reddit, quora, medium.com, substack, prnewswire, globenewswire, stock picks, penny]
   min_sources: 5
   require_primary: true        # at least one filing, transcript, or court document
   banned_sole_source: [wikipedia]   # Wikipedia may start research, never finish it
@@ -301,6 +306,13 @@ topics:
   cooldown_days: 365           # never repeat a company within a year
   min_company_age_years: 5
 
+# ---------- other languages ----------
+# Translated titles on every video, subtitles on long ones. Each caption costs
+# 400 units of the 10,000 daily YouTube API quota: remove a language if uploads
+# ever fail with quotaExceeded.
+localize:
+  languages: {es: Spanish, hi: Hindi}
+
 # ---------- human gates ----------
 # Both off: the pipeline picks, produces and publishes with nobody in the loop.
 # Turn either on to get Telegram approval buttons back. A run that fails or is
@@ -318,6 +330,8 @@ upload:
                                # publish_times slot (same time every day, so
                                # viewers learn when to expect it); now = at once
   category_id: 25              # News & Politics
+  category_explainer: 27       # Education: history films and evergreen explainers
+  series_playlist: "How It Collapsed"   # the history films
   made_for_kids: false
   synthetic_media_disclosure: true
   playlists:                   # one playlist per narration language

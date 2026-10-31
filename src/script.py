@@ -205,12 +205,59 @@ def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
     return shots
 
 
-def all_shots(script: dict) -> list[dict[str, Any]]:
-    """Flatten to a single ordered shot list for the renderer."""
-    flat = []
-    for beat in script.get("beats", []):
-        for shot in beat.get("shots", []):
-            flat.append({**shot, "beat": beat.get("id")})
+def pieces(text: str, max_words: int) -> list[str]:
+    """Narration cut at sentence ends, then at clause breaks, so no shot runs long."""
+    import re
+
+    out: list[str] = []
+    for sentence in re.split(r"(?<=[.?!।])\s+", text.strip()):
+        while len(sentence.split()) > max_words:
+            words = sentence.split()
+            breaks = [i for i, w in enumerate(words[:-3], 1) if i >= 4 and (
+                w[-1] in ",;:—" or words[i].lower() in ("and", "but", "while", "which", "after",
+                                                         "because", "as", "meaning"))]
+            if not breaks:
+                break
+            cut = min(breaks, key=lambda i: abs(i - max_words * 0.7))
+            out.append(" ".join(words[:cut]))
+            sentence = " ".join(words[cut:])
+        out.append(sentence)
+    merged: list[str] = []
+    for piece in out:
+        if merged and len(piece.split()) < 4:
+            merged[-1] += " " + piece
+        elif piece:
+            merged.append(piece)
+    return merged
+
+
+def all_shots(script: dict, max_words: int = 0) -> list[dict[str, Any]]:
+    """Flatten to a single ordered shot list for the renderer. With `max_words`,
+    long shots are split, each new piece getting its own moving picture."""
+    import copy
+
+    shots = [{**s, "beat": b.get("id")} for b in script.get("beats", []) for s in b.get("shots", [])]
+    scenes = [s["visual_spec"]["stock_terms"] for s in shots
+              if (s.get("visual_spec") or {}).get("stock_terms")]
+    flat: list[dict[str, Any]] = []
+    for shot in shots:
+        parts = pieces(shot.get("narration") or "", max_words) if max_words else []
+        if len(parts) < 2:
+            flat.append(shot)
+            continue
+        for n, line in enumerate(parts):
+            piece = copy.deepcopy(shot)
+            piece["narration"] = line
+            if n < len(parts) - 1:
+                piece["emphasis"] = "normal"
+            if n and piece.get("visual_type") not in ("photo", "ai_still") and scenes:
+                piece["visual_type"] = "photo"
+                piece["visual_spec"] = {"stock_terms": scenes[(len(flat)) % len(scenes)],
+                                        "prompt": (shot.get("visual_spec") or {}).get("prompt", "")}
+            elif n and piece.get("visual_type") in ("photo", "ai_still") and scenes:
+                piece["visual_spec"] = {**piece["visual_spec"], "search_terms": "",
+                                        "stock_terms": scenes[(len(flat)) % len(scenes)]}
+            flat.append(piece)
     for i, s in enumerate(flat):
         s["index"] = i
     return flat

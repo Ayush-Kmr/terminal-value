@@ -20,9 +20,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src import upload  # noqa: E402
-from src.config import load  # noqa: E402
+from src.config import channel_key, load  # noqa: E402
 
 BRAND = ROOT / "assets" / "brand"
+if (BRAND / channel_key() / "banner.png").exists() and channel_key():
+    BRAND = BRAND / channel_key()
 
 
 def keyword_string(keywords: list[str]) -> str:
@@ -53,6 +55,8 @@ def main() -> int:
 
     branding = ch.get("brandingSettings", {})
     channel_block = dict(branding.get("channel", {}))
+    if cfg.get_path("channel.trailer"):      # a video ID, shown to non-subscribers
+        channel_block["unsubscribedTrailer"] = cfg.get_path("channel.trailer")
     channel_block.update({
         "description": about,
         "keywords": keywords,

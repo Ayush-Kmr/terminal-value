@@ -135,7 +135,7 @@ jobs:
             !output/**/assets/*.frames
             !output/**/assets/*.frames/**
             output/**/final.mp4
-            output/**/thumbnail.jpg
+            output/**/thumbnail*.jpg
             output/**/metadata.json
             output/**/script.json
             output/**/research.json

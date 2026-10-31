@@ -121,6 +121,21 @@ def _plain(text: str) -> str:
     return re.sub(r"\s+", " ", text.replace("<", "").replace(">", "")).strip()
 
 
+SCANS = ("report", "document", "page", "book", "journal", "magazine", "newspaper",
+         "catalog", "annual", "volume", "letter", "patent", "map of", "stamp", "coin", "logo")
+
+
+def _about(query: str, title: str, meta: dict) -> bool:
+    """Every word of the subject in the file's own name or description, and not
+    a scanned document: "Amazon" once matched a 1973 government report."""
+    described = " ".join([title, _plain(meta.get("ImageDescription", {}).get("value", "")),
+                          _plain(meta.get("ObjectName", {}).get("value", ""))]).lower()
+    named = title.lower()
+    if any(word in named for word in SCANS):
+        return False
+    return all(w in described for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2)
+
+
 def wikimedia_image(query: str, dest: Path) -> dict | None:
     """Archival photographs. Licence-filtered — this is where real historical
     imagery of real companies and people legitimately comes from."""
@@ -139,6 +154,8 @@ def wikimedia_image(query: str, dest: Path) -> dict | None:
         for _, page in pages.items():
             info = (page.get("imageinfo") or [{}])[0]
             meta = info.get("extmetadata", {})
+            if not _about(query, page.get("title", ""), meta):
+                continue  # a search hit is not proof the picture shows the subject
             licence = (meta.get("LicenseShortName", {}).get("value", "") or "").lower()
             normalised = licence.replace(" ", "-").replace("public-domain", "pd")
             if not any(safe in normalised for safe in SAFE_LICENCES):
@@ -166,7 +183,7 @@ def find(query: str, dest: Path, prefer_archival: bool = False,
     """Archival first for real people and places, stock first for mood/texture."""
     video = [pexels_video, pixabay_video] if allow_video else []
     chain = ([wikimedia_image, *video, pixabay_image] if prefer_archival
-             else [*video, pixabay_image, wikimedia_image])
+             else [*video, pixabay_image])
     for fn in chain:
         result = fn(query, dest)
         if result:
