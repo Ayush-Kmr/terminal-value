@@ -332,7 +332,7 @@ def queued(args, kind: str, n: int) -> list[dict]:
     out = []
     for item in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get(kind, []):
         key = f"{kind}:{item['topic']}"
-        if key in used:
+        if key in used or str(item.get("not_before", "")) > datetime.now().date().isoformat():
             continue
         story = {"company": item["topic"], "region": "US", "language": "en", "wiki_title": "",
                  **item, "queue": key}

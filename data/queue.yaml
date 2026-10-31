@@ -2,6 +2,7 @@
 # queue once it has been uploaded (tracked in data/history.json); then the
 # automatic picks carry on. Add stories at the bottom, or move them up.
 # A title is used only if every figure in it is in the research.
+# not_before holds a story back until that date, for anything timed to an event.
 long:
   - topic: "AI bubble"
     title: "Is the AI Bubble About to Pop? What It Means for Your Money"
@@ -64,6 +65,18 @@ long:
     angle: "Are more Americans falling behind on car payments, and what does that signal?"
     search_query: "auto loan delinquencies US"
     keywords: [car loan crisis, car loans explained]
+  - topic: "Black Friday deals"
+    not_before: 2026-11-22
+    title: "Are Black Friday Deals Actually Real?"
+    angle: "Are Black Friday discounts real savings, and how do retailers set those prices?"
+    search_query: "Black Friday deals real discounts retailers"
+    keywords: [are black friday deals real, black friday deals, black friday explained]
+  - topic: "Federal Reserve interest rates"
+    not_before: 2026-12-03
+    title: "How the Fed's Next Decision Reaches Your Wallet"
+    angle: "How does a Federal Reserve rate decision reach your mortgage, car loan and savings?"
+    search_query: "Federal Reserve December meeting interest rates"
+    keywords: [what does the federal reserve do, how do interest rates work, fed rate decision]
 
 shorts:
   - topic: "Is the AI bubble about to pop"
