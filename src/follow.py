@@ -282,12 +282,14 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
         short = shorts.standalone(cfg, video, shots, workdir, title, title, language)
         out.update(short, kind="short", title=full_title, description=seo.description(
             cfg, summary, "", sources[:6], keywords, language,
-            facts=local_facts, tags_extra=search, topic_text=topic_text))
+            facts=local_facts, tags_extra=search, topic_text=topic_text,
+            music=render.music_credit(cfg, company)))
     else:
         out.update(kind="long", title=full_title, video=str(video),
                    description=seo.description(cfg, summary, seo.chapters(cfg, shots),
                                                sources, keywords, language, facts=local_facts,
-                                               tags_extra=search, topic_text=topic_text),
+                                               tags_extra=search, topic_text=topic_text,
+                                               music=render.music_credit(cfg, company)),
                    thumbnail=str(_thumbnail(cfg, meta, pkg, title, shots, src, workdir)),
                    runtime=f"{int(sum(s['duration'] for s in shots) // 60)}:"
                            f"{int(sum(s['duration'] for s in shots) % 60):02d}")

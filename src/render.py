@@ -187,6 +187,17 @@ def pick_music(cfg: Config, seed: str) -> Path | None:
     return tracks[int(hashlib.sha1(seed.encode("utf-8")).hexdigest(), 16) % len(tracks)]
 
 
+def music_credit(cfg: Config, seed: str) -> str:
+    """The attribution the track's Creative Commons licence requires."""
+    track = pick_music(cfg, seed)
+    title = (cfg.get_path("audio.credits", {}) or {}).get(track.stem) if track else None
+    if not title:
+        return ""
+    return (f'Music: "{title}" by Kevin MacLeod (incompetech.com), mixed under the narration.\n'
+            "Licensed under Creative Commons: By Attribution 4.0\n"
+            "https://creativecommons.org/licenses/by/4.0/")
+
+
 def _join(cfg: Config, shots: list[dict], workdir: Path) -> Path:
     """Dissolve the clips into one silent video whose cuts land exactly where
     each shot's narration starts."""

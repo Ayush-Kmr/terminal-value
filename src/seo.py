@@ -273,7 +273,7 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
 def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict],
                 keywords: list[str], language: str = "en", facts: list[str] | None = None,
                 credits: str = "", tags_extra: list[str] | None = None,
-                topic_text: str = "") -> str:
+                topic_text: str = "", music: str = "") -> str:
     """Built from parts rather than generated: the sources and the disclosure
     must be exact, and a model asked to copy them verbatim sometimes does not.
     Order: summary, chapters, key facts, call to action, sources, credits,
@@ -302,6 +302,8 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
     if credits:
         parts.append("IMAGE CREDITS\n" + credits)
 
+    if music:
+        parts.append(music)
     parts.append(cfg.get_path("channel.disclosure", "").strip())
     tail = hashtags(cfg, keywords + list(tags_extra or []), language, f"{summary} {topic_text}")
     body = "\n\n".join(p for p in parts if p)

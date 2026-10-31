@@ -114,7 +114,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     desc = seo.description(
         cfg, best.get("summary") or fb.summary, chapter_text,
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources],
-        [company, *keywords], language, facts=fact_lines, credits=attribution)
+        [company, *keywords], language, facts=fact_lines, credits=attribution,
+        music=render.music_credit(cfg, company))
 
     srt = captions.srt(shot_list, workdir / "captions.srt")
 
@@ -261,7 +262,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         cfg, lead, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
         [company, *keywords], language,
-        facts=[str(f.get("claim", "")) for f in fb.facts][:4]) + " #shorts"
+        facts=[str(f.get("claim", "")) for f in fb.facts][:4],
+        music=render.music_credit(cfg, company)) + " #shorts"
     short["captions"] = str(captions.srt(shot_list, workdir / "captions.srt"))
     short.update({"company": company,
                   "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
