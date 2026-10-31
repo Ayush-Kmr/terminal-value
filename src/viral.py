@@ -83,7 +83,8 @@ so never reuse a title, a script or a structure from these videos.
 
 Choose a story about money: a corporate collapse, a fraud, a market crash, a
 rivalry, a bad bet, a rise and fall. It must have ended at least five years ago
-and be well documented.
+and be well documented. Prefer a story with one person at its centre: people
+watch a person, not an abstract event.
 
 Never choose:
 - War, terrorism, a disaster or anything centred on deaths: YouTube limits ads on these
@@ -99,6 +100,7 @@ Return one JSON object:
   search_query  - 3-6 words that find reporting on exactly this story
   wiki_title    - English Wikipedia article title for it
   keywords      - 6-10 search phrases people type about it
+  collapse      - true if the story ends in failure, false if it is a person's rise
   video         - the number of the video above that is about exactly this subject"""
 
 
@@ -156,6 +158,7 @@ def _proof(topic: str, hits: list[dict[str, Any]]) -> dict[str, Any] | None:
 def _story(pick: dict[str, Any], topic: str) -> dict[str, Any]:
     return {"topic": topic, "company": topic, "angle": pick.get("angle", ""),
             "region": "US", "language": "en", "history": topic,
+            "collapse": pick.get("collapse") is not False,
             "search_query": pick.get("search_query") or topic,
             "wiki_title": pick.get("wiki_title", ""),
             "keywords": [str(k) for k in pick.get("keywords") or []][:10] or [topic]}

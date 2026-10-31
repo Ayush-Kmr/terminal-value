@@ -67,7 +67,7 @@ trending:
     - {code: US, name: United States, weight: 1.0, language: en, trends_geo: US,
        news: {hl: en-US, gl: US}}
     - {code: MARKETS, name: US business and markets, weight: 1.0, language: en,
-       news: {hl: en-US, gl: US, query: "stocks OR earnings OR layoffs OR \"Federal Reserve\" OR tariffs when:1d"}}
+       news: {hl: en-US, gl: US, query: "prices OR rent OR housing OR \"car prices\" OR layoffs OR \"Federal Reserve\" OR tariffs OR stocks when:1d"}}
   # Stories an unattended pipeline must not narrate. These are also the
   # categories YouTube restricts ads on.
   # Checked in code after the model picks: a story using any of these words is
@@ -99,11 +99,10 @@ format:
     # views (src/viral.py), told from our own research. 0 = never.
     history_every: 2
     # Over 8 minutes so the video can carry mid-roll ads once monetised.
-    # The narration runs faster than 150 words a minute (a 9.5-minute script
-    # came out at 8:28), so aim well above the line. A video that still ends
-    # up under min_minutes is reported in Telegram.
+    # A video that ends up under min_minutes is reported in Telegram.
     max_shot_words: 20          # longer shots are split, so the picture keeps moving
-    target_minutes: 10.5
+    # Near CNBC's 9-minute format, and still over 8 for mid-roll ads.
+    target_minutes: 9
     min_minutes: 8
     words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["12:00"]    # ET, channel timezone. A starting point to test
@@ -166,14 +165,37 @@ structure:
       share: 0.18
       intent: "What changed afterwards for ordinary Americans: laws, jobs, prices, savings. End on what the story still explains today, not on a moral. Do not ask for likes or subscriptions."
 
+  # A person's rise rather than a collapse.
+  biography_beats:
+    - id: hook
+      label: "The story"
+      share: 0.08
+      intent: "The most striking verified moment of this person's life. Start in the middle of it. No greeting, no channel name."
+    - id: beginnings
+      label: "The beginning"
+      share: 0.22
+      intent: "Where they came from and what shaped them, with dates, places and numbers."
+    - id: bet
+      label: "The big bet"
+      share: 0.26
+      intent: "The risky decision that changed everything, and who doubted it."
+    - id: empire
+      label: "The empire"
+      share: 0.26
+      intent: "What they built, how it made money, and what it cost other people."
+    - id: legacy
+      label: "What it changed"
+      share: 0.18
+      intent: "What still touches ordinary Americans today because of this person. End on that, not on a moral. Do not ask for likes or subscriptions."
+
 # ---------- proven demand on YouTube (src/viral.py) ----------
 # Used only to choose subjects. Nothing is ever copied from these videos.
 viral:
   news_days: 7
   news_min_views: 100000
-  news_queries: [stock market news, business news explained, ai stocks]
+  news_queries: [why is everything so expensive, us economy explained, stock market news, ai bubble]
   history_min_views: 1000000
-  history_queries: [rise and fall of company documentary, biggest corporate scandal documentary, stock market crash history documentary]
+  history_queries: [rise and fall of company documentary, biggest corporate scandal documentary, stock market crash history documentary, how he became the richest man documentary]
   history_avoid:
     - Anything mainly about a country other than the United States
   # Used when the search finds nothing, in this order.
@@ -183,6 +205,8 @@ viral:
     - {topic: "Blockbuster", angle: "How did Blockbuster go from 9,000 stores to one?", search_query: "Blockbuster bankruptcy", wiki_title: "Blockbuster (retailer)", keywords: [what happened to blockbuster, blockbuster vs netflix]}
     - {topic: "WorldCom", angle: "How did WorldCom hide billions in plain sight?", search_query: "WorldCom accounting scandal", wiki_title: "MCI Inc.", keywords: [worldcom scandal, bernie ebbers]}
     - {topic: "Theranos", angle: "How did Theranos convince investors with technology that did not work?", search_query: "Theranos fraud trial", wiki_title: "Theranos", keywords: [theranos explained, elizabeth holmes]}
+    - {topic: "J.P. Morgan", collapse: false, angle: "How did one banker end up rescuing the US government?", search_query: "J.P. Morgan banker history", wiki_title: "J. P. Morgan", keywords: [jp morgan documentary, how jp morgan financed america]}
+    - {topic: "Andrew Carnegie", collapse: false, angle: "How did a poor immigrant boy become the richest man in the world?", search_query: "Andrew Carnegie steel history", wiki_title: "Andrew Carnegie", keywords: [andrew carnegie documentary, how carnegie got rich]}
     - {topic: "Long-Term Capital Management", angle: "How did a hedge fund run by Nobel winners nearly break Wall Street?", search_query: "Long-Term Capital Management collapse", wiki_title: "Long-Term Capital Management", keywords: [ltcm collapse, hedge fund collapse 1998]}
 
 # ---------- visual system ----------

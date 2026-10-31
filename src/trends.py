@@ -119,6 +119,9 @@ How to rank:
 - Choose American business stories: US companies, markets, jobs, prices, the
   Fed, tariffs, big tech and AI deals. Region weight: {weights}. A foreign
   story qualifies only if it clearly moves American money, jobs or prices.
+- Prefer everyday American money over company results: prices, rent, housing, cars,
+  groceries, jobs, debt, the things a family feels. Frame a company story around
+  what it changes for ordinary people. A big open question beats a recap.
 - Prefer stories that are BOTH searched and covered by several outlets today.
 - A VIRAL line is a video already doing big numbers on YouTube this week. If one
   with 1,000,000 views or more is about an American business story and breaks none
