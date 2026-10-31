@@ -82,6 +82,9 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
     return None
 
 
+_used_clips: set = set()
+
+
 def pixabay_video(query: str, dest: Path) -> dict | None:
     """Moving footage. Same key as Pixabay images."""
     key = env("PIXABAY_API_KEY")
@@ -90,15 +93,18 @@ def pixabay_video(query: str, dest: Path) -> dict | None:
     try:
         r = requests.get(
             "https://pixabay.com/api/videos/",
-            params={"key": key, "q": query[:100], "per_page": 5, "safesearch": "true"},
+            params={"key": key, "q": query[:100], "per_page": 12, "safesearch": "true"},
             timeout=30,
         )
         r.raise_for_status()
         for hit in r.json().get("hits", []):
             files = hit.get("videos", {})
-            best = files.get("medium") or files.get("large") or files.get("small") or {}
+            best = files.get("large") or files.get("medium") or files.get("small") or {}
             if not best.get("url") or (best.get("width") or 0) < (best.get("height") or 0):
                 continue  # skip vertical clips
+            if hit.get("id") in _used_clips:
+                continue  # the same clip twice in a video looks cheap
+            _used_clips.add(hit.get("id"))
             out = dest.with_suffix(".mp4")
             if _download(best["url"], out):
                 return {"path": str(out), "kind": "video", "credit": hit.get("user", "Pixabay"),

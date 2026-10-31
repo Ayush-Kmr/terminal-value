@@ -19,7 +19,20 @@ from .visuals import motion
 
 log = logging.getLogger(__name__)
 
-XFADE = 0.35      # seconds each shot overlaps the next
+XFADE = 0.4       # seconds each shot overlaps the next
+# Cycled so no two neighbouring cuts match; a new section gets its own move.
+CUTS_WIDE = ("fade", "slideleft", "smoothleft", "circleopen", "wipeleft", "fade",
+             "slideright", "zoomin")
+CUTS_TALL = ("fade", "slideup", "smoothup", "circleopen", "wipeup", "fade",
+             "slidedown", "zoomin")
+# (zoom from, zoom to, x from, x to, y from, y to), x and y as shares of the free
+# margin. Six moves, used in turn, so a run of photographs never drifts one way.
+MOVES = ((1.02, 1.18, .5, .5, .5, .5),     # push in
+         (1.18, 1.02, .5, .5, .5, .5),     # pull out
+         (1.16, 1.16, 0, 1, .5, .5),       # pan right
+         (1.16, 1.16, 1, 0, .5, .5),       # pan left
+         (1.04, 1.18, .5, .5, .15, .15),   # push in on the upper part
+         (1.16, 1.16, .5, .5, 1, 0))       # tilt up
 
 
 def _run(cmd: list[str]) -> None:
@@ -71,19 +84,18 @@ def _ken_burns(src: Path, dest: Path, seconds: float, cfg: Config, seed: int,
     w, h, fps = _size(cfg)
     frames = max(int(seconds * fps), 1)
 
-    rng = random.Random(seed)
-    # Max 8% movement - more than that looks cheap on archival material.
-    rate = 0.08 / frames
-    z = (f"min(1.001+{rate:.6f}*on,1.08)" if rng.random() < 0.6
-         else f"max(1.08-{rate:.6f}*on,1.001)")
-    x = {0: "iw/2-(iw/zoom/2)", 1: "0", 2: "iw-(iw/zoom)"}[rng.randint(0, 2)]
-    y = {0: "ih/2-(ih/zoom/2)", 1: "0"}[rng.randint(0, 1)]
+    z0, z1, x0, x1, y0, y1 = MOVES[seed % len(MOVES)]
+    # Eased, so the camera settles instead of moving like a machine.
+    p = f"(1-pow(1-on/{frames},2))"
+    z = f"{z0}+({z1 - z0:.3f})*{p}"
+    x = f"(iw-iw/zoom)*({x0}+({x1 - x0})*{p})"
+    y = f"(ih-ih/zoom)*({y0}+({y1 - y0})*{p})"
 
     graph = (
         f"[0:v]scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
         f"crop={w*2}:{h*2},"
         f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={w}x{h}:fps={fps},"
-        f"eq=contrast=1.05:saturation=0.92,vignette=PI/5[pic]"
+        f"eq=contrast=1.05:saturation=1.05,vignette=PI/6[pic]"
     )
     inputs, graph = _with_plate(["-loop", "1", "-i", str(src)], graph, plate, fps)
     return _encode(inputs, graph, seconds, fps, dest)
@@ -96,7 +108,7 @@ def _card_clip(frames: Path, dest: Path, seconds: float, cfg: Config) -> Path:
     graph = (
         f"[0:v]tpad=stop_mode=clone:stop_duration={seconds + 1:.2f},"
         f"scale={w*2}:{h*2}:flags=bilinear,"
-        f"zoompan=z='min(1+0.00028*on,1.035)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+        f"zoompan=z='min(1+0.0006*on,1.08)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
         f":d=1:s={w}x{h}:fps={fps},format=yuv420p[v]"
     )
     return _encode(["-framerate", str(fps), "-i", str(frames / "f_%03d.png")],
@@ -121,7 +133,7 @@ def _trim_video(src: Path, dest: Path, seconds: float, cfg: Config,
     w, h, fps = _size(cfg)
     graph = (
         f"[0:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
-        f"fps={fps},eq=saturation=0.8:contrast=1.06,vignette=PI/5[pic]"
+        f"fps={fps},eq=saturation=1.02:contrast=1.05,vignette=PI/6[pic]"
     )
     inputs, graph = _with_plate(["-stream_loop", "-1", "-i", str(src)], graph, plate, fps)
     return _encode(inputs, graph, seconds, fps, dest)
@@ -197,12 +209,13 @@ def _join(cfg: Config, shots: list[dict], workdir: Path) -> Path:
     for shot in shots:
         starts[shot["index"]] = t
         t += float(shot.get("duration", 5.0))
+    cuts = CUTS_TALL if h > w else CUTS_WIDE
     move = "smoothup" if h > w else "smoothleft"
     last = "c0"
     for i in range(1, len(used)):
         new_beat = used[i].get("beat") != used[i - 1].get("beat")
         parts.append(
-            f"[{last}][c{i}]xfade=transition={move if new_beat else 'fade'}"
+            f"[{last}][c{i}]xfade=transition={move if new_beat else cuts[i % len(cuts)]}"
             f":duration={XFADE}:offset={starts[used[i]['index']]:.3f}[x{i}]")
         last = f"x{i}"
     _run(["ffmpeg", "-y", *inputs, "-filter_complex", ";".join(parts), "-map", f"[{last}]",

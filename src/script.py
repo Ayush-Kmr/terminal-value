@@ -81,8 +81,11 @@ Rules:
 - A chart needs at least three real data points from FINANCIAL DATA. A timeline
   needs 3-6 "events". Use quote_card only for a supplied verbatim quote that is
   in English: put the quote in "quote" and "Name, role, date" in "caption". If you have neither data nor a quote, use photo or ai_still.
-- Prefer photo over ai_still: real places, buildings, products and objects
-  hold attention better. Use ai_still only for what no photograph can show.
+- Keep the picture moving. Prefer photo with "stock_terms" over ai_still: it
+  brings real moving footage (traders, factories, cargo ships, city streets, chips
+  on a production line). Use ai_still only for what no footage can show.
+- Never use the same visual_type three shots in a row, and make at least half of
+  the shots photo. Cards land hardest between pieces of footage.
 - Every photo shot needs "search_terms" (a real, named subject) or
   "stock_terms" (a generic scene), never a sentence. Also give every photo
   shot a "prompt" as a fallback illustration."""

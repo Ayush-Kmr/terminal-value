@@ -72,8 +72,8 @@ HISTORY_PROMPT = """You choose the next long documentary for a YouTube channel a
 American business, for a US audience.
 
 These videos by other channels have each passed {floor:,} views, so the subjects
-are proven. Choose the best SUBJECT: one real company, person or event from the
-past. We will research and tell it ourselves from primary sources and reporting,
+are proven. Choose the best SUBJECT: the one real company, person or event from the
+past that one of these videos is about. We will research and tell it ourselves from primary sources and reporting,
 so never reuse a title, a script or a structure from these videos.
 
 {videos}
@@ -96,7 +96,7 @@ Return one JSON object:
   search_query  - 3-6 words that find reporting on exactly this story
   wiki_title    - English Wikipedia article title for it
   keywords      - 6-10 search phrases people type about it
-  inspired_by   - the title of a video above that is about this same subject"""
+  video         - the number of the video above that is about exactly this subject"""
 
 
 def history_story(cfg: Config) -> dict[str, Any] | None:
@@ -113,10 +113,15 @@ def history_story(cfg: Config) -> dict[str, Any] | None:
             pick = llm.json_call(HISTORY_PROMPT.format(
                 floor=floor, avoid=avoid,
                 covered="\n".join(f"- {d}" for d in [*done, *rejected]) or "- (nothing yet)",
-                videos="\n".join(f"- {v['views']:,} views: {v['title']}" for v in hits[:40])),
+                videos="\n".join(f"{n}. {v['views']:,} views: {v['title']}"
+                                 for n, v in enumerate(hits[:40], 1))),
                 temperature=0.5)
             topic = str(pick.get("topic") or "").strip()
-            proof = _proof(topic, hits)
+            try:
+                chosen = hits[:40][int(pick.get("video")) - 1]
+            except (TypeError, ValueError, IndexError):
+                chosen = None
+            proof = _proof(topic, [chosen]) if chosen else None
             if proof and topic.lower() not in {d.lower() for d in done} \
                     and not trends.blocked(pick, words):
                 log.info("History pick: %s (%d views: %s)", topic, proof["views"], proof["title"])

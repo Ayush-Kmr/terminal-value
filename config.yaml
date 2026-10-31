@@ -47,7 +47,8 @@ channel:
   #   - "Daily brief on Telegram: https://t.me/..."
   #   - "Books we used (affiliate): https://amzn.to/..."
   # An affiliate link needs the disclosure in the line itself.
-  links: []
+  links:
+    - "Subscribe for the story behind the headline: https://www.youtube.com/@terminalvaluedoc?sub_confirmation=1"
   # Closes every description, before the sources.
   cta: >-
     New explainer every other day at 12 PM ET and two Shorts every day.
@@ -325,6 +326,13 @@ upload:
   # Topic playlists: a video joins every playlist one of whose words appears
   # in its subject, title or tags (whole words, any case). Keeps viewers
   # watching the next video on the same subject.
+  # Category hashtag for each topic playlist.
+  hashtags:
+    "Stock Market & Companies": "#stockmarket"
+    "AI & Big Tech": "#ai"
+    "Fed, Banks & Interest Rates": "#interestrates"
+    "Trade, Tariffs & Deals": "#tariffs"
+    "Economy & Jobs": "#economy"
   topic_playlists:
     "Stock Market & Companies": [stock, stocks, share, shares, nasdaq, dow, ipo, market, markets, investors, earnings, profit, layoffs, ceo, startup, valuation, bear, bull]
     "AI & Big Tech": [ai, nvidia, openai, anthropic, microsoft, google, apple, amazon, meta, tesla, chip, chips, semiconductor, spacex]

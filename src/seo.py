@@ -232,16 +232,26 @@ def chapters(cfg: Config, shots: list[dict]) -> str:
     return "\n".join(lines) if len(lines) >= 3 else ""
 
 
-def hashtags(keywords: list[str], language: str) -> str:
-    """Three at most: the first three show above the title."""
+def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") -> str:
+    """Three, because only the first three show above the title: the subject, its
+    category, and what the channel is. Specific tags reach people looking for that
+    subject; "#viral" and the like only blur what the video is about."""
+    from . import upload
+
     tags = []
     # Phrases with figures in them make unreadable hashtags (#Rbi550Repo).
     keywords = [k for k in keywords if not re.search(r"\d", k)] or keywords
-    for k in keywords[:2]:
+    # The shortest phrase is the subject itself; long ones make unreadable tags.
+    for k in sorted(keywords[:6], key=len)[:1]:
         word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title() if k.isascii() else k)
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
-    tags.append({"hi": "#hindinews", "ta": "#tamilnews"}.get(language, "#explained"))
+    names = cfg.get_path("upload.hashtags", {}) or {}
+    topic = next((names[n] for n in upload.topic_playlists(cfg, text, *keywords)
+                  if n in names), "#business")
+    if topic not in tags:
+        tags.append(topic)
+    tags.append({"hi": "#hindinews", "ta": "#tamilnews"}.get(language, "#businessnews"))
     return " ".join(tags)
 
 
@@ -276,7 +286,7 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
         parts.append("IMAGE CREDITS\n" + credits)
 
     parts.append(cfg.get_path("channel.disclosure", "").strip())
-    tail = hashtags(list(tags_extra or []) + keywords, language)
+    tail = hashtags(cfg, list(tags_extra or []) + keywords, language, summary)
     body = "\n\n".join(p for p in parts if p)
     # Trim the body, never the hashtags: they must close the description.
     return body[:4880 - len(tail)] + "\n\n" + tail

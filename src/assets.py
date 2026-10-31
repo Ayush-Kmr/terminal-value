@@ -91,13 +91,21 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             found = (stock.wikimedia_image(name, base)
                      or stock.wikimedia_image(" ".join(name.split()[:3]), base))
             if not found and spec.get("stock_terms"):
-                found = stock.find(spec["stock_terms"], base,
-                                   allow_video=shot["index"] % 2 == 0)
+                found = stock.find(spec["stock_terms"], base)
             if found:
                 shot["asset"] = found["path"]
                 credits.append(found)
             else:
                 vtype = "ai_still"   # fall through
+
+        # Real moving footage beats a still, so a generic scene tries for it first.
+        if vtype == "ai_still" and not shot.get("asset") and spec.get("stock_terms"):
+            found = stock.pixabay_video(spec["stock_terms"],
+                                        img_dir / f"shot_{shot['index']:03d}")
+            if found:
+                shot["asset"] = found["path"]
+                shot["visual_type"] = "photo"
+                credits.append(found)
 
         if vtype == "ai_still" and not shot.get("asset"):
             prompt = (spec.get("prompt") or spec.get("stock_terms")
