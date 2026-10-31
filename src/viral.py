@@ -141,12 +141,13 @@ def _proof(topic: str, hits: list[dict[str, Any]]) -> dict[str, Any] | None:
     """The million-view video that is really about this topic: the model's own
     citation cannot be trusted (it once offered a Madoff film as proof of Lehman)."""
     generic = {"collapse", "scandal", "crash", "fall", "rise", "story", "history", "company",
-               "fraud", "crisis", "bankruptcy", "the"}
+               "fraud", "crisis", "bankruptcy", "the", "scheme", "ponzi", "brothers", "market",
+               "stock", "bank", "corporate", "wall", "street", "big", "great"}
     names = [w for w in re.findall(r"[a-z0-9]+", topic.lower())
              if len(w) > 2 and w not in generic]
     if not names:
         return None
-    return next((v for v in hits if names[0] in v["title"].lower()), None)
+    return next((v for v in hits if any(n in v["title"].lower() for n in names)), None)
 
 
 def _story(pick: dict[str, Any], topic: str) -> dict[str, Any]:
