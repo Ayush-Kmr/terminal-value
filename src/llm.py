@@ -64,7 +64,7 @@ def _gemini(prompt: str, system: str | None, temperature: float) -> str:
             model = genai.GenerativeModel(name, system_instruction=system)
             resp = model.generate_content(
                 prompt, generation_config={"temperature": temperature,
-                                           "max_output_tokens": 8192})
+                                           "max_output_tokens": 16384})
             return resp.text
         except Exception as exc:  # noqa: BLE001
             last = exc
@@ -116,6 +116,23 @@ def call(prompt: str, system: str | None = None, temperature: float = 0.7) -> st
         return _groq(prompt, system, temperature)
 
 
+def _complete_items(raw: str) -> list[Any]:
+    """The whole objects at the start of an array that was cut off mid-way."""
+    start = raw.find("[")
+    if start == -1 or raw.find("{") < start:
+        return []
+    decoder, pos, items = json.JSONDecoder(), start + 1, []
+    while True:
+        pos = raw.find("{", pos)
+        if pos == -1:
+            return items
+        try:
+            item, pos = decoder.raw_decode(raw, pos)
+        except json.JSONDecodeError:
+            return items
+        items.append(item)
+
+
 def _extract_json(raw: str) -> Any:
     """Models wrap JSON in prose and fences more often than they should."""
     raw = raw.strip()
@@ -134,6 +151,10 @@ def _extract_json(raw: str) -> Any:
                 return json.loads(raw[start : end + 1])
             except json.JSONDecodeError:
                 continue
+    items = _complete_items(raw)
+    if items:
+        log.warning("Model reply was cut off; kept %d complete item(s)", len(items))
+        return items
     raise ValueError(f"Could not parse JSON from model output:\n{raw[:800]}")
 
 

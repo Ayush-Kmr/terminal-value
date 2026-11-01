@@ -78,11 +78,14 @@ def _subtitles(cfg: Config, video_id: str, srt: Path, code: str, name: str) -> N
     out: list[str] = []
     for start in range(0, len(lines), BATCH):
         part = lines[start:start + BATCH]
-        got = llm.json_call(LINES_PROMPT.format(
-            name=name, n=len(part), lines="\n".join(f"{i + 1}. {t}" for i, t in enumerate(part))),
-            temperature=0.2)
-        got = got.get("lines") if isinstance(got, dict) else got
-        if not isinstance(got, list) or len(got) != len(part):
+        for _ in range(3):
+            got = llm.json_call(LINES_PROMPT.format(
+                name=name, n=len(part),
+                lines="\n".join(f"{i + 1}. {t}" for i, t in enumerate(part))), temperature=0.2)
+            got = got.get("lines") if isinstance(got, dict) else got
+            if isinstance(got, list) and len(got) == len(part):
+                break
+        else:
             raise RuntimeError("subtitle batch came back the wrong length")
         out += [re.sub(r"\s+", " ", str(t)).strip() for t in got]
     path = srt.with_suffix(f".{code}.srt")

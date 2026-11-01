@@ -4,11 +4,6 @@
 # A title is used only if every figure in it is in the research.
 # not_before holds a story back until that date, for anything timed to an event.
 long:
-  - topic: "AI bubble"
-    title: "Is the AI Bubble About to Pop? What It Means for Your Money"
-    angle: "Is the AI boom a bubble, and what happens to ordinary jobs and savings if it bursts?"
-    search_query: "AI bubble stocks investors"
-    keywords: [ai bubble explained, ai bubble burst, stock market crash 2026]
   - topic: "Rising cost of living"
     title: "Why Is Everything So Expensive Right Now?"
     angle: "Why do groceries, rent and cars still cost so much, and who is actually getting the money?"

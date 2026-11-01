@@ -461,7 +461,13 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
         fb.sources.append(wiki_src)
 
     # Trusted outlets first in the description, the rest dropped or demoted.
-    labelled = [(outlet_rank(f"{s.title} {s.url}", cfg), n, s) for n, s in enumerate(fb.sources)]
+    def outlet(s: Source) -> str:
+        """Who published it: "reuters.com: Reddit stock jumps" -> "reuters.com"."""
+        name = s.title.split(": ")[0] if ": " in s.title else s.title
+        host = "" if "vertexaisearch" in s.url else re.sub(r"^https?://(www\.)?", "", s.url).split("/")[0]
+        return f"{name} {host}"
+
+    labelled = [(outlet_rank(outlet(s), cfg), n, s) for n, s in enumerate(fb.sources)]
     fb.sources = [s for r, _, s in sorted(labelled, key=lambda x: x[:2]) if r < 2]
     trusted = sum(r == 0 for r, _, _ in labelled)
     need = 1 if history else int(cfg.get_path("research.min_trusted", 2))
