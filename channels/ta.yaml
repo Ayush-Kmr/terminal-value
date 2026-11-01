@@ -53,6 +53,7 @@ voice:
   # voice cannot speak Tamil. Jaya is the model's recommended Tamil speaker.
   provider: indic
   match_ok: 0.5                # Whisper hears Tamil less exactly than English
+  check_rounds: 1              # a full second and third take added two hours to a long video
   indic:
     description: >-
       Jaya speaks in a clear, confident and slightly expressive tone at a

@@ -308,7 +308,8 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
         # Kokoro says a line the same way every time, so a second take cannot help:
         # its transcripts are still needed for the caption timings.
         heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language,
-                             rounds=0 if provider == "kokoro" else 2)
+                             rounds=0 if provider == "kokoro"
+                             else int(cfg.get_path("voice.check_rounds", 2)))
                  if cfg.get_path("voice.check", True) else {})
         for shot in shots:
             t = heard.get(audio_dir / f"shot_{shot['index']:03d}.mp3")
