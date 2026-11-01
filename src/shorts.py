@@ -159,8 +159,11 @@ def standalone(cfg: Config, video: Path, shots: list[dict], workdir: Path,
                headline: str, title: str, language: str = "en") -> dict:
     """A Short that is its own story: the video was already rendered 9:16, so
     it only needs its headline."""
-    out = finish(cfg, video, workdir / "short.mp4", latin_only(headline) or "EXPLAINED",
-                 shots=shots)
+    # A channel with its own script draws the headline in it; latin_only would
+    # hand the Tamil font an English fallback it has no letters for.
+    native = cfg.get_path("visuals.fonts.caption")
+    out = finish(cfg, video, workdir / "short.mp4",
+                 headline if native else latin_only(headline) or "EXPLAINED", shots=shots)
     return {
         "path": str(out),
         "title": f"{title.strip()[:90]} #shorts",

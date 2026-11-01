@@ -73,6 +73,8 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
         )
         r.raise_for_status()
         for hit in r.json().get("hits", []):
+            if not _fits(query, hit.get("tags", "")):
+                continue
             out = dest.with_suffix(".jpg")
             if _download(hit.get("largeImageURL", ""), out):
                 return {"path": str(out), "kind": "image", "credit": hit.get("user", "Pixabay"),
@@ -83,6 +85,14 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
 
 
 _used_clips: set = set()
+
+
+def _fits(query: str, tags: str) -> bool:
+    """Stock search returns near misses ("telecommunications store" found a clothes
+    rack), so a clip's own tags must share at least two words with the request."""
+    wanted = {w for w in re.findall(r"[a-z]+", query.lower()) if len(w) > 3}
+    have = set(re.findall(r"[a-z]+", str(tags).lower()))
+    return len(wanted & have) >= min(2, len(wanted))
 
 
 def pixabay_video(query: str, dest: Path) -> dict | None:
@@ -104,6 +114,8 @@ def pixabay_video(query: str, dest: Path) -> dict | None:
                 continue  # skip vertical clips
             if hit.get("id") in _used_clips:
                 continue  # the same clip twice in a video looks cheap
+            if not _fits(query, hit.get("tags", "")):
+                continue
             _used_clips.add(hit.get("id"))
             out = dest.with_suffix(".mp4")
             if _download(best["url"], out):
