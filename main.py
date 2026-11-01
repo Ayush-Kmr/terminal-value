@@ -438,10 +438,22 @@ def lead_of(short: dict) -> str:
     return short["description"].split("\n\n")[0]
 
 
+def fresh_or_queue(cfg, args, n: int, kinds: tuple[str, ...]) -> list[dict]:
+    """Today's picks. If the picker fails, a day with queued stories still runs."""
+    try:
+        return candidates_for(cfg, args, n)
+    except Exception as exc:  # noqa: BLE001
+        if not any(queued(args, k, 1) for k in kinds):
+            raise
+        log.warning("Story picker failed (%s); using the queue", str(exc)[:160])
+        return []
+
+
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
     n = args.count or int(cfg.get_path("format.short.per_day", 2))
-    stories = with_stock(cfg, args, queued(args, "shorts", n) + candidates_for(cfg, args, n))
+    stories = with_stock(cfg, args, queued(args, "shorts", n)
+                         + fresh_or_queue(cfg, args, n, ("shorts",)))
     return make_shorts(cfg, args, stories[:n], stories[n:])
 
 
@@ -523,7 +535,7 @@ def run(args) -> int:
         return run_shorts_day(cfg, args)
 
     n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
-    candidates = candidates_for(cfg, args, 4 + n_shorts)
+    candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
     story = (first[0] if first else None) or history_story(cfg, args) \
         or evergreen_story(cfg, args) or candidates[0]

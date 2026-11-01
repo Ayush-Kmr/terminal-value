@@ -158,6 +158,15 @@ Return a JSON array of {n} objects, best first:
   score         - 0-100"""
 
 
+def _as_list(reply: Any) -> list[dict[str, Any]]:
+    """Models sometimes wrap the array in an object, or return one story alone."""
+    if isinstance(reply, dict):
+        if reply.get("topic"):
+            return [reply]
+        reply = next((v for v in reply.values() if isinstance(v, list)), [])
+    return [r for r in reply if isinstance(r, dict)] if isinstance(reply, list) else []
+
+
 def blocked(cand: dict[str, Any], words: list[str]) -> str:
     """The first banned word in a story's text, or "". A hard stop behind the
     model's own judgement, which has let a congressional race through."""
@@ -254,7 +263,7 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
     regions = {r["code"]: r for r in cfg.get_path("trending.regions", [])}
     tz = ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
 
-    ranked = llm.json_call(
+    prompt = (
         PICK_PROMPT.format(
             today=f"{datetime.now(tz):%A %d %B %Y}", n=n,
             minutes=cfg.get_path("format.long.target_minutes", 6),
@@ -264,10 +273,15 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
             own=own_winners(st),
             signals="\n".join(lines)[:24000],
             codes=", ".join(regions),
-        ),
-        temperature=0.4,
+        )
     )
-    if not isinstance(ranked, list) or not ranked:
+    ranked = []
+    for _ in range(3):
+        ranked = _as_list(llm.json_call(prompt, temperature=0.4))
+        if ranked:
+            break
+        log.warning("Trend picker reply had no stories; asking again")
+    if not ranked:
         raise RuntimeError("Trend picker returned nothing")
 
     out = []
