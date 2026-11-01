@@ -31,8 +31,11 @@ def suggestions(query: str, hl: str = "en", gl: str = "US") -> list[str]:
 
 def _core(subject: str) -> str:
     """The searchable head of a subject: "RBI repo rate decision" -> "rbi repo rate"."""
-    words = [w for w in re.findall(r"[\w.&-]+", subject) if w.lower() not in
-             {"decision", "news", "latest", "update", "the", "a", "of", "and", "why", "how"}]
+    # "Verizon's $2 Billion Deal" -> "verizon deal", not "verizon s 2".
+    plain = re.sub(r"[’']s\b", "", subject)
+    words = [w for w in re.findall(r"[^\W\d][\w.&-]*", plain) if w.lower() not in
+             {"decision", "news", "latest", "update", "the", "a", "of", "and", "why", "how",
+              "billion", "million", "trillion"}]
     return " ".join(words[:3]).lower()
 
 
