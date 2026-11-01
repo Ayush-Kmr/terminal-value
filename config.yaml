@@ -46,7 +46,8 @@ channel:
   # Links shown under the call to action in every description, e.g.
   #   - "Daily brief on Telegram: https://t.me/..."
   #   - "Books we used (affiliate): https://amzn.to/..."
-  # An affiliate link needs the disclosure in the line itself.
+  # An affiliate link needs the disclosure in the line itself. Sell books and
+  # learning, not brokers or investing apps: this channel never gives advice.
   links:
     - "Subscribe for the story behind the headline: https://www.youtube.com/@terminalvaluedoc?sub_confirmation=1"
   # Closes every description, before the sources.

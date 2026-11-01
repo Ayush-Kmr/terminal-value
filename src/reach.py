@@ -117,6 +117,37 @@ def drop_off(cfg: Config, videos: list[dict], count: int = 3) -> list[str]:
     return out
 
 
+def progress(cfg: Config) -> list[str]:
+    """Distance from each Partner Program tier, from the channel's own numbers."""
+    from googleapiclient.discovery import build
+
+    try:
+        creds = upload.credentials()
+        subs = int(build("youtube", "v3", credentials=creds, cache_discovery=False)
+                   .channels().list(part="statistics", mine=True).execute()["items"][0]
+                   ["statistics"].get("subscriberCount", 0))
+        ya = build("youtubeAnalytics", "v2", credentials=creds, cache_discovery=False)
+        rows = {r[0]: r for r in ya.reports().query(
+            ids="channel==MINE", startDate=str(date.today() - timedelta(days=365)),
+            endDate=str(date.today()), metrics="views,estimatedMinutesWatched",
+            dimensions="creatorContentType").execute().get("rows", [])}
+        hours = rows.get("videoOnDemand", [0, 0, 0])[2] / 60
+        recent = ya.reports().query(
+            ids="channel==MINE", startDate=str(date.today() - timedelta(days=90)),
+            endDate=str(date.today()), metrics="views",
+            dimensions="creatorContentType").execute().get("rows", [])
+        shorts = next((r[1] for r in recent if r[0] == "shorts"), 0)
+    except Exception as exc:  # noqa: BLE001
+        log.info("Progress unavailable: %s", str(exc)[:160])
+        return []
+    return ["| Target | Now | Lower tier | Full tier |", "|---|---|---|---|",
+            f"| Subscribers | {subs:,} | 500 | 1,000 |",
+            f"| Watch hours (12 months) | {hours:,.0f} | 3,000 | 4,000 |",
+            f"| Shorts views (90 days) | {shorts:,} | 3,000,000 | 10,000,000 |",
+            "", "Each tier needs its subscribers plus either the hours or the Shorts views. "
+            "Watch hours here exclude Shorts."]
+
+
 def report(cfg: Config) -> Path:
     videos = fetch_stats(cfg)
     ret = retention(cfg)
@@ -172,6 +203,10 @@ def report(cfg: Config) -> Path:
         lines += [f"- {name}: {len(v)} videos, median {mid(v):,.0f} views"
                   for name, v in sorted(styles.items())]
 
+    road = progress(cfg)
+    if road:
+        lines += ["", "## Road to monetisation", "", *road]
+
     lines += ["", "## What to do next", ""]
     weak = [v for v in videos if median and v["views"] < median * 0.4
             and v["privacy"] == "public"]
@@ -193,4 +228,6 @@ def report(cfg: Config) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")
     log.info("Reach report written to %s", out)
+    from . import newsletter
+    newsletter.draft(cfg)
     return out
