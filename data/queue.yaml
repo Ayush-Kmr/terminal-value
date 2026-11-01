@@ -5,13 +5,13 @@
 # not_before holds a story back until that date, for anything timed to an event.
 long:
   - topic: "Rising cost of living"
-    title: "Why Is Everything So Expensive Right Now?"
-    angle: "Why do groceries, rent and cars still cost so much, and who is actually getting the money?"
+    title: "Why Are Groceries So Expensive in the US? The Real Reason"
+    angle: "Why do groceries still cost so much in the US, and who is actually getting the money?"
     search_query: "US consumer prices cost of living"
-    keywords: [why is everything so expensive, why are groceries so expensive in the us, why is housing so expensive]
+    keywords: [why are groceries so expensive in the us, why are groceries still expensive, cost of living crisis]
   - topic: "Bernie Madoff"
     history: true
-    title: "The Madoff Scheme: How One Man Stole Billions in Plain Sight"
+    title: "Bernie Madoff: How One Man Stole Billions in Plain Sight"
     angle: "How did Bernie Madoff fool investors and regulators for decades?"
     search_query: "Bernie Madoff Ponzi scheme"
     wiki_title: "Madoff investment scandal"
@@ -23,7 +23,7 @@ long:
     keywords: [why are cars so expensive now, why are cars so expensive, car market]
   - topic: "Enron"
     history: true
-    title: "Enron: The Biggest Fraud in American Business"
+    title: "Enron Scandal Explained: The Biggest Fraud in American Business"
     angle: "How did one of America's most admired companies turn out to be a fraud?"
     search_query: "Enron collapse fraud"
     wiki_title: "Enron scandal"
@@ -45,7 +45,7 @@ long:
     keywords: [worldcom scandal explained, worldcom collapse, bernie ebbers]
   - topic: "FTX"
     history: true
-    title: "What Really Happened at FTX?"
+    title: "FTX Collapse: What Really Happened to Customers' Money?"
     angle: "How did FTX lose billions of its customers' money so quickly?"
     search_query: "FTX collapse Sam Bankman-Fried trial"
     wiki_title: "Bankruptcy of FTX"
@@ -68,7 +68,7 @@ long:
     keywords: [are black friday deals real, black friday deals, black friday explained]
   - topic: "Federal Reserve interest rates"
     not_before: 2026-12-03
-    title: "How the Fed's Next Decision Reaches Your Wallet"
+    title: "How Do Interest Rates Work? What the Fed's Decision Means for You"
     angle: "How does a Federal Reserve rate decision reach your mortgage, car loan and savings?"
     search_query: "Federal Reserve December meeting interest rates"
     keywords: [what does the federal reserve do, how do interest rates work, fed rate decision]
