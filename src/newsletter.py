@@ -24,7 +24,7 @@ Choose the 3 most useful. For each: a plain headline, 2-3 short sentences on wha
 happened and why it matters to someone's money or job, then "Watch: <link>".
 Use only what is in the summaries. No new figures, no predictions and no advice on
 what to buy or sell. Open with one friendly sentence and end with one question for
-readers to reply to. Under 250 words, in Markdown."""
+readers to reply to. Under 250 words, in plain Markdown paragraphs, with no tables."""
 
 
 def week_stories(days: int = 7) -> list[dict]:
