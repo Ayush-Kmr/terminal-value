@@ -245,7 +245,10 @@ def run_line(run: dict, jobs: bool = True) -> str:
             f"{esc(run['name'])} #{run['run_number']}</a> · {started} · "
             f"{'scheduled' if run['event'] == 'schedule' else 'manual'}")
     if jobs and run["name"] == "Episode":
-        js = gh(f"actions/runs/{run['id']}/jobs").get("jobs", [])
+        try:
+            js = gh(f"actions/runs/{run['id']}/jobs").get("jobs", [])
+        except requests.RequestException:
+            return line
         names = {"produce": "English", "tamil": "Tamil"}
         line += "\n     " + " · ".join(f"{names.get(j['name'], j['name'])} "
                                        f"{ICON.get(j['conclusion'], '⏳')}" for j in js)
@@ -253,8 +256,12 @@ def run_line(run: dict, jobs: bool = True) -> str:
 
 
 def last_episode_run() -> str:
-    runs = gh("actions/workflows/episode.yml/runs?per_page=1").get("workflow_runs", [])
-    return run_line(runs[0]) if runs else "no runs yet"
+    """Never the reason a command fails: YouTube numbers still go out without it."""
+    try:
+        runs = gh("actions/workflows/episode.yml/runs?per_page=1").get("workflow_runs", [])
+        return run_line(runs[0]) if runs else "no runs yet"
+    except requests.RequestException as exc:
+        return f"(GitHub unavailable right now: {esc(type(exc).__name__)})"
 
 
 # ------------------------------------------------------------------ commands
@@ -316,7 +323,10 @@ def cmd_top(chs: list[dict]) -> str:
 
 
 def cmd_runs(_: list[dict]) -> str:
-    runs = gh("actions/runs?per_page=8").get("workflow_runs", [])
+    try:
+        runs = gh("actions/runs?per_page=8").get("workflow_runs", [])
+    except requests.RequestException as exc:
+        return f"⚙️ <b>PIPELINE RUNS</b>\n\nGitHub unavailable right now: {esc(type(exc).__name__)}"
     runs = [r for r in runs if r["name"] != "Telegram bot"][:6]
     return "⚙️ <b>PIPELINE RUNS</b>\n\n" + "\n".join(
         run_line(r, jobs=i < 3) for i, r in enumerate(runs))
@@ -431,8 +441,16 @@ def main() -> int:
         hook = tg("getWebhookInfo")["result"]
         print(f"bot @{me['username']}; webhook {hook.get('url') or 'none'}; waiting messages "
               f"{hook.get('pending_update_count')}; last error {hook.get('last_error_message')}")
-        send("✅ Bot check: this message came from the Telegram check workflow.")
-        print("test message sent")
+        chs = _channels()
+        print("tokens:", {c["key"]: bool(c["token"]) for c in chs},
+              "github token:", bool(os.getenv("GITHUB_TOKEN")))
+        send("✅ Bot check: running every command.")
+        for name, _ in COMMANDS:
+            started = time.time()
+            text = reply(f"/{name}", chs)
+            state = "FAILED" if text.startswith("⚠️") else "ok"
+            print(f"/{name}: {state} in {time.time() - started:.1f}s: {text[:150]!r}", flush=True)
+            send(text)
     elif args.once:
         print(reply(args.once, _channels()))
     elif args.digest:
