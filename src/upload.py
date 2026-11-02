@@ -198,8 +198,13 @@ def add_to_playlist(video_id: str, playlist_title: str) -> None:
                       "status": {"privacyStatus": "public"}},
             ).execute()
             pid = created["id"]
-        if yt.playlistItems().list(part="id", playlistId=pid, videoId=video_id).execute().get("items"):
-            return                                # already there
+        try:
+            if yt.playlistItems().list(part="id", playlistId=pid,
+                                       videoId=video_id).execute().get("items"):
+                return                            # already there
+        except HttpError as exc:
+            if exc.resp.status != 404:            # a brand-new playlist cannot be read yet
+                raise
         for wait in (5, 15, 30, 60, 0):
             try:
                 yt.playlistItems().insert(

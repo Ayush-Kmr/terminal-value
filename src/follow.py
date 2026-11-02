@@ -117,6 +117,7 @@ def _drawable(text: str) -> str:
     def money(m: re.Match) -> str:
         return f"{m[1]}{m[2] or ''} டாலர்"
     text = re.sub(r"\$\s?(\d[\d,.]*)(\s?(?:மில்லியன்|பில்லியன்|டிரில்லியன்|ஆயிரம்))?", money, str(text))
+    text = re.sub(r"(டாலர்)(\s+\1)+", r"\1", text)
     return text.replace("·", ":").replace("$", "").replace("&", " மற்றும் ")
 
 
