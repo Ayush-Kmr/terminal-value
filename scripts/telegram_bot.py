@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import html
 import os
+import re
 import sys
 import time
 from datetime import date, datetime, timedelta, timezone
@@ -78,8 +79,15 @@ def send(text: str) -> None:
     while text:
         cut = len(text) if len(text) <= 4000 else text.rfind("\n", 0, 4000)
         cut = cut if cut > 0 else 4000
-        tg("sendMessage", chat_id=os.environ["TELEGRAM_CHAT_ID"], text=text[:cut],
-           parse_mode="HTML", disable_web_page_preview=True)
+        part = text[:cut]
+        try:
+            tg("sendMessage", chat_id=os.environ["TELEGRAM_CHAT_ID"], text=part,
+               parse_mode="HTML", disable_web_page_preview=True)
+        except requests.HTTPError as exc:
+            # A formatting fault must not cost the reply: send it as plain text.
+            print(f"HTML send refused: {exc.response.text[:200]}", flush=True)
+            tg("sendMessage", chat_id=os.environ["TELEGRAM_CHAT_ID"],
+               text=re.sub(r"<[^>]+>", "", part), disable_web_page_preview=True)
         text = text[cut:].lstrip("\n")
 
 
@@ -412,8 +420,16 @@ def main() -> int:
     ap.add_argument("--poll", type=int, metavar="SECONDS")
     ap.add_argument("--digest", action="store_true")
     ap.add_argument("--once", metavar="COMMAND")
+    ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
-    if args.once:
+    if args.check:
+        me = tg("getMe")["result"]
+        hook = tg("getWebhookInfo")["result"]
+        print(f"bot @{me['username']}; webhook {hook.get('url') or 'none'}; waiting messages "
+              f"{hook.get('pending_update_count')}; last error {hook.get('last_error_message')}")
+        send("✅ Bot check: this message came from the Telegram check workflow.")
+        print("test message sent")
+    elif args.once:
         print(reply(args.once, _channels()))
     elif args.digest:
         digest(_channels())
