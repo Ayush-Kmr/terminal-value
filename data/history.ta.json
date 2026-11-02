@@ -133,7 +133,8 @@
         "views": 1403,
         "likes": 1,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Is the AI bubble about to pop",
@@ -151,7 +152,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Big Tech AI Capex and the Bubble Threat",
@@ -169,7 +171,34 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "Gas prices",
+      "angle": "What is pushing up the price of gas in the US?",
+      "title": "Gas Price Hike Tamil | அமெரிக்காவில் பெட்ரோல் விலை உயர்வு",
+      "region": "US",
+      "language": "ta",
+      "video_id": "R4Si8lu77mQ",
+      "kind": "short",
+      "source": "2026-11-02-short-gas-prices",
+      "warnings": [],
+      "question": "உங்கள் பகுதியில் பெட்ரோல் விலை எப்படி உள்ளது?",
+      "created_at": "2026-11-02T16:21:05.709227+00:00"
+    },
+    {
+      "company": "Inovio Pharmaceuticals stock",
+      "angle": "Why did Inovio stock surge 224% in a single day?",
+      "title": "Inovio Stock | இனோவியோ நிறுவன பங்குகள் 224% உயர்வு",
+      "region": "MARKETS",
+      "language": "ta",
+      "video_id": "2iGUtCPXWLY",
+      "kind": "short",
+      "source": "2026-11-02-short-inovio-pharmaceuticals-stock",
+      "warnings": [],
+      "question": "இந்த பங்கு விலை உயர்வு பற்றி நீங்கள் என்ன நினைக்கிறீர்கள்?",
+      "created_at": "2026-11-02T16:40:00.868434+00:00"
     }
   ],
   "rejected_topics": [],
