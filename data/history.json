@@ -111,11 +111,11 @@
       "warnings": [],
       "created_at": "2026-10-14T15:32:54.507639+00:00",
       "stats": {
-        "views": 371,
+        "views": 374,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
-        "avg_pct": 79.13,
+        "avg_pct": 79.02,
         "minutes": 53
       }
     },
@@ -259,7 +259,7 @@
       "warnings": [],
       "created_at": "2026-10-19T17:34:24.707133+00:00",
       "stats": {
-        "views": 128,
+        "views": 129,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 53,
@@ -337,12 +337,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 128,
+        "views": 166,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 115,
-        "avg_pct": 22.72,
-        "minutes": 102
+        "avg_duration_s": 107,
+        "avg_pct": 21.26,
+        "minutes": 104
       }
     },
     {
@@ -356,11 +356,11 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 108,
+        "views": 110,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
-        "avg_pct": 62.9,
+        "avg_pct": 63.65,
         "minutes": 18
       }
     },
@@ -398,7 +398,7 @@
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 13,
-        "avg_pct": 31.010000000000005,
+        "avg_pct": 31.319999999999997,
         "minutes": 18
       }
     },
@@ -435,12 +435,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:22:56.859675+00:00",
       "stats": {
-        "views": 16,
+        "views": 20,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 102,
-        "avg_pct": 19.25,
-        "minutes": 11
+        "avg_duration_s": 145,
+        "avg_pct": 27.38,
+        "minutes": 26
       }
     },
     {
@@ -454,12 +454,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 105,
+        "views": 110,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
-        "avg_pct": 57.38999999999999,
-        "minutes": 13
+        "avg_pct": 56.74,
+        "minutes": 15
       }
     },
     {
@@ -554,11 +554,11 @@
       "warnings": [],
       "created_at": "2026-10-26T11:44:47.545945+00:00",
       "stats": {
-        "views": 410,
+        "views": 411,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 30,
-        "avg_pct": 79.59,
+        "avg_pct": 78.99,
         "minutes": 68
       }
     },
@@ -573,7 +573,7 @@
       "warnings": [],
       "created_at": "2026-10-26T11:55:27.451692+00:00",
       "stats": {
-        "views": 171,
+        "views": 173,
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 27,
@@ -597,7 +597,7 @@
       ],
       "created_at": "2026-10-28T11:41:57.269368+00:00",
       "stats": {
-        "views": 2,
+        "views": 3,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 63,
@@ -616,7 +616,7 @@
       "warnings": [],
       "created_at": "2026-10-28T11:51:46.930290+00:00",
       "stats": {
-        "views": 31,
+        "views": 32,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 19,
@@ -635,11 +635,11 @@
       "warnings": [],
       "created_at": "2026-10-28T12:02:05.990792+00:00",
       "stats": {
-        "views": 119,
+        "views": 122,
         "likes": 3,
         "comments": 0,
-        "avg_duration_s": 21,
-        "avg_pct": 55.14,
+        "avg_duration_s": 20,
+        "avg_pct": 52.96999999999999,
         "minutes": 16
       }
     },
@@ -654,12 +654,12 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 183,
+        "views": 227,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 27,
-        "avg_pct": 81.33,
-        "minutes": 10
+        "avg_duration_s": 24,
+        "avg_pct": 71.52,
+        "minutes": 18
       }
     },
     {
@@ -673,12 +673,12 @@
       "warnings": [],
       "created_at": "2026-10-29T10:38:46.805451+00:00",
       "stats": {
-        "views": 130,
+        "views": 148,
         "likes": 2,
         "comments": 0,
-        "avg_duration_s": 10,
-        "avg_pct": 23.03,
-        "minutes": 3
+        "avg_duration_s": 11,
+        "avg_pct": 25.900000000000002,
+        "minutes": 9
       }
     },
     {
@@ -695,9 +695,12 @@
       "warnings": [],
       "created_at": "2026-10-30T12:23:32.688274+00:00",
       "stats": {
-        "views": 10,
+        "views": 27,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 229,
+        "avg_pct": 36.32,
+        "minutes": 11
       }
     },
     {
@@ -711,9 +714,12 @@
       "warnings": [],
       "created_at": "2026-10-30T12:40:06.327737+00:00",
       "stats": {
-        "views": 86,
+        "views": 143,
         "likes": 1,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 17,
+        "avg_pct": 48.01,
+        "minutes": 5
       }
     },
     {
@@ -727,9 +733,12 @@
       "warnings": [],
       "created_at": "2026-10-30T13:00:19.902734+00:00",
       "stats": {
-        "views": 55,
-        "likes": 0,
-        "comments": 0
+        "views": 534,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 12,
+        "avg_pct": 43.32,
+        "minutes": 3
       }
     },
     {
@@ -743,7 +752,7 @@
       "warnings": [],
       "created_at": "2026-10-31T10:06:27.130994+00:00",
       "stats": {
-        "views": 75,
+        "views": 208,
         "likes": 0,
         "comments": 0
       }
@@ -780,7 +789,12 @@
       "history": "",
       "runtime": "9:02",
       "warnings": [],
-      "created_at": "2026-11-01T12:01:32.048352+00:00"
+      "created_at": "2026-11-01T12:01:32.048352+00:00",
+      "stats": {
+        "views": 9,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Is the AI bubble about to pop",
@@ -795,7 +809,12 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "shorts:Is the AI bubble about to pop",
-      "created_at": "2026-11-01T12:04:09.847736+00:00"
+      "created_at": "2026-11-01T12:04:09.847736+00:00",
+      "stats": {
+        "views": 178,
+        "likes": 2,
+        "comments": 1
+      }
     },
     {
       "company": "Egg prices",
@@ -810,9 +829,14 @@
       "parent_url": "",
       "title_style": "curious",
       "queue": "shorts:Egg prices",
-      "created_at": "2026-11-01T12:07:19.626318+00:00"
+      "created_at": "2026-11-01T12:07:19.626318+00:00",
+      "stats": {
+        "views": 84,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 59.0
+  "channel_median_views": 89.0
 }
