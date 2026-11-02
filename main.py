@@ -327,14 +327,19 @@ def candidates_for(cfg, args, n: int) -> list[dict]:
     return candidates
 
 
+def long_slot(n: int) -> str:
+    """What the nth long video is, after the queue: mostly stories that keep their
+    audience for years, with news kept to one in four."""
+    return ("evergreen", "history", "evergreen", "news")[n % 4]
+
+
 def history_story(cfg, args) -> dict | None:
     """Every format.long.history_every-th long video: a past business story
     already proven at a million views on YouTube."""
-    every = int(cfg.get_path("format.long.history_every", 0))
-    if args.topic or every <= 0:
+    if args.topic:
         return None
     eps = [e for e in state.load().get("episodes", []) if e.get("kind", "long") == "long"]
-    if len(eps) % every != every - 1:
+    if long_slot(len(eps)) != "history":
         return None
     from src import viral
     return viral.history_story(cfg)
@@ -372,12 +377,11 @@ def evergreen_story(cfg, args) -> dict | None:
     from data/evergreen.yaml, written as an explainer rather than news."""
     import yaml
 
-    every = int(cfg.get_path("format.long.evergreen_every", 0))
     path = ROOT / "data" / "evergreen.yaml"
-    if args.topic or every <= 0 or not path.exists():
+    if args.topic or not path.exists():
         return None
     eps = [e for e in state.load().get("episodes", []) if e.get("kind", "long") == "long"]
-    if len(eps) % every != every - 1:
+    if long_slot(len(eps)) != "evergreen":
         return None
     used = {str(e.get("evergreen", "")).lower() for e in eps}
     for t in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("topics", []):

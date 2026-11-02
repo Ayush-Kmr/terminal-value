@@ -42,6 +42,7 @@ today's top trend, or type a story and choose its region.
   voice; `elevenlabs` uses ElevenLabs (paid plan needed for daily videos).
 - **Tone.** `channel/voice.md` is pasted into every script prompt.
 - **What comes next.** `data/queue.yaml` lists stories that go ahead of the automatic picks.
+  After it, long videos run in fours: explainer, history, explainer, news (`long_slot` in `main.py`).
 - **Regions and priorities.** `trending.regions` in `config.yaml`.
 - **Review before publishing.** Set `gates.topic_approval` / `gates.final_review`
   to `true` to get Telegram approval buttons.

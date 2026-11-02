@@ -93,12 +93,8 @@ format:
   long:
     days: []                    # weekdays a long video may go out. Empty = any day
     every_days: 2               # 2 = a long video on alternate days; 1 = every day
-    # Every 3rd long video is an evergreen explainer from data/evergreen.yaml
-    # (searched for month after month) instead of today's news. 0 = never.
-    evergreen_every: 3
-    # Every 2nd long video is a past business story already proven at a million
-    # views (src/viral.py), told from our own research. 0 = never.
-    history_every: 2
+    # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
+    # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
     # Over 8 minutes so the video can carry mid-roll ads once monetised.
     # A video that ends up under min_minutes is reported in Telegram.
     max_shot_words: 20          # longer shots are split, so the picture keeps moving

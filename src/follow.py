@@ -73,6 +73,64 @@ Return JSON:
   "search": ["<8 short phrases {name} viewers would type into YouTube search to find
              this story, in {name} script only>"]}}"""
 
+ADAPT_PROMPT = """These lines from a US business video explain what a story means for an
+American household. The video is being remade for Tamil viewers in India. Rewrite
+only what needs it, so the lines speak to a family in Tamil Nadu: a 401(k) becomes
+savings or a provident fund, a mortgage becomes a home loan EMI, gas becomes petrol,
+a paycheck becomes a salary, a grocery bill stays a grocery bill.
+
+Rules:
+- The story's facts stay exactly as they are. Everything reported about the US stays
+  about the US.
+- Add no figures, dates, names, rupee amounts or claims about India. Do not say that
+  anything has happened or will happen in India: say only what the viewer might watch for.
+- Never say what to buy, sell or hold.
+- Keep exactly one line for each line, in order, in simple English.
+
+Video: {title}
+
+Lines:
+{lines}
+
+Return JSON: {{"lines": ["<line 1>", ...]}} with exactly {n} strings."""
+
+LOCAL_BEATS = {"stakes", "legacy", "whats_next", "short"}
+US_WORDS = re.compile(r"401\(k\)|\bmortgages?\b|\bpaychecks?\b|\bcar loans?\b|\bretirement\b"
+                      r"|\bgas prices?\b|\bAmericans?\b|\bfamil(y|ies)\b|\bhouseholds?\b", re.I)
+
+
+def adapt(cfg: Config, title: str, shots: list[dict]) -> int:
+    """Rewrites viewer-impact lines for the channel's audience, before translation.
+    A rewrite that brings in any new figure is refused; failure keeps the original."""
+    if not cfg.get_path("follow.adapt_to"):
+        return 0
+    chosen = [s for s in shots if s.get("beat") in LOCAL_BEATS
+              and US_WORDS.search(s.get("narration") or "")]
+    changed = 0
+    for start in range(0, len(chosen), BATCH):
+        part = chosen[start:start + BATCH]
+        try:
+            got = llm.json_call(ADAPT_PROMPT.format(
+                title=title, n=len(part),
+                lines="\n".join(f"{i + 1}. {s['narration']}" for i, s in enumerate(part))),
+                temperature=0.3)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Adapting lines skipped: %s", str(exc)[:160])
+            continue
+        got = got.get("lines") if isinstance(got, dict) else got
+        if not isinstance(got, list) or len(got) != len(part):
+            continue
+        for shot, line in zip(part, got):
+            old = shot["narration"]
+            if (isinstance(line, str) and line.strip()
+                    and set(re.findall(r"\d+(?:\.\d+)?", line)) <= set(re.findall(r"\d+(?:\.\d+)?", old))
+                    and "₹" not in line and "rupee" not in line.lower()):
+                shot["narration"] = line.strip()
+                changed += line.strip() != old
+    log.info("Adapted %d lines for this channel's viewers", changed)
+    return changed
+
+
 SCREEN_NOTE = """These lines are short text printed on the picture of the video, not speech.
 Keep each one as short as the English. Digits, %, $ and dates as digits stay; every
 word, name, month and unit goes into Tamil script ("$4 billion" -> "4 பில்லியன் டாலர்",
@@ -218,6 +276,7 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     en_title = meta["title"].replace("#shorts", "").strip()
 
     shots = _load_shots(src, workdir)
+    adapt(cfg, en_title, shots)
     spoken = [s for s in shots if (s.get("narration") or "").strip()]
     for shot, line in zip(spoken, translate(cfg, en_title,
                                             [s["narration"] for s in spoken], language)):

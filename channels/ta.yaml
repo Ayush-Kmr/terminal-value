@@ -88,6 +88,7 @@ upload:
 
 # Every story the main channel makes gets a Tamil version.
 follow:
+  adapt_to: Tamil Nadu         # viewer-impact lines rewritten for this audience
   skip_regions: []
   max_shorts: 2
 
