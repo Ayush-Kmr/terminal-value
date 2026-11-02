@@ -84,6 +84,8 @@ Rules:
   about the US.
 - Add no figures, dates, names, rupee amounts or claims about India. Do not say that
   anything has happened or will happen in India: say only what the viewer might watch for.
+- Where a line is about the viewer, speak to them directly as "you" or "a family like
+  yours", never "American families" or "a family in Ohio".
 - Never say what to buy, sell or hold.
 - Keep exactly one line for each line, in order, in simple English.
 
