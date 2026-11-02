@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ from zoneinfo import ZoneInfo
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
 from .config import Config, env
@@ -153,7 +155,12 @@ def set_thumbnail(video_id: str, image: Path) -> None:
         client().thumbnails().set(
             videoId=video_id, media_body=MediaFileUpload(str(image))).execute()
     except Exception as exc:  # noqa: BLE001
-        log.warning("Thumbnail upload failed (channel verified?): %s", exc)
+        log.warning("Thumbnail upload failed: %s", exc)
+        if "permissions to upload" in str(exc):
+            from . import gate
+            gate.notify(f"⚠️ {video_id}: YouTube refused the custom thumbnail. Turn on "
+                        "intermediate features at youtube.com/verify for this channel.",
+                        markdown=False)
 
 
 def upload_captions(video_id: str, srt: Path, language: str = "en") -> None:
@@ -191,11 +198,22 @@ def add_to_playlist(video_id: str, playlist_title: str) -> None:
                       "status": {"privacyStatus": "public"}},
             ).execute()
             pid = created["id"]
-        yt.playlistItems().insert(
-            part="snippet",
-            body={"snippet": {"playlistId": pid,
-                              "resourceId": {"kind": "youtube#video", "videoId": video_id}}},
-        ).execute()
+        if yt.playlistItems().list(part="id", playlistId=pid, videoId=video_id).execute().get("items"):
+            return                                # already there
+        for wait in (5, 15, 30, 60, 0):
+            try:
+                yt.playlistItems().insert(
+                    part="snippet",
+                    body={"snippet": {"playlistId": pid,
+                                      "resourceId": {"kind": "youtube#video",
+                                                     "videoId": video_id}}},
+                ).execute()
+                return
+            except HttpError as exc:
+                if exc.resp.status != 409 or not wait:
+                    raise
+                log.info("Playlist busy; retrying in %d s", wait)
+                time.sleep(wait)
     except Exception as exc:  # noqa: BLE001
         log.warning("Playlist add failed: %s", exc)
 

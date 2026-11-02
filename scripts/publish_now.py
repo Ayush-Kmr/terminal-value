@@ -34,6 +34,11 @@ def main() -> int:
             print(f"Published {v['id']}: {v['snippet']['title'][:70]}")
             done += 1
     print(f"{done} video(s) published")
+    language = cfg.get_path("channel.language", "en")
+    for v in yt.videos().list(part="snippet", id=",".join(ids[:6])).execute().get("items", []):
+        s = v["snippet"]
+        upload.add_to_playlists(cfg, v["id"], language, s["title"], " ".join(s.get("tags", [])))
+    print("Playlists checked for the 6 newest videos")
     return 0
 
 

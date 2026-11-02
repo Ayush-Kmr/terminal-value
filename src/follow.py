@@ -144,15 +144,21 @@ def translate_screen(cfg: Config, title: str, shots: list[dict], language: str) 
         if str(c[k]) in done:
             continue
         c[k] = _drawable(c[k])
+    stubborn = [t for t, tr in done.items() if re.search(r"[A-Za-z]", tr)]
+    for text in stubborn:           # one at a time, where the model has only this to do
+        done[text] = translate(cfg, title, [text], language,
+                               SCREEN_NOTE + "\nSpell every English word in Tamil letters.",
+                               r"[A-Za-z]")[0]
     left = 0
     for c, k in slots:
-        c[k] = _drawable(done[str(c[k])])
-        if re.search(r"[A-Za-z]", c[k]):
+        line = _drawable(done[str(c[k])])
+        if re.search(r"[A-Za-z]", line):
             left += 1
-            if k == "caption":
-                c[k] = ""
+            # Any English left would print as empty boxes, so it comes off the card.
+            line = re.sub(r"\s{2,}", " ", re.sub(r"[A-Za-z][A-Za-z.&'’-]*", "", line)).strip(" -:,")
+        c[k] = line
     if left:
-        log.warning("%d on-screen text(s) still have English letters", left)
+        log.warning("%d on-screen text(s) had English removed", left)
 
 
 def _load_shots(src: Path, workdir: Path) -> list[dict]:
