@@ -390,7 +390,11 @@ def poll(seconds: int) -> None:
             offset = u["update_id"] + 1
             msg = u.get("message") or u.get("channel_post") or {}
             text = msg.get("text") or ""
-            if str(msg.get("chat", {}).get("id")) != chat or not text.startswith("/"):
+            where = msg.get("chat", {})
+            if str(where.get("id")) != chat:
+                print(f"ignored a message from another chat: {where.get('type')}", flush=True)
+                continue
+            if not text.startswith("/"):
                 continue
             print(f"command: {text.split()[0]}", flush=True)
             try:
