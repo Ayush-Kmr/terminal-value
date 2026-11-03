@@ -185,7 +185,8 @@
       "source": "2026-11-02-short-gas-prices",
       "warnings": [],
       "question": "உங்கள் பகுதியில் பெட்ரோல் விலை எப்படி உள்ளது?",
-      "created_at": "2026-11-02T16:21:05.709227+00:00"
+      "created_at": "2026-11-02T16:21:05.709227+00:00",
+      "commented": true
     },
     {
       "company": "Inovio Pharmaceuticals stock",
@@ -199,6 +200,47 @@
       "warnings": [],
       "question": "இந்த பங்கு விலை உயர்வு பற்றி நீங்கள் என்ன நினைக்கிறீர்கள்?",
       "created_at": "2026-11-02T16:40:00.868434+00:00"
+    },
+    {
+      "company": "How Madoff fooled everyone",
+      "angle": "How did Bernie Madoff keep his fraud hidden for decades?",
+      "title": "Madoff Fooled Tamil | பெர்னி மடோப்பின் மிகப்பெரிய மோசடி",
+      "region": "US",
+      "language": "ta",
+      "video_id": "MHNM3HTFVwU",
+      "kind": "short",
+      "source": "2026-11-03-short-how-madoff-fooled-everyone",
+      "warnings": [],
+      "question": "இந்த மிகப்பெரிய மோசடியை இவ்வளவு காலம் கண்டுபிடிக்க முடியாமல் போனது ஏன்?",
+      "created_at": "2026-11-03T12:29:34.527490+00:00"
+    },
+    {
+      "company": "LiveWire stock",
+      "angle": "Why did LiveWire stock plunge over 40%?",
+      "title": "Livewire Stock | லைவ்யூர் பங்கு விலை 40% சரிவு ஏன்?",
+      "region": "MARKETS",
+      "language": "ta",
+      "video_id": "6u9or8fo3YM",
+      "kind": "short",
+      "source": "2026-11-03-short-livewire-stock",
+      "warnings": [],
+      "question": "இந்த மின்சார மோட்டார் சைக்கிள் நிறுவனம் மீண்டு வருமா?",
+      "created_at": "2026-11-03T12:41:56.074766+00:00"
+    },
+    {
+      "company": "Rising cost of living",
+      "angle": "Why do groceries still cost so much in the US, and who is actually getting the money?",
+      "title": "Rising Cost of Living USA | அமெரிக்காவில் விலைவாசி உயர்வது ஏன் உண்மையான காரணம் என்ன",
+      "region": "US",
+      "language": "ta",
+      "video_id": "CE2Eo78ZJTI",
+      "kind": "long",
+      "source": "2026-11-03-rising-cost-of-living",
+      "warnings": [
+        "Long video is only 7.7 min, under 8: no mid-roll ads on it"
+      ],
+      "question": "உங்கள் குடும்பத்தில் விலைவாசி உயர்வை எவ்வாறு சமாளிக்கிறீர்கள்?",
+      "created_at": "2026-11-03T15:29:44.174832+00:00"
     }
   ],
   "rejected_topics": [],
