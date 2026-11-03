@@ -852,7 +852,8 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-02T15:59:18.703616+00:00"
+      "created_at": "2026-11-02T15:59:18.703616+00:00",
+      "commented": true
     },
     {
       "company": "Gas prices",
@@ -868,6 +869,56 @@
       "title_style": "search",
       "queue": "shorts:Gas prices",
       "created_at": "2026-11-02T16:03:09.420207+00:00"
+    },
+    {
+      "company": "Rising cost of living",
+      "angle": "Why do groceries still cost so much in the US, and who is actually getting the money?",
+      "title": "Why Are Groceries So Expensive in the US? The Real Reason",
+      "region": "US",
+      "language": "en",
+      "video_id": "X_RJbVpSeZ4",
+      "short_ids": [],
+      "kind": "long",
+      "question": "Has the rising price of childcare changed your family or work plans?",
+      "title_style": "search",
+      "queue": "long:Rising cost of living",
+      "evergreen": "",
+      "history": "",
+      "runtime": "7:40",
+      "warnings": [
+        "Long video is only 7.7 min, under 8: no mid-roll ads on it"
+      ],
+      "created_at": "2026-11-03T12:05:52.640499+00:00"
+    },
+    {
+      "company": "LiveWire stock",
+      "angle": "Why did LiveWire stock plunge over 40%?",
+      "title": "Why Did LiveWire Stock Plunge 40%? #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "hai4CCssKAI",
+      "kind": "short",
+      "warnings": [],
+      "question": "What is the biggest red flag you look for before buying a company stock?",
+      "parent_url": "",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-03T12:09:05.062483+00:00"
+    },
+    {
+      "company": "How Madoff fooled everyone",
+      "angle": "How did Bernie Madoff keep his fraud hidden for decades?",
+      "title": "How Did Madoff Fool Everyone? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "JmRvW9AJDSM",
+      "kind": "short",
+      "warnings": [],
+      "question": "What red flags would make you pull your money out of an investment?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "shorts:How Madoff fooled everyone",
+      "created_at": "2026-11-03T12:12:28.027839+00:00"
     }
   ],
   "rejected_topics": [],
