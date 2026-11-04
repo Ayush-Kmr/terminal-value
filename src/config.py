@@ -63,7 +63,16 @@ def portrait(cfg: Config) -> Config:
     import copy
 
     out = Config(copy.deepcopy(dict(cfg)))
-    out.setdefault("visuals", {})["resolution"] = [1080, 1920]
+    vis = out.setdefault("visuals", {})
+    vis["resolution"] = [1080, 1920]
+    # Shorts have their own style (visuals.short_style), palette and fonts.
+    # A channel drawing its own script (fonts.caption, e.g. Tamil) keeps its fonts.
+    if vis.get("short_style"):
+        vis["style"] = vis["short_style"]
+    vis["palette"] = {**(vis.get("palette") or {}), **(vis.get("short_palette") or {})}
+    if vis.get("short_fonts") and not (vis.get("fonts") or {}).get("caption"):
+        vis["fonts"] = {**(vis.get("fonts") or {}), **vis["short_fonts"]}
+        vis["font_weights"] = vis.get("short_font_weights") or {}
     return out
 
 

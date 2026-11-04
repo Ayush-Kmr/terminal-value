@@ -60,6 +60,8 @@ def _headline_plate(cfg: Config, title: str, out: Path, series: str = "") -> Pat
 
     vcfg = cfg.get("visuals", {})
     pal = vcfg.get("palette", {})
+    if vcfg.get("style") == "caption_news":
+        return _caption_news_plate(cfg, title, out, series)
     img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     font, lines, size = _fit(d, vcfg, "display", title.upper(), 900, 84, 52, max_lines=3)
@@ -81,10 +83,58 @@ def _headline_plate(cfg: Config, title: str, out: Path, series: str = "") -> Pat
     return out
 
 
+def _caption_news_plate(cfg: Config, title: str, out: Path, series: str = "") -> Path:
+    """Caption News, 9:16: the channel bug (a honey block) in the top safe area,
+    the headline under it in heavy ivory type, a dark shade at the foot so the
+    captions read on any picture."""
+    import numpy as np
+    from PIL import Image, ImageDraw, ImageFilter
+
+    from .visuals.motion import _fit, _font
+
+    vcfg = cfg.get("visuals", {})
+    pal = vcfg.get("palette", {})
+    ink, honey = pal.get("ink", "#F7F5EF"), pal.get("accent", "#FFC21A")
+    img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
+    a = np.zeros((1920, 1080), dtype="float32")
+    a[:560] = (np.linspace(1, 0, 560) ** 1.2 * 0.62)[:, None]  # under the bug and headline
+    a[1300:] = (np.linspace(0, 1, 620) ** 1.3 * 0.78)[:, None]  # under the captions
+    shade = np.zeros((1920, 1080, 4), dtype="uint8")
+    shade[..., 3] = (a * 255).astype("uint8")
+    img.alpha_composite(Image.fromarray(shade))
+    d = ImageDraw.Draw(img)
+
+    name = (cfg.get_path("visuals.labels.wordmark") or cfg.get_path("channel.name", "")).upper()
+    fb = _font(vcfg, "display", 30)
+    bw = d.textlength(name, font=fb) + 36
+    d.rectangle([84, 128, 84 + bw, 174], fill=honey)
+    d.text((84 + 18, 151), name, font=fb, fill="#0E0E0C", anchor="lm")
+
+    font, lines, size = _fit(d, vcfg, "display", title.upper(), 912, 78, 50, max_lines=3)
+    line_h = int(size * 1.08)
+    text = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    td = ImageDraw.Draw(text)
+    y = 200
+    for line in lines:
+        td.text((84, y), line, font=font, fill=ink)
+        y += line_h
+    if series:
+        small = _font(vcfg, "mono", 28)
+        for n, row in enumerate((f"SERIES: {series.upper()}", "FOLLOW FOR THE NEXT ONE")):
+            td.text((84, y + 14 + n * 40), row, font=small, fill=honey if n == 0 else ink)
+    shadow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    shadow.putalpha(text.getchannel("A").point(lambda v: int(v * 0.8)))
+    img.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(10)))
+    img.alpha_composite(text)
+    img.save(out)
+    return out
+
+
 def finish(cfg: Config, video: Path, out: Path, title: str, max_seconds: float = 58.0,
            shots: list[dict] | None = None, series: str = "") -> Path:
     """Lay the headline and the word-by-word captions over a vertical cut and
     cap it at Shorts length."""
+    cfg = portrait(cfg)                 # the Shorts style, palette and fonts
     plate = _headline_plate(cfg, title, out.with_suffix(".png"), series)
     track = captions.overlay(cfg, shots, (1080, 1920), out.parent / f"{out.stem}_cc") \
         if shots else None

@@ -212,20 +212,49 @@ viral:
 # ---------- visual system ----------
 # Motion graphics first. AI video is a garnish, not the meal.
 visuals:
+  # The look follows two styles of the Lemo-Opuscar library
+  # (github.com/lemomo-ai/lemo-opuscar, MIT), rebuilt here in Python so it runs
+  # in the daily job: "Broadcast News Package" for long videos (ink frame, one
+  # lemon accent, a bug top right, a headline strap that never leaves, band
+  # wipes between sections, duotone plates) and "Caption News" for Shorts
+  # (ledger cards, huge captions with one keyword on a honey block, hard cuts).
+  # classic = the channel's earlier look.
+  style: news_package
+  short_style: caption_news
   resolution: [1920, 1080]
   fps: 30
-  palette:
-    bg:      "#0E1116"
-    surface: "#161B22"
-    ink:     "#F2F4F7"
-    muted:   "#8B949E"
-    accent:  "#E8B931"        # one accent colour, used sparingly, is a brand
-    danger:  "#D1485A"
+  palette:                     # News Package
+    bg:      "#121417"        # ink
+    surface: "#1B1E23"        # ink2: cards
+    surface2: "#22262C"       # ink3
+    ink:     "#F4F1E8"        # paper: text on ink
+    paper:   "#F4F1E8"        # strap, documents, the chart line
+    muted:   "#A39C86"
+    accent:  "#F2CF1D"        # lemon: plate, tabs, wipes, bars, stamps
+    gold:    "#D4B064"        # datelines, source lines, rules
+    olive:   "#6E5A1E"        # secondary text on paper (gold is too weak there)
+    # Red is kept for BREAKING only, so a falling number stays in the accent.
+    danger:  "#F2CF1D"
   fonts:
-    display: "assets/fonts/Archivo-Black.ttf"
-    body:    "assets/fonts/Inter-Regular.ttf"
-    mono:    "assets/fonts/JetBrainsMono-Regular.ttf"
-  grain: 0.035                 # film grain overlay; makes stock + AI blend together
+    display: "assets/fonts/BarlowCondensed-ExtraBold.ttf"
+    body:    "assets/fonts/BarlowCondensed-SemiBold.ttf"
+    mono:    "assets/fonts/IBMPlexMono-Medium.ttf"
+  short_palette:               # Caption News, laid over palette for Shorts
+    bg:      "#151512"        # the ledger sheet
+    surface: "#1E1E1A"
+    ink:     "#F7F5EF"        # ivory
+    paper:   "#F7F5EF"
+    muted:   "#8D8B83"
+    dim:     "#5E5C55"
+    accent:  "#FFC21A"        # honey: the point, gains, the keyword block
+    gold:    "#FFC21A"
+    danger:  "#FF4A3D"        # losses, the bad number
+  short_fonts:                 # not used by a channel that sets fonts.caption (Tamil)
+    display: "assets/fonts/InterTight-Variable.ttf"
+    body:    "assets/fonts/InterTight-Variable.ttf"
+    mono:    "assets/fonts/IBMPlexMono-Medium.ttf"
+  short_font_weights: {display: Black, body: SemiBold}
+  grain: 0                     # graphics are never grained; plates get their own grain
   lower_thirds: true           # caption plate over photographs and clips
   shot_seconds: [4, 9]         # min/max per shot. Under 4s reads as slop.
   ai_video:

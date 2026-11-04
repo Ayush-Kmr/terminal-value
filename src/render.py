@@ -20,6 +20,7 @@ from .visuals import motion
 log = logging.getLogger(__name__)
 
 XFADE = 0.4       # seconds each shot overlaps the next
+WIPE = 0.3        # News Package band wipe between sections
 # Cycled so no two neighbouring cuts match; a new section gets its own move.
 CUTS_WIDE = ("fade", "slideleft", "smoothleft", "circleopen", "wipeleft", "fade",
              "slideright", "zoomin")
@@ -46,6 +47,68 @@ def _size(cfg: Config) -> tuple[int, int, int]:
     return int(w), int(h), int(cfg.get_path("visuals.fps", 30))
 
 
+def _style(cfg: Config) -> str:
+    return str(cfg.get_path("visuals.style", "classic"))
+
+
+def _packaged(cfg: Config) -> bool:
+    """Long videos in the News Package style carry the strap, bug and tabs."""
+    w, h, _ = _size(cfg)
+    return _style(cfg) == motion.NEWS and w > h
+
+
+# Photographs and clips are graded to the style. News Package: one duotone
+# (ink to paper) for every plate with a little grain, so stock, archive and AI
+# pictures read as one set; Caption News: a light, slightly warm grade.
+GRADES = {
+    motion.NEWS: ("format=gray,eq=contrast=1.22:gamma=1.05:brightness=-0.02,format=rgb24,"
+                  "lutrgb=r='14+val*222/255':g='16+val*215/255':b='19+val*197/255',"
+                  "vignette=PI/4.6,noise=alls=7:allf=t"),
+    motion.CAPTION: ("eq=contrast=1.07:saturation=0.92:brightness=-0.02,"
+                     "colorbalance=rs=0.04:gs=0.01:bs=-0.03,vignette=PI/6"),
+}
+
+
+def _grade(cfg: Config) -> str:
+    return GRADES.get(_style(cfg), "eq=contrast=1.05:saturation=1.05,vignette=PI/6")
+
+
+def _labels(cfg: Config) -> dict[str, str]:
+    """Beat id -> its label, from every spine in the config (for the strap tab)."""
+    out: dict[str, str] = {}
+    for key in ("structure.beats", "structure.history_beats", "structure.biography_beats"):
+        for b in cfg.get_path(key, []) or []:
+            out.setdefault(b.get("id"), b.get("label", ""))
+    return out
+
+
+def _package(shot: dict, prev: dict | None, cfg: Config, dest: Path, headline: str) -> Path | None:
+    """The News Package layer for one shot, as a frame sequence."""
+    try:
+        spec = shot.get("visual_spec") or {}
+        picture = shot.get("visual_type") in {"photo", "ai_still"} or \
+            str(shot.get("asset", "")).lower().endswith(".mp4")
+        line = (spec.get("headline") or "") if picture else ""
+        prev_spec = (prev or {}).get("visual_spec") or {}
+        prev_line = (prev_spec.get("headline") or "") if prev and (
+            prev.get("visual_type") in {"photo", "ai_still"}
+            or str(prev.get("asset", "")).lower().endswith(".mp4")) else ""
+        labels = _labels(cfg)
+        vis = {**cfg.get("visuals", {}), "wordmark": cfg.get_path("visuals.labels.wordmark")
+               or cfg.get_path("channel.name", "")}
+        png = motion.package(
+            vis, dest.with_name(dest.stem + "_pkg.png"),
+            headline=headline, tab=labels.get(shot.get("beat"), ""), line=line,
+            source=str(spec.get("caption") or ""),
+            tag="Illustration · AI-generated" if shot.get("visual_type") == "ai_still" else "",
+            enter=prev is None, new_tab=bool(prev) and prev.get("beat") != shot.get("beat"),
+            new_line=line != prev_line)
+        return motion.frames_dir(png)
+    except Exception as exc:  # noqa: BLE001 - a missing strap must not lose the shot
+        log.warning("Package layer failed for shot %s: %s", shot.get("index"), exc)
+        return None
+
+
 def _encode(inputs: list[str], graph: str, seconds: float, fps: int, dest: Path) -> Path:
     _run(["ffmpeg", "-y", *inputs, "-filter_complex", graph, "-map", "[v]",
           "-t", f"{seconds:.3f}", "-r", str(fps), "-an", "-c:v", "libx264",
@@ -58,7 +121,8 @@ def _plate(shot: dict, cfg: Config, dest: Path) -> Path | None:
     text = (shot.get("visual_spec") or {}).get("headline", "")
     w, h, _ = _size(cfg)
     # Shorts carry word captions in the same band; two texts there collide.
-    if not text or h > w or not cfg.get_path("visuals.lower_thirds", True):
+    # In the News Package the strap carries the line instead.
+    if not text or h > w or _packaged(cfg) or not cfg.get_path("visuals.lower_thirds", True):
         return None
     try:
         vis = {**cfg.get("visuals", {})}
@@ -95,13 +159,14 @@ def _ken_burns(src: Path, dest: Path, seconds: float, cfg: Config, seed: int,
         f"[0:v]scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
         f"crop={w*2}:{h*2},"
         f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={w}x{h}:fps={fps},"
-        f"eq=contrast=1.05:saturation=1.05,vignette=PI/6[pic]"
+        f"{_grade(cfg)}[pic]"
     )
     inputs, graph = _with_plate(["-loop", "1", "-i", str(src)], graph, plate, fps)
     return _encode(inputs, graph, seconds, fps, dest)
 
 
-def _card_clip(frames: Path, dest: Path, seconds: float, cfg: Config) -> Path:
+def _card_clip(frames: Path, dest: Path, seconds: float, cfg: Config,
+               plate: Path | None = None) -> Path:
     """Play a card's entrance, then hold the finished frame with a slow push
     so it never sits completely still under the narration."""
     w, h, fps = _size(cfg)
@@ -109,22 +174,24 @@ def _card_clip(frames: Path, dest: Path, seconds: float, cfg: Config) -> Path:
         f"[0:v]tpad=stop_mode=clone:stop_duration={seconds + 1:.2f},"
         f"scale={w*2}:{h*2}:flags=bilinear,"
         f"zoompan=z='min(1+0.0006*on,1.08)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        f":d=1:s={w}x{h}:fps={fps},format=yuv420p[v]"
+        f":d=1:s={w}x{h}:fps={fps}[pic]"
     )
-    return _encode(["-framerate", str(fps), "-i", str(frames / "f_%03d.png")],
-                   graph, seconds, fps, dest)
+    inputs, graph = _with_plate(["-framerate", str(fps), "-i", str(frames / "f_%03d.png")],
+                                graph, plate, fps)
+    return _encode(inputs, graph, seconds, fps, dest)
 
 
-def _still_clip(src: Path, dest: Path, seconds: float, cfg: Config) -> Path:
+def _still_clip(src: Path, dest: Path, seconds: float, cfg: Config,
+                plate: Path | None = None) -> Path:
     """A card with no entrance sequence: near-imperceptible push only."""
     w, h, fps = _size(cfg)
     frames = max(int(seconds * fps), 1)
     graph = (
         f"[0:v]scale={w}:{h},zoompan=z='min(1.0+0.0006*on,1.025)':"
-        f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={w}x{h}:fps={fps},"
-        f"format=yuv420p[v]"
+        f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={w}x{h}:fps={fps}[pic]"
     )
-    return _encode(["-loop", "1", "-i", str(src)], graph, seconds, fps, dest)
+    inputs, graph = _with_plate(["-loop", "1", "-i", str(src)], graph, plate, fps)
+    return _encode(inputs, graph, seconds, fps, dest)
 
 
 def _trim_video(src: Path, dest: Path, seconds: float, cfg: Config,
@@ -133,19 +200,23 @@ def _trim_video(src: Path, dest: Path, seconds: float, cfg: Config,
     w, h, fps = _size(cfg)
     graph = (
         f"[0:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
-        f"fps={fps},eq=saturation=1.02:contrast=1.05,vignette=PI/6[pic]"
+        f"fps={fps},{_grade(cfg)}[pic]"
     )
     inputs, graph = _with_plate(["-stream_loop", "-1", "-i", str(src)], graph, plate, fps)
     return _encode(inputs, graph, seconds, fps, dest)
 
 
-def build_shot_clips(cfg: Config, shots: list[dict], workdir: Path) -> list[Path]:
+def build_shot_clips(cfg: Config, shots: list[dict], workdir: Path,
+                     headline: str = "") -> list[Path]:
     """One clip per shot. Each runs XFADE longer than the shot so it can
     dissolve into the next; shots that produce no clip are marked so the
-    join stays in step with the narration."""
+    join stays in step with the narration. `headline` goes on the News
+    Package strap (long videos)."""
     clips_dir = workdir / "clips"
     clips_dir.mkdir(parents=True, exist_ok=True)
     clips: list[Path] = []
+    packaged = _packaged(cfg)
+    prev: dict | None = None
 
     for shot in shots:
         dest = clips_dir / f"clip_{shot['index']:03d}.mp4"
@@ -161,18 +232,19 @@ def build_shot_clips(cfg: Config, shots: list[dict], workdir: Path) -> list[Path
             continue
 
         frames = motion.frames_dir(asset)
+        plate = _package(shot, prev, cfg, dest, headline) if packaged else _plate(shot, cfg, dest)
         if asset.suffix.lower() == ".mp4":
-            _trim_video(asset, dest, seconds, cfg, _plate(shot, cfg, dest))
+            _trim_video(asset, dest, seconds, cfg, plate)
         elif shot.get("visual_type") in {"photo", "ai_still"} and not frames:
-            _ken_burns(asset, dest, seconds, cfg, seed=shot["index"],
-                       plate=_plate(shot, cfg, dest))
+            _ken_burns(asset, dest, seconds, cfg, seed=shot["index"], plate=plate)
         elif frames:
-            _card_clip(frames, dest, seconds, cfg)
+            _card_clip(frames, dest, seconds, cfg, plate if packaged else None)
         else:
-            _still_clip(asset, dest, seconds, cfg)
+            _still_clip(asset, dest, seconds, cfg, plate if packaged else None)
 
         shot["clip"] = str(dest)
         clips.append(dest)
+        prev = shot
     return clips
 
 
@@ -222,13 +294,38 @@ def _join(cfg: Config, shots: list[dict], workdir: Path) -> Path:
         t += float(shot.get("duration", 5.0))
     cuts = CUTS_TALL if h > w else CUTS_WIDE
     move = "smoothup" if h > w else "smoothleft"
+    style = _style(cfg)
+    # News Package: hard cuts inside a section, a band wipe between sections.
+    # Caption News: hard cuts only. Classic: dissolves and slides.
+    hard = 1.0 / fps
+    wipes: list[float] = []
     last = "c0"
     for i in range(1, len(used)):
         new_beat = used[i].get("beat") != used[i - 1].get("beat")
-        parts.append(
-            f"[{last}][c{i}]xfade=transition={move if new_beat else cuts[i % len(cuts)]}"
-            f":duration={XFADE}:offset={starts[used[i]['index']]:.3f}[x{i}]")
+        at = starts[used[i]["index"]]
+        if style == motion.NEWS and w > h:
+            kind, dur = ("wipeleft", WIPE) if new_beat else ("fade", hard)
+            if new_beat:
+                wipes.append(at)
+        elif style == motion.CAPTION:
+            kind, dur = "fade", hard
+        else:
+            kind, dur = (move if new_beat else cuts[i % len(cuts)]), XFADE
+        parts.append(f"[{last}][c{i}]xfade=transition={kind}:duration={dur:.3f}"
+                     f":offset={at:.3f}[x{i}]")
         last = f"x{i}"
+    if wipes:
+        # The band rides the wipe's edge, which moves right to left.
+        band = motion.band(cfg.get("visuals", {}), workdir / "band.png")
+        n = len(used)
+        inputs += ["-loop", "1", "-i", str(band)]
+        parts.append(f"[{n}:v]split={len(wipes)}" + "".join(f"[b{j}]" for j in range(len(wipes))))
+        lead = int(14 * h / 1080)
+        for j, at in enumerate(wipes):
+            parts.append(
+                f"[{last}][b{j}]overlay=x='{w}*(1-(t-{at:.3f})/{WIPE})-{lead}':y=0:"
+                f"enable='between(t,{at:.3f},{at + WIPE:.3f})':eof_action=pass[w{j}]")
+            last = f"w{j}"
     _run(["ffmpeg", "-y", *inputs, "-filter_complex", ";".join(parts), "-map", f"[{last}]",
           "-t", f"{total:.3f}", "-r", str(fps), "-c:v", "libx264", "-preset", "medium",
           "-crf", "19", "-pix_fmt", "yuv420p", str(silent)])

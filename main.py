@@ -89,7 +89,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     credits = assets.gather(cfg, shot_list, workdir, company)
 
     # ---- render ---------------------------------------------------------
-    clips = render.build_shot_clips(cfg, shot_list, workdir)
+    clips = render.build_shot_clips(cfg, shot_list, workdir,
+                                    headline=story.get("title") or company)
     video = render.concat_with_audio(cfg, clips, shot_list, workdir,
                                      render.pick_music(cfg, company))
     save_shots(shot_list, workdir)

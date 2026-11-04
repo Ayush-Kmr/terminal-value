@@ -103,6 +103,9 @@ format:
     publish_times: ["09:00", "21:00"]
 
 visuals:
+  # Tamil long videos keep the earlier layout: the News Package strap and tabs
+  # are set in English. Tamil Shorts use Caption News in the Tamil font.
+  style: classic
   fonts:                       # every text on every card, in Tamil (OFL)
     display: "assets/fonts/NotoSansTamil-Bold.ttf"
     body:    "assets/fonts/NotoSansTamil-Bold.ttf"

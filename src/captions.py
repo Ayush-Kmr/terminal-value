@@ -16,9 +16,9 @@ import re
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageDraw, features
+from PIL import Image, ImageDraw, ImageFilter, features
 
-from .config import Config, latin_only
+from .config import Config, latin_only, portrait
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +77,71 @@ def native_script(cfg: Config) -> bool:
     return bool(font) and features.check("raqm")
 
 
+def _keyword(words: list[str]) -> int | None:
+    """Caption News puts one word per caption on the honey block: a figure if
+    there is one, else the longest long word."""
+    for i, w in enumerate(words):
+        if re.search(r"\d", w):
+            return i
+    longest = max(range(len(words)), key=lambda i: len(words[i]), default=None)
+    return longest if longest is not None and len(words[longest].strip(".,?!")) >= 6 else None
+
+
+def _draw_slam(cfg: Config, size: tuple[int, int], words: list[str], key: int | None,
+               y_frac: float, scale: float = 1.0) -> Image.Image:
+    """Caption News: the chunk in ivory heavy type with a soft dark shadow, one
+    keyword in ink on a honey block; `scale` > 1 for the frames of the slam."""
+    from .visuals.motion import _font
+
+    w, h = size
+    vcfg = cfg.get("visuals", {})
+    pal = vcfg.get("palette", {})
+    native = native_script(cfg)
+    clean = [x.strip("\"'“”‘’") if native else latin_only(x).upper().strip("\"'“”‘’") or "·"
+             for x in words]
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    pt = int(w * (0.075 if native else 0.092))
+    while True:
+        font = _font(vcfg, "caption" if native else "display", pt)
+        space = d.textlength(" ", font=font)
+        widths = [d.textlength(x, font=font) for x in clean]
+        total = sum(widths) + space * (len(clean) - 1)
+        if total <= w * 0.84 or pt < 40:
+            break
+        pt = int(pt * 0.92)
+    if scale != 1.0:
+        pt2 = int(pt * scale)
+        font = _font(vcfg, "caption" if native else "display", pt2)
+        space = d.textlength(" ", font=font)
+        widths = [d.textlength(x, font=font) for x in clean]
+        total = sum(widths) + space * (len(clean) - 1)
+    gap = int(font.size * 0.14) if key is not None else 0     # room for the block
+    x, y = (w - total - 2 * gap) / 2, h * y_frac
+    shadow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    sdw = ImageDraw.Draw(shadow)
+    text = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    td = ImageDraw.Draw(text)
+    for i, (word, ww) in enumerate(zip(clean, widths)):
+        if i == key:
+            x += gap
+            bb = td.textbbox((x, y), word, font=font, anchor="lm")
+            pad = int(font.size * 0.14)
+            td.rectangle([bb[0] - pad, bb[1] - pad, bb[2] + pad, bb[3] + pad],
+                         fill=pal.get("accent", "#FFC21A"))
+            td.text((x, y), word, font=font, fill="#0E0E0C", anchor="lm")
+            sdw.rectangle([bb[0] - pad, bb[1] - pad, bb[2] + pad, bb[3] + pad], fill=(0, 0, 0, 150))
+            x += gap
+        else:
+            sdw.text((x, y), word, font=font, fill=(0, 0, 0, 200), anchor="lm")
+            td.text((x, y), word, font=font, fill=pal.get("ink", "#F7F5EF"), anchor="lm",
+                    stroke_width=max(2, font.size // 40), stroke_fill="#0E0E0C")
+        x += ww + space
+    img.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(max(6, pt // 6))))
+    img.alpha_composite(text)
+    return img
+
+
 def _draw(cfg: Config, size: tuple[int, int], words: list[str], active: int,
           y_frac: float) -> Image.Image:
     from .visuals.motion import _font
@@ -111,6 +176,7 @@ def _draw(cfg: Config, size: tuple[int, int], words: list[str], active: int,
 def overlay(cfg: Config, shots: list[dict], size: tuple[int, int], workdir: Path,
             y_frac: float = 0.79) -> Path | None:
     """A transparent caption track the length of the narration."""
+    cfg = portrait(cfg)                 # the Shorts style, palette and fonts
     words = timeline(shots)
     if not native_script(cfg) and not any(latin_only(w[0]) for w in words):
         # Narration in a script the fonts cannot draw: no captions rather
@@ -128,7 +194,27 @@ def overlay(cfg: Config, shots: list[dict], size: tuple[int, int], workdir: Path
     events: list[tuple[Path, float]] = []      # (image, seconds shown)
     t = 0.0
     n = 0
-    for group in _groups(words):
+    if cfg.get_path("visuals.style") == "caption_news":
+        # A whole chunk at a time, slammed in (1.3x -> 1x over ~0.13 s).
+        for group in _groups(words):
+            texts = [g[0] for g in group]
+            start, end = group[0][1], group[-1][2]
+            if start > t + 0.02:
+                events.append((blank, start - t))
+                t = start
+            key = _keyword(texts)
+            for scale in (1.3, 1.12, 1.03):
+                png = frames / f"c_{n:04d}.png"
+                _draw_slam(cfg, size, texts, key, y_frac, scale).save(png)
+                n += 1
+                events.append((png, 1 / 30))
+                t += 1 / 30
+            png = frames / f"c_{n:04d}.png"
+            _draw_slam(cfg, size, texts, key, y_frac).save(png)
+            n += 1
+            events.append((png, max(end - t, 0.04)))
+            t = max(end, t + 0.04)
+    for group in (_groups(words) if not events else []):
         texts = [g[0] for g in group]
         for i, (_, start, end) in enumerate(group):
             if start > t + 0.02:
