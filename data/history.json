@@ -337,7 +337,7 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 201,
+        "views": 209,
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 109,
@@ -597,7 +597,7 @@
       ],
       "created_at": "2026-10-28T11:41:57.269368+00:00",
       "stats": {
-        "views": 3,
+        "views": 4,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 45,
@@ -654,7 +654,7 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 256,
+        "views": 258,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 25,
@@ -695,7 +695,7 @@
       "warnings": [],
       "created_at": "2026-10-30T12:23:32.688274+00:00",
       "stats": {
-        "views": 46,
+        "views": 48,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 89,
@@ -887,7 +887,7 @@
       "queue": "shorts:Gas prices",
       "created_at": "2026-11-02T16:03:09.420207+00:00",
       "stats": {
-        "views": 54,
+        "views": 57,
         "likes": 0,
         "comments": 0
       },
@@ -913,9 +913,9 @@
       ],
       "created_at": "2026-11-03T12:05:52.640499+00:00",
       "stats": {
-        "views": 2,
+        "views": 3,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -934,9 +934,9 @@
       "queue": "",
       "created_at": "2026-11-03T12:09:05.062483+00:00",
       "stats": {
-        "views": 29,
+        "views": 31,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -955,9 +955,9 @@
       "queue": "shorts:How Madoff fooled everyone",
       "created_at": "2026-11-03T12:12:28.027839+00:00",
       "stats": {
-        "views": 24,
+        "views": 31,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -975,7 +975,12 @@
       "title_style": "curious",
       "queue": "",
       "created_at": "2026-11-04T06:02:41.107366+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 23,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Bernie Madoff",
@@ -995,7 +1000,12 @@
       "warnings": [
         "Long video is only 4.7 min, under the 5-minute floor"
       ],
-      "created_at": "2026-11-04T06:45:27.312371+00:00"
+      "created_at": "2026-11-04T06:45:27.312371+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Kalshi",
@@ -1010,9 +1020,14 @@
       "parent_url": "",
       "title_style": "curious",
       "queue": "shorts:Kalshi",
-      "created_at": "2026-11-04T06:47:48.531315+00:00"
+      "created_at": "2026-11-04T06:47:48.531315+00:00",
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 59.0
+  "channel_median_views": 55.0
 }
