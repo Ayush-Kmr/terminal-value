@@ -1,15 +1,15 @@
 Welcome back to another edition of business news made simple.
 
-**Who Actually Pays Tariffs?**
-Customs officers collect import duties directly from American businesses across 328 ports of entry, rather than billing foreign governments. These domestic importers generally pass the added expenses to consumers through higher retail prices across the country. 
-Watch: [https://youtu.be/SGAiWX_Tuxg](https://youtu.be/SGAiWX_Tuxg)
+**Tariffs Explained: Who Actually Pays**
+Customs officers collect import duties directly from American businesses across 328 ports of entry, rather than billing foreign governments. These domestic importers generally pass the added expenses to consumers through higher retail prices across the country. This directly impacts your everyday household budget when shopping. 
+Watch: https://youtu.be/SGAiWX_Tuxg
 
-**Why Are Groceries and Living Costs Rising?**
-The rising cost of living in the USA is hitting families hard as childcare costs rose 7.6% and consumer sentiment sank near record lows. This squeeze directly impacts household budgets and everyday purchasing power. 
-Watch: [https://youtu.be/X_RJbVpSeZ4](https://youtu.be/X_RJbVpSeZ4)
+**Why Are Groceries So Expensive in the US?**
+The rising cost of living is hitting families hard as childcare costs rose 7.6% and consumer sentiment sank near record lows. This squeeze on household budgets reflects broader economic pressures affecting everyday Americans. 
+Watch: https://youtu.be/X_RJbVpSeZ4
 
-**The Reality Behind Big Tech's AI Spending**
-Big tech AI infrastructure spending has reached nearly two trillion dollars in total commitments. As a direct result, companies like Alphabet, Meta, and Amazon slipped into negative free cash flow. 
-Watch: [https://youtu.be/bVymaEB_quo](https://youtu.be/bVymaEB_quo)
+**Why Are Eggs Still So Expensive?**
+Egg prices are tied to massive agricultural producers that dominate the multi-billion dollar market. Understanding this corporate side of America's breakfast staple shows how big industry players influence your grocery bill. 
+Watch: https://youtu.be/KMKtnSWw0Ho
 
-Which of these rising costs has impacted your household budget the most lately?
+Which of these rising everyday costs has impacted your family budget the most recently?

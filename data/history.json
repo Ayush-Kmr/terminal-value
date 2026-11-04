@@ -454,7 +454,7 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 112,
+        "views": 113,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
@@ -511,7 +511,7 @@
       "warnings": [],
       "created_at": "2026-10-25T09:32:35.580675+00:00",
       "stats": {
-        "views": 7,
+        "views": 8,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 4,
@@ -654,7 +654,7 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 256,
+        "views": 260,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 25,
@@ -752,7 +752,7 @@
       "warnings": [],
       "created_at": "2026-10-31T10:06:27.130994+00:00",
       "stats": {
-        "views": 222,
+        "views": 223,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 15,
@@ -867,7 +867,7 @@
       "created_at": "2026-11-02T15:59:18.703616+00:00",
       "commented": true,
       "stats": {
-        "views": 72,
+        "views": 73,
         "likes": 1,
         "comments": 1
       }
@@ -1022,7 +1022,7 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 4,
+        "views": 20,
         "likes": 0,
         "comments": 0
       }

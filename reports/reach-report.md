@@ -12,9 +12,9 @@
 | Cyclone Arnab causes and effects: 140 kmph winds #shorts | 411 | 79% | 🔥 outlier |
 | Anthropic IREN deal exposes the massive new data center crun | 375 | 79% | 🔥 outlier |
 | Gold silver price crash marks 4-month record drop #shorts | 301 | 31% | 🔥 outlier |
-| EPFO Minimum Pension Latest News: What Does 20 Years of Serv | 256 | 75% | 🔥 outlier |
+| EPFO Minimum Pension Latest News: What Does 20 Years of Serv | 260 | 75% | 🔥 outlier |
 | Is the AI Bubble About to Pop? #shorts | 230 | 84% | 🔥 outlier |
-| IDBI Bank Recent News on the 60% Stake Sale #shorts | 222 | 41% | 🔥 outlier |
+| IDBI Bank Recent News on the 60% Stake Sale #shorts | 223 | 41% | 🔥 outlier |
 | China CSI 300 drops 20% into a bear market | 210 | 22% | 🔥 outlier |
 | SpaceX Current News on the 40 Billion Dollar Deal #shorts | 173 | 70% | 🔥 outlier |
 | Ladakh standoff: Will 28 new placenames escalate the border  | 170 | 76% | 🔥 outlier |
@@ -23,15 +23,15 @@
 | World Bank India poverty: 134 million jobs added #shorts | 145 | 50% | 🔥 outlier |
 | Why China is blocking 700m a week moles to India | 129 | 36% |  |
 | Dollar General News About the 8.5 Million Deal #shorts | 128 | 52% |  |
+| India Rice Price Hits 100 Rupees as Millers Panic #shorts | 113 | 57% |  |
 | China Restricts 40 Tech Exports in New AI and Solar Crackdow | 113 | 54% |  |
-| India Rice Price Hits 100 Rupees as Millers Panic #shorts | 112 | 57% |  |
 | Will an 8.1 megaquake strike Uttarakhand soon? #shorts | 111 | 62% |  |
-| Elon Musk और Ambani की इस जंग से भारत को क्या मिलेगा? #short | 105 | 75% |  |
+| Elon Musk और Ambani की इस जंग से भारत को क्या मिलेगा? #short | 105 | 75% | 🔒 unlisted |
 | Canada and India trade: 1951 ties shaping today's pivot #sho | 99 | 49% |  |
 | India Russia trade target: Why crude is over 80% #shorts | 94 | 49% |  |
 | Why Are Eggs Still So Expensive? #shorts | 93 | 60% |  |
 | Why China Just Banned Tunnel Machines #shorts | 82 | 49% |  |
-| Inovio Stock Surges 224% in a Day #shorts | 72 | — |  |
+| Inovio Stock Surges 224% in a Day #shorts | 73 | — |  |
 | Vande Bharat sleeper adds 16 new coaches #shorts | 59 | 52% |  |
 | Why Is Gas So Expensive? #shorts | 58 | — |  |
 | Why did tariffs drop to 18% for India? #shorts | 53 | 47% |  |
@@ -48,6 +48,7 @@
 | US-रूस के बीच क्या हुआ गुप्त समझौता? #shorts | 30 | 86% | 🔒 unlisted |
 | Indian newsroom fight: 21 media groups in court #shorts | 28 | 64% |  |
 | Supreme Court Rules Yes Bank Bond Write-Off Illegal #shorts | 27 | 89% |  |
+| How Does Kalshi Actually Make Money? #shorts | 20 | — | ⚠️ retitle candidate |
 | Ather Energy Q2 Results: Can Volume Growth Sustain the New P | 19 | 19% | ⚠️ retitle candidate |
 | Why Arista Networks Stock Moved #shorts | 17 | — | ⚠️ retitle candidate |
 | OpenAI updates: Why valuation hit $1.25 trillion #shorts | 17 | 43% | ⚠️ retitle candidate |
@@ -56,11 +57,10 @@
 | Sugar Ethanol Ban: सरकार ने 20% Blending Target क्यों रोका?  | 13 | 41% | 🔒 unlisted |
 | रूसी तेल पर US का 500% टैरिफ शून्य क्यों हुआ? #shorts | 13 | 77% | 🔒 unlisted |
 | Yes Bank AT1 bond holders win $884 million legal battle | 11 | 16% | ⚠️ retitle candidate |
+| India joins 6G alliance to lower network costs #shorts | 8 | 10% | ⚠️ retitle candidate |
 | सोना गिर रहा था, फिर भी निवेशकों ने क्यों खरीदा? #shorts | 8 | 28% | 🔒 unlisted |
-| India joins 6G alliance to lower network costs #shorts | 7 | 10% | ⚠️ retitle candidate |
 | त्योहारों से ठीक पहले सोने में ₹8,000 की ऐतिहासिक गिरावट! #s | 7 | 15% | 🔒 unlisted |
 | Reliance Jio IPO में $20B की बाढ़ क्यों? #shorts | 5 | 31% | 🔒 unlisted |
-| How Does Kalshi Actually Make Money? #shorts | 4 | — | ⚠️ retitle candidate |
 | Jio IPO Latest News: What the 21 Percent Opening Jump Means  | 4 | 10% | ⚠️ retitle candidate |
 | Gold के दाम 5% टूटे: क्या निवेशकों का रुख अब बदल रहा है? | 4 | 13% | 🔒 unlisted |
 | Why Are Groceries So Expensive in the US? The Real Reason | 3 | — | ⚠️ retitle candidate |
@@ -75,7 +75,7 @@
 
 ## Title styles
 
-- curious: 5 videos, median 17 views
+- curious: 5 videos, median 20 views
 - search: 6 videos, median 44 views
 
 ## Where views came from (28 days)
@@ -99,7 +99,7 @@
 |---|---|---|---|
 | Subscribers | 4 | 500 | 1,000 |
 | Watch hours (12 months) | 5 | 3,000 | 4,000 |
-| Shorts views (90 days) | 4,493 | 3,000,000 | 10,000,000 |
+| Shorts views (90 days) | 4,491 | 3,000,000 | 10,000,000 |
 
 Each tier needs its subscribers plus either the hours or the Shorts views. Watch hours here exclude Shorts.
 

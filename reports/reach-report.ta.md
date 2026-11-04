@@ -36,16 +36,6 @@
 | Direct / unknown | 1 | 0% | 0 |
 | Other YouTube pages | 1 | 0% | 0 |
 
-## Road to monetisation
-
-| Target | Now | Lower tier | Full tier |
-|---|---|---|---|
-| Subscribers | 2 | 500 | 1,000 |
-| Watch hours (12 months) | 0 | 3,000 | 4,000 |
-| Shorts views (90 days) | 2,334 | 3,000,000 | 10,000,000 |
-
-Each tier needs its subscribers plus either the hours or the Shorts views. Watch hours here exclude Shorts.
-
 ## What to do next
 
 - 2 video(s) under 40% of median. Packaging is the usual cause — try a new thumbnail first, then a new title. Change one at a time.
