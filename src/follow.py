@@ -389,6 +389,9 @@ def run(cfg: Config, root: Path, publish: str = "slot", no_upload: bool = False)
         if str(src_meta.get("region") or "").upper() in skip_regions:
             log.info("Skipping %s: %s story", src.name, src_meta.get("region"))
             continue
+        if "path" not in src_meta and not cfg.get_path("follow.long", True):
+            log.info("Skipping %s: long videos are off for this channel (follow.long)", src.name)
+            continue
         if "path" in src_meta:
             if shorts_taken >= max_shorts:
                 log.info("Skipping %s: already %d Short(s) today", src.name, shorts_taken)

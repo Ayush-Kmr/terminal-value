@@ -37,10 +37,16 @@ Narrator voice:
 {voice}
 
 Each cold open: 65-85 words, spoken aloud in about 30 seconds, in three parts:
-  0-5 seconds: the attention grab.
-  5-15 seconds: what is at stake for the viewer personally, and exactly what they
-  will know by the end. This promise is required.
-  15-30 seconds: why it matters now, ending on what the video answers next.
+  0-5 seconds: ONE short sentence (under 18 words) that names the subject and
+  contains the single most surprising number from the facts. No scene-setting.
+  5-15 seconds: the payoff, said plainly: the exact question this video answers,
+  what the viewer will know by the end, and why it touches their own money,
+  job or prices. This promise is required, and must be finished by word 35.
+  15-30 seconds: one reason it matters right now, ending on the first thing
+  the video shows next, so there is no pause where a viewer could leave.
+No background, history, definitions or "to understand this" before 15 seconds:
+viewers of this channel leave in the first minute when the opening explains
+before it pays off.
 
 Make the five genuinely different in STRATEGY, not just wording:
   1. Open on the single most absurd verifiable number.
@@ -57,11 +63,12 @@ Return JSON array of objects: {{"strategy": "...", "text": "..."}}"""
 SCORE_PROMPT = """Score each cold open 0-100 for a YouTube explainer audience.
 
 Rubric:
-  25  Curiosity gap — does the viewer now need the rest of the video?
+  25  Payoff by 15 seconds — within the first ~35 words, do they know exactly
+      what question is answered and what they will get?
+  20  Curiosity gap — does the viewer now need the rest of the video?
   20  Viewer stake — does it say what this means for the viewer's own money or life?
-  20  Clear promise — within 15 seconds, do they know what they will get?
-  15  Specificity — real numbers, names, dates beat abstractions every time
-  10  Pace — does it get to the point inside the first sentence?
+  15  Specificity — a real number in the FIRST sentence; names and dates beat abstractions
+  10  Pace — no background or context before the payoff
   10  Credibility — does it sound like someone who read the source material?
 
 Deduct 25 points for any rhetorical question. Deduct 20 for stacked adjectives.
@@ -82,13 +89,20 @@ def _penalty(text: str) -> tuple[int, list[str]]:
         if phrase in low:
             score -= 30
             issues.append(f"banned phrase: {phrase!r}")
-    first = text.split(".")[0]
+    # Split on sentence ends, not every dot: "$1.25 trillion" is one sentence.
+    first = re.split(r"(?<=[.!?])\s+", text.strip())[0]
     if first.strip().endswith("?"):
         score -= 25
         issues.append("opens on a rhetorical question")
     if not re.search(r"\d", text):
         score -= 15
         issues.append("no concrete number")
+    elif not re.search(r"\d", first):
+        score -= 10
+        issues.append("no number in the first sentence")
+    if len(first.split()) > 18:
+        score -= 10
+        issues.append(f"first sentence too long ({len(first.split())} words)")
     words = len(text.split())
     if words > 90:
         score -= 10

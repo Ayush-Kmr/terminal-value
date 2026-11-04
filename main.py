@@ -151,7 +151,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     floor = float(cfg.get_path("format.long.min_minutes", 0))
     if floor and runtime < floor * 60:
         warnings = [*warnings, f"Long video is only {runtime / 60:.1f} min, under "
-                               f"{floor:g}: no mid-roll ads on it"]
+                               f"the {floor:g}-minute floor"]
     meta = {
         "company": company, "angle": angle, "title": title,
         "region": region, "language": language, "series": bool(series),
@@ -269,7 +269,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         best["title"] = full if len(full) <= seo.SHORT_TITLE_MAX else f"Why {story['stock']} Stock Moved"
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
-                              headline, best["title"], language)
+                              headline, best["title"], language,
+                              series=upload.title_series(cfg, best["title"]))
     lead = best.get("summary") or fb.summary
     if story.get("parent_url"):
         lead += f"\n\nWatch the full story: {story['parent_url']}"

@@ -1,0 +1,42 @@
+name: Library cleanup
+
+# Unlists every public video in one narration language on the main channel
+# (they keep their views and links) and makes that language's playlist private,
+# then files existing videos into their title-series playlists.
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: "Narration language code"
+        default: hi
+      dry_run:
+        description: "Only list what would change"
+        type: boolean
+        default: true
+
+jobs:
+  unlist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Unlist
+        env:
+          YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          LANG_CODE:        ${{ inputs.language }}
+          DRY:              ${{ inputs.dry_run && '--dry-run' || '' }}
+        run: python scripts/unlist_language.py "$LANG_CODE" $DRY
+      - name: Series playlists
+        if: ${{ !inputs.dry_run }}
+        env:
+          YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python scripts/backfill_series.py

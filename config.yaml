@@ -95,12 +95,15 @@ format:
     every_days: 2               # 2 = a long video on alternate days; 1 = every day
     # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
     # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
-    # Over 8 minutes so the video can carry mid-roll ads once monetised.
     # A video that ends up under min_minutes is reported in Telegram.
     max_shot_words: 20          # longer shots are split, so the picture keeps moving
-    # Near CNBC's 9-minute format, and still over 8 for mid-roll ads.
-    target_minutes: 9
-    min_minutes: 8
+    # 6 minutes while retention is fixed (audit 2026-11-04: 12 long videos held
+    # 16% on average, about 1.5 minutes of a 9-minute video; under 40% YouTube
+    # shows a video less). Mid-roll ads need 8+ minutes but only pay after
+    # monetisation. Go back towards 8 once the average watched is over 30% and
+    # minutes watched per view have held.
+    target_minutes: 6
+    min_minutes: 5
     words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["12:00"]    # ET, channel timezone. A starting point to test
   short:
@@ -360,6 +363,10 @@ upload:
   category_id: 25              # News & Politics
   category_explainer: 27       # Education: history films and evergreen explainers
   series_playlist: "How It Collapsed"   # the history films
+  # Title series: a video whose title matches the pattern joins that playlist,
+  # and its Short carries the series name on screen (src/upload.title_series).
+  title_series:
+    "Why Is It So Expensive?": '^\s*why (is|are) .{2,60}? so expensive'
   made_for_kids: false
   synthetic_media_disclosure: true
   playlists:                   # one playlist per narration language

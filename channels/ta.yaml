@@ -89,8 +89,12 @@ upload:
 # Every story the main channel makes gets a Tamil version.
 follow:
   adapt_to: Tamil Nadu         # viewer-impact lines rewritten for this audience
-  skip_regions: []
-  max_shorts: 2
+  # Audit 2026-11-04: single-stock Shorts (MARKETS) got 0 views here, and the
+  # two Tamil long videos got 3 views in total for ~4.5 runner hours each.
+  # One Short a day until Tamil Shorts average 20+ views, then turn long back on.
+  skip_regions: [MARKETS]
+  max_shorts: 1
+  long: false
 
 format:
   long:

@@ -113,7 +113,45 @@ def drop_off(cfg: Config, videos: list[dict], count: int = 3) -> list[str]:
             if kept:
                 out.append(f"- {v['title'][:60]}: " + ", ".join(kept))
     except Exception as exc:  # noqa: BLE001
-        log.info("Drop-off data unavailable: %s", str(exc)[:160])
+        log.warning("Drop-off data unavailable: %s", str(exc)[:200])
+    return out
+
+
+SOURCE_NAMES = {
+    "YT_SEARCH": "YouTube search", "SHORTS": "Shorts feed", "SUBSCRIBER": "Subscribers",
+    "RELATED_VIDEO": "Suggested videos", "YT_CHANNEL": "Channel page",
+    "YT_OTHER_PAGE": "Other YouTube pages", "EXT_URL": "Outside YouTube",
+    "NO_LINK_OTHER": "Direct / unknown", "PLAYLIST": "Playlists", "NOTIFICATION": "Notifications",
+    "END_SCREEN": "End screens", "HASHTAGS": "Hashtag pages", "SOUND_PAGE": "Sound pages",
+    "BROWSE": "Home & browse", "ANNOTATION": "Cards",
+}
+
+
+def sources(cfg: Config, days: int = 28) -> list[str]:
+    """Where views came from, and subscribers gained, over the last `days`.
+    Impressions and click-through rate are not in the Analytics API (only in
+    Studio and the bulk Reporting API), so they are not here."""
+    from googleapiclient.discovery import build
+
+    try:
+        ya = build("youtubeAnalytics", "v2", credentials=upload.credentials(),
+                   cache_discovery=False)
+        span = dict(ids="channel==MINE", startDate=str(date.today() - timedelta(days=days)),
+                    endDate=str(date.today()))
+        rows = ya.reports().query(**span, metrics="views,estimatedMinutesWatched",
+                                  dimensions="insightTrafficSourceType",
+                                  sort="-views").execute().get("rows", [])
+        subs = ya.reports().query(**span, metrics="subscribersGained,subscribersLost,views"
+                                  ).execute().get("rows", [[0, 0, 0]])[0]
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Traffic sources unavailable: %s", str(exc)[:200])
+        return []
+    total = sum(r[1] for r in rows) or 1
+    out = [f"**Subscribers ({days}d):** +{subs[0]:,} / -{subs[1]:,} "
+           f"({subs[0] / max(subs[2], 1) * 100:.2f}% of {subs[2]:,} views)", "",
+           "| Source | Views | Share | Watch min |", "|---|---|---|---|"]
+    out += [f"| {SOURCE_NAMES.get(r[0], r[0].replace('_', ' ').title())} | {r[1]:,} | "
+            f"{r[1] / total * 100:.0f}% | {r[2]:,.0f} |" for r in rows]
     return out
 
 
@@ -138,7 +176,7 @@ def progress(cfg: Config) -> list[str]:
             dimensions="creatorContentType").execute().get("rows", [])
         shorts = next((r[1] for r in recent if r[0] == "shorts"), 0)
     except Exception as exc:  # noqa: BLE001
-        log.info("Progress unavailable: %s", str(exc)[:160])
+        log.warning("Progress unavailable: %s", str(exc)[:200])
         return []
     return ["| Target | Now | Lower tier | Full tier |", "|---|---|---|---|",
             f"| Subscribers | {subs:,} | 500 | 1,000 |",
@@ -202,6 +240,10 @@ def report(cfg: Config) -> Path:
         lines += ["", "## Title styles", ""]
         lines += [f"- {name}: {len(v)} videos, median {mid(v):,.0f} views"
                   for name, v in sorted(styles.items())]
+
+    came_from = sources(cfg)
+    if came_from:
+        lines += ["", "## Where views came from (28 days)", "", *came_from]
 
     road = progress(cfg)
     if road:

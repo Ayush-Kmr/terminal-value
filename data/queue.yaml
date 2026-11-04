@@ -101,3 +101,30 @@ shorts:
     search_query: "Bernie Madoff Ponzi scheme"
     wiki_title: "Madoff investment scandal"
     keywords: [madoff scheme, bernie madoff]
+  # "Why Is It So Expensive?" series (audit 2026-11-04: the price-explainer
+  # Shorts are the format US viewers keep watching). Joins the series playlist.
+  - topic: "Childcare costs"
+    title: "Why Is Childcare So Expensive?"
+    angle: "Why does childcare cost American families as much as rent?"
+    search_query: "US childcare costs"
+    keywords: [why is childcare so expensive, childcare costs]
+  - topic: "Car insurance prices"
+    title: "Why Is Car Insurance So Expensive Now?"
+    angle: "Why have US car insurance premiums jumped so fast?"
+    search_query: "US car insurance premiums rising"
+    keywords: [why is car insurance so expensive, car insurance rates]
+  - topic: "Coffee prices"
+    title: "Why Is Coffee So Expensive Now?"
+    angle: "What pushed up the price of a cup of coffee in the US?"
+    search_query: "coffee prices US"
+    keywords: [why is coffee so expensive, coffee prices]
+  - topic: "Beef prices"
+    title: "Why Is Beef So Expensive?"
+    angle: "Why are US beef prices at records?"
+    search_query: "US beef prices record"
+    keywords: [why is beef so expensive, beef prices]
+  - topic: "Health insurance costs"
+    title: "Why Is Health Insurance So Expensive in the US?"
+    angle: "Why do Americans pay so much for health insurance?"
+    search_query: "US health insurance premiums"
+    keywords: [why is health insurance so expensive, health insurance cost]

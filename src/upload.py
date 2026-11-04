@@ -175,13 +175,20 @@ def upload_captions(video_id: str, srt: Path, language: str = "en") -> None:
         log.warning("Caption upload failed: %s", exc)
 
 
+# videos.update replaces the whole status part: a field left out is reset, which
+# would drop the AI disclosure (containsSyntheticMedia) and the like.
+KEEP_STATUS = ("embeddable", "license", "publicStatsViewable", "containsSyntheticMedia",
+               "selfDeclaredMadeForKids")
+
+
 def set_privacy(video_id: str, privacy: str) -> None:
     yt = client()
-    yt.videos().update(
-        part="status",
-        body={"id": video_id, "status": {"privacyStatus": privacy,
-                                         "selfDeclaredMadeForKids": False}},
-    ).execute()
+    items = yt.videos().list(part="status", id=video_id).execute().get("items", [])
+    current = items[0]["status"] if items else {}
+    status = {k: current[k] for k in KEEP_STATUS if k in current}
+    status.setdefault("selfDeclaredMadeForKids", False)
+    status["privacyStatus"] = privacy
+    yt.videos().update(part="status", body={"id": video_id, "status": status}).execute()
     log.info("Video %s set to %s", video_id, privacy)
 
 
@@ -231,9 +238,21 @@ def topic_playlists(cfg: Config, *texts: str) -> list[str]:
             if words & {k.lower() for k in keys}]
 
 
+def title_series(cfg: Config, title: str) -> str:
+    """The upload.title_series playlist a title belongs to, or "" (e.g. every
+    "Why Are Eggs So Expensive?" joins "Why Is It So Expensive?")."""
+    for name, pattern in (cfg.get_path("upload.title_series", {}) or {}).items():
+        if re.search(pattern, title or "", re.IGNORECASE):
+            return name
+    return ""
+
+
 def add_to_playlists(cfg: Config, video_id: str, language: str, *texts: str) -> None:
-    """The language playlist plus every matching topic playlist."""
+    """The language playlist, every matching topic playlist, and the title
+    series (matched on the title, the second text)."""
     names = [cfg.get_path(f"upload.playlists.{language}")] + topic_playlists(cfg, *texts)
+    if len(texts) > 1:
+        names.append(title_series(cfg, texts[1]))
     for name in dict.fromkeys(n for n in names if n):
         add_to_playlist(video_id, name)
 

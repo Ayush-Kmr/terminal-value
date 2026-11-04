@@ -50,7 +50,7 @@ def _offset(shots: list[dict], index: int) -> float:
     return sum(float(s.get("duration", 5)) for s in shots if s["index"] < index)
 
 
-def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
+def _headline_plate(cfg: Config, title: str, out: Path, series: str = "") -> Path:
     """Transparent 1080x1920 overlay: the headline, held at the top for the
     whole Short, below where the app draws its own controls. Drawn with
     Pillow so it wraps and uses the brand font."""
@@ -69,6 +69,11 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
         d.text((540, y), line, font=font, fill=pal.get("accent", "#E8B931"), anchor="ma",
                stroke_width=8, stroke_fill="#0B0E13")
         y += line_h
+    if series:      # names the series so a viewer knows there is a next one
+        small = _font(vcfg, "mono", 32, "Bold")
+        for n, text in enumerate((f"SERIES: {series.upper()}", "FOLLOW FOR THE NEXT ONE")):
+            d.text((540, y + 18 + n * 44), text, font=small, fill="#FFFFFF", anchor="ma",
+                   stroke_width=5, stroke_fill="#0B0E13")
     d.text((540, 1920 - 272), (cfg.get_path("visuals.labels.wordmark")
                                or cfg.get_path("channel.name", "")).upper(),
            font=_font(vcfg, "mono", 30, "Bold"), fill=pal.get("muted", "#8B949E"), anchor="ma")
@@ -77,10 +82,10 @@ def _headline_plate(cfg: Config, title: str, out: Path) -> Path:
 
 
 def finish(cfg: Config, video: Path, out: Path, title: str, max_seconds: float = 58.0,
-           shots: list[dict] | None = None) -> Path:
+           shots: list[dict] | None = None, series: str = "") -> Path:
     """Lay the headline and the word-by-word captions over a vertical cut and
     cap it at Shorts length."""
-    plate = _headline_plate(cfg, title, out.with_suffix(".png"))
+    plate = _headline_plate(cfg, title, out.with_suffix(".png"), series)
     track = captions.overlay(cfg, shots, (1080, 1920), out.parent / f"{out.stem}_cc") \
         if shots else None
     inputs = ["-i", str(video), "-i", str(plate)]
@@ -156,14 +161,15 @@ def build_all(cfg: Config, source: Path, shots: list[dict], workdir: Path,
 
 
 def standalone(cfg: Config, video: Path, shots: list[dict], workdir: Path,
-               headline: str, title: str, language: str = "en") -> dict:
+               headline: str, title: str, language: str = "en", series: str = "") -> dict:
     """A Short that is its own story: the video was already rendered 9:16, so
     it only needs its headline."""
     # A channel with its own script draws the headline in it; latin_only would
     # hand the Tamil font an English fallback it has no letters for.
     native = cfg.get_path("visuals.fonts.caption")
     out = finish(cfg, video, workdir / "short.mp4",
-                 headline if native else latin_only(headline) or "EXPLAINED", shots=shots)
+                 headline if native else latin_only(headline) or "EXPLAINED", shots=shots,
+                 series=series)
     return {
         "path": str(out),
         "title": f"{title.strip()[:90]} #shorts",
