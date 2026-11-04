@@ -100,7 +100,9 @@ def _package(shot: dict, prev: dict | None, cfg: Config, dest: Path, headline: s
             vis, dest.with_name(dest.stem + "_pkg.png"),
             headline=headline, tab=labels.get(shot.get("beat"), ""), line=line,
             source=str(spec.get("caption") or ""),
-            tag="Illustration · AI-generated" if shot.get("visual_type") == "ai_still" else "",
+            tag={"ai": "Illustration · AI-generated", "stock": "Illustration · stock image"}.get(
+                shot.get("illustration") or ("ai" if shot.get("visual_type") == "ai_still" else "")
+                if picture else "", ""),
             enter=prev is None, new_tab=bool(prev) and prev.get("beat") != shot.get("beat"),
             new_line=line != prev_line)
         return motion.frames_dir(png)

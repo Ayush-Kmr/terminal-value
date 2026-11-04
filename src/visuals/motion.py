@@ -491,11 +491,16 @@ def quote_card(spec: dict, cfg: dict, out: Path) -> Path:
     text = str(spec.get("quote") or spec.get("headline") or spec.get("value") or "")
     text = text.strip().strip('"“”')
     max_w = (s.right - s.left) * (1.0 if s.portrait else 0.86)
-    font, lines, size = _fit(s.sd, cfg, "body", text, max_w,
-                             s.px(104 if s.style == NEWS else 92), s.px(50),
-                             max_lines=7 if s.portrait else 4, weight="Bold")
-    line_h = int(size * 1.28)
     attr = str(spec.get("caption", "")).strip()
+    start = s.px(104 if s.style == NEWS else 92)
+    room = s.bottom - (s.top + s.px(190)) - (s.px(96) if attr else 0)
+    while True:     # smaller type until the quote fits under its mark and above the strap
+        font, lines, size = _fit(s.sd, cfg, "body", text, max_w, start, s.px(44),
+                                 max_lines=7 if s.portrait else 5, weight="Bold")
+        line_h = int(size * 1.28)
+        if len(lines) * line_h <= room or start <= s.px(48):
+            break
+        start = int(start * 0.9)
     block = len(lines) * line_h + (s.px(96) if attr else 0)
     # The quote mark is drawn above the first line: keep it below the label.
     y = max(s.cy - block / 2 + s.px(40), s.top + s.px(190))

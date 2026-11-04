@@ -101,6 +101,9 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             if found:
                 shot["asset"] = found["path"]
                 credits.append(found)
+                # A stock picture sets a mood; it is not the event or the person.
+                if found.get("licence") in ("pixabay", "pexels"):
+                    shot["illustration"] = "stock"
             else:
                 vtype = "ai_still"   # fall through
 
@@ -111,6 +114,7 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             if found:
                 shot["asset"] = found["path"]
                 shot["visual_type"] = "photo"
+                shot["illustration"] = "stock"
                 credits.append(found)
 
         if vtype == "ai_still" and not shot.get("asset"):
@@ -119,6 +123,7 @@ def gather(cfg: Config, shots: list[dict], workdir: Path, company: str) -> list[
             result = ai_images.generate(prompt, dest)
             if result:
                 shot["asset"] = str(result)
+                shot["illustration"] = "ai"
             else:
                 # Last resort: a typographic card. Never ship a black frame.
                 motion.title_card(spec.get("headline", "") or company, "", vis_cfg, dest)
