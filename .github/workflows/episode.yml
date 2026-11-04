@@ -30,7 +30,7 @@ on:
         options: [slot, now]
         default: slot
       count:
-        description: "With kind = shorts: how many Shorts to make (blank = 2)"
+        description: "How many Shorts to make (blank = 2); with kind = long, the Shorts made alongside it"
         required: false
       no_upload:
         description: "Build only, do not upload"

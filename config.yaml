@@ -91,8 +91,10 @@ trending:
 format:
   kind: "news explainer video"     # how prompts describe the video
   long:
-    days: []                    # weekdays a long video may go out. Empty = any day
-    every_days: 2               # 2 = a long video on alternate days; 1 = every day
+    # Two long videos a week (Ayush, 2026-11-04): they go public on these
+    # weekdays (the day of the publish slot, channel time). Empty = any day.
+    days: [tuesday, friday]
+    every_days: 1               # with days set: every listed day; 2 = alternate days
     # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
     # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
     # A video that ends up under min_minutes is reported in Telegram.

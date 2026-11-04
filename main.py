@@ -401,7 +401,9 @@ def todays_kind(cfg, args) -> str:
     if args.kind != "auto":
         return args.kind
     tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
-    today = datetime.now(tz).strftime("%A").lower()
+    # The day the video would go public, not the day the job runs: the job
+    # starts 03:30 UTC, still the evening before in New York.
+    today = upload.next_slot(cfg, "long").astimezone(tz).strftime("%A").lower()
     days = [d.lower() for d in cfg.get_path("format.long.days", [])]
     if days and today not in days:
         return "shorts"
@@ -540,7 +542,7 @@ def run(args) -> int:
     if todays_kind(cfg, args) == "shorts":
         return run_shorts_day(cfg, args)
 
-    n_shorts = 0 if args.no_shorts else int(cfg.get_path("format.short.per_day", 2))
+    n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.short.per_day", 2))
     candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
     story = (first[0] if first else None) or history_story(cfg, args) \
@@ -672,7 +674,7 @@ def main() -> int:
                     help="now: public as soon as it uploads; slot: schedule for the next "
                          "publish time. Default: upload.publish in config.yaml")
     ap.add_argument("--count", type=int, default=0,
-                    help="with --kind shorts: how many Shorts to make (default: per_day)")
+                    help="how many Shorts to make (default: per_day); with --kind long, the Shorts made alongside it")
     ap.add_argument("--kind", choices=["auto", "long", "shorts"], default="auto",
                     help="auto: long on format.long.days, Shorts otherwise")
     ap.add_argument("--no-upload", action="store_true")
