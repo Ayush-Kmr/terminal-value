@@ -102,6 +102,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
                             style=title_style())
     best = title_opts[0]
     title = set_title(story.get("title", ""), fact_lines, best["title"])
+    title = seo.pick_delivered([title, *[o["title"] for o in title_opts[:5]]],
+                               " ".join(s.get("narration", "") for s in shot_list))
     series = (cfg.get_path("upload.series_playlist")
               if story.get("history") and story.get("collapse", True) else "")
     if series and len(title) + len(series) + 3 <= 100:
@@ -257,14 +259,17 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     save_shots(shot_list, workdir)
 
     best_fact = next((f.get("claim", "") for f in fb.facts if f.get("is_surprising")), "")
-    best = seo.titles(cfg, company, story.get("angle", ""), best_fact, language,
-                      maxlen=seo.SHORT_TITLE_MAX, style=title_style(),
-                      facts=[str(f.get("claim", "")) for f in fb.facts])[0]
+    options = seo.titles(cfg, company, story.get("angle", ""), best_fact, language,
+                         maxlen=seo.SHORT_TITLE_MAX, style=title_style(),
+                         facts=[str(f.get("claim", "")) for f in fb.facts])
+    best = options[0]
     keywords = [str(k) for k in story.get("keywords", [])]
     # The on-screen headline is the title itself: written to be understood
     # cold, where the 2-4 word thumbnail text often is not.
     best["title"] = set_title(story.get("title", ""),
                               [str(f.get("claim", "")) for f in fb.facts], best["title"])
+    best["title"] = seo.pick_delivered([best["title"], *[o["title"] for o in options[:5]]],
+                                       " ".join(s.get("narration", "") for s in shot_list))
     if story.get("stock") and "stock" not in best["title"].lower():
         full = f"{story['stock']} Stock: {best['title']}"
         best["title"] = full if len(full) <= seo.SHORT_TITLE_MAX else f"Why {story['stock']} Stock Moved"

@@ -287,7 +287,7 @@ def outlet_rank(text: str, cfg: Config) -> int:
 
 
 def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
-                  total: int = 11000, cfg: Config | None = None) -> tuple[str, list[Source]]:
+                  total: int = 11000, cfg: Config | None = None) -> tuple[list[str], list[Source]]:
     """The reporting itself, not just its headlines: the full text of the
     latest articles on the story. Bing's news feed links straight to the
     publisher (Google News links are redirects), and trafilatura strips each
@@ -345,7 +345,7 @@ def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
         if len(sources) >= limit or size >= total:
             break
     log.info("Article research: %d articles, %d chars", len(sources), size)
-    return "\n\n".join(parts), sources
+    return parts, sources
 
 
 def _local_note(cfg: Config) -> str:
@@ -366,7 +366,10 @@ Source material (a search-grounded briefing, today's headlines, background):
 ---
 
 Extract ONLY what the source material supports. Never invent a number, a date,
-a name or a quote. If the material marks something as unconfirmed or disputed,
+a name or a quote. Every fact must be about the story above as the question
+frames it: leave out material on other subjects even when it appears in the
+material (a story about grocery prices takes no facts about childcare or
+health insurance). If the material marks something as unconfirmed or disputed,
 set "needs_verification": true on that item. Do not add outside knowledge about
 recent events — your own memory of current affairs is out of date.
 
@@ -395,6 +398,48 @@ def _claim_text(value: Any) -> str:
     return str(value or "").strip()
 
 
+RELEVANCE_PROMPT = """A video is being made about this story:
+Story: {topic}
+The question it answers: {angle}
+
+Below are news items a search returned. Searches also return reporting on
+other subjects that share a word with the story (a bank's profits for a story
+about a fraud, health insurance for a story about grocery prices). Mark which
+items are directly about THIS story: the same subject, event, company, person
+or price. Background on the same subject counts; a different subject does not.
+
+{items}
+
+Return JSON: {{"about_story": [<numbers of the items that are about the story>]}}"""
+
+
+def _topic_words(topic: str, angle: str) -> set[str]:
+    stop = {"why", "how", "what", "who", "when", "does", "did", "are", "the", "and", "for",
+            "with", "this", "that", "still", "actually", "really", "real", "reason", "much",
+            "cost", "costs", "expensive", "price", "prices", "news", "today", "latest", "from"}
+    return {w[:5] for w in re.findall(r"[a-z]{4,}", f"{topic} {angle}".lower()) if w not in stop}
+
+
+def on_topic(topic: str, angle: str, items: list[str]) -> list[bool]:
+    """Which search results are really about the story. They decide what the
+    script can say and which outlets the description cites (review of
+    2026-11-04: an HSBC article cited under a Madoff Short; childcare and
+    health-insurance reporting written into a video titled groceries)."""
+    if not items:
+        return []
+    listing = "\n".join(f"{n}. {it[:400]}" for n, it in enumerate(items, 1))
+    try:
+        got = llm.json_call(RELEVANCE_PROMPT.format(topic=topic, angle=angle or topic,
+                                                    items=listing), temperature=0.0)
+        keep = {int(n) for n in (got or {}).get("about_story", []) if str(n).isdigit()}
+        if keep:
+            return [n in keep for n in range(1, len(items) + 1)]
+    except Exception as exc:  # noqa: BLE001 - fall back to a word check
+        log.warning("Relevance check unavailable (%s); using word overlap", exc)
+    words = _topic_words(topic, angle)
+    return [any(w in it.lower() for w in words) for it in items]
+
+
 def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     from datetime import datetime
     from . import trends
@@ -404,10 +449,9 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
 
     history = bool(story.get("history"))
     briefing, sources = grounded_briefing(topic, angle, history)
-    articles, article_sources = article_texts(
+    article_parts, article_sources = article_texts(
         [story.get("search_query"), topic, *[str(k) for k in story.get("keywords", [])[:2]]],
         cfg=cfg)
-    sources = list(sources) + article_sources
 
     query = (story.get("search_query") or topic) + ("" if history else " when:3d")
     ed = cfg.get_path("research.news_edition", {}) or {}
@@ -417,6 +461,25 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
                                        story.get("search_query") or topic, limit=6)
     if story.get("language") == "hi":
         heads += trends.news_headlines("hi", "IN", story.get("search_query") or topic, limit=6)
+
+    # Only reporting about this story reaches the fact base and the sources.
+    if article_parts or heads:
+        # Judged against the promised title too: a queued story's title can be
+        # narrower than its search ("Rising cost of living" -> groceries).
+        about = f"{topic} (title: {story['title']})" if story.get("title") else topic
+        verdict = on_topic(about, angle, [*article_parts,
+                                          *[f"{h['title']} ({h['source']})" for h in heads]])
+        keep_a, keep_h = verdict[:len(article_parts)], verdict[len(article_parts):]
+        dropped = [s.title for s, k in zip(article_sources, keep_a) if not k] + \
+                  [h["title"] for h, k in zip(heads, keep_h) if not k]
+        if dropped:
+            log.info("Off-topic reporting left out (%d): %s", len(dropped),
+                     "; ".join(d[:70] for d in dropped[:8]))
+        article_parts = [a for a, k in zip(article_parts, keep_a) if k]
+        article_sources = [s for s, k in zip(article_sources, keep_a) if k]
+        heads = [h for h, k in zip(heads, keep_h) if k]
+    articles = "\n\n".join(article_parts)
+    sources = list(sources) + article_sources
 
     material = ""
     if briefing:

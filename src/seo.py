@@ -348,3 +348,43 @@ def tags(company: str, keywords: list[str], language: str = "en",
         out.append(t)
         total += len(t) + 1
     return out
+
+
+DELIVERS_PROMPT = """A viewer clicks a video because of its title and leaves if
+the video is about something else. Below is what the video actually says, then
+candidate titles. For each title, answer whether the narration delivers what
+the title promises: the same subject, and an answer to the question it asks.
+A title about grocery prices is NOT delivered by narration mostly about
+childcare or health insurance, even if both are "cost of living".
+
+NARRATION:
+{narration}
+
+TITLES:
+{titles}
+
+Return JSON: {{"delivers": [true or false for each title, in order]}}"""
+
+
+def pick_delivered(candidates: list[str], narration: str) -> str:
+    """The first title the script really delivers (review of 2026-11-04: a
+    queued groceries title went out on a script about other household costs).
+    One model call checks all of them; if it fails, the first title stands."""
+    titles = [t for t in dict.fromkeys(candidates) if t]
+    if len(titles) < 2 or not narration.strip():
+        return titles[0] if titles else ""
+    try:
+        got = llm.json_call(DELIVERS_PROMPT.format(
+            narration=narration[:6000],
+            titles="\n".join(f"{n}. {t}" for n, t in enumerate(titles, 1))), temperature=0.0)
+        marks = list((got or {}).get("delivers") or [])
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Title check unavailable (%s)", exc)
+        return titles[0]
+    for title, ok in zip(titles, marks):
+        if ok is True or str(ok).lower() == "true":
+            if title != titles[0]:
+                log.warning("Title %r does not match the script; using %r", titles[0], title)
+            return title
+    log.warning("No title option matched the script; keeping %r", titles[0])
+    return titles[0]
