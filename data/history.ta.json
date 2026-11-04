@@ -92,12 +92,12 @@
       "warnings": [],
       "created_at": "2026-10-29T11:06:59.775145+00:00",
       "stats": {
-        "views": 326,
+        "views": 327,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 29,
-        "avg_pct": 60.91,
-        "minutes": 4
+        "avg_duration_s": 17,
+        "avg_pct": 35.78,
+        "minutes": 27
       }
     },
     {
@@ -112,9 +112,12 @@
       "warnings": [],
       "created_at": "2026-10-31T10:38:51.967575+00:00",
       "stats": {
-        "views": 443,
+        "views": 446,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 10,
+        "avg_pct": 21.51,
+        "minutes": 22
       }
     },
     {
@@ -130,9 +133,12 @@
       "question": "உங்கள் ஊரில் முட்டை விலை எப்படி இருக்கிறது?",
       "created_at": "2026-11-01T12:21:18.306478+00:00",
       "stats": {
-        "views": 1403,
+        "views": 1407,
         "likes": 1,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 11,
+        "avg_pct": 32.72,
+        "minutes": 171
       },
       "commented": true
     },
@@ -149,9 +155,9 @@
       "question": "ஏஐ தொழில்நுட்பம் மீதான உங்கள் முதலீடு என்ன?",
       "created_at": "2026-11-01T12:31:32.716187+00:00",
       "stats": {
-        "views": 0,
+        "views": 2,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -168,9 +174,9 @@
       "question": "செயற்கை நுண்ணறிவுத் துறையில் நிறுவனங்களின் இந்த அதீத முதலீடு எதிர்காலத்தில் லாபத்தைத் தருமா?",
       "created_at": "2026-11-01T15:40:38.834886+00:00",
       "stats": {
-        "views": 0,
+        "views": 3,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -186,7 +192,12 @@
       "warnings": [],
       "question": "உங்கள் பகுதியில் பெட்ரோல் விலை எப்படி உள்ளது?",
       "created_at": "2026-11-02T16:21:05.709227+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Inovio Pharmaceuticals stock",
@@ -199,7 +210,12 @@
       "source": "2026-11-02-short-inovio-pharmaceuticals-stock",
       "warnings": [],
       "question": "இந்த பங்கு விலை உயர்வு பற்றி நீங்கள் என்ன நினைக்கிறீர்கள்?",
-      "created_at": "2026-11-02T16:40:00.868434+00:00"
+      "created_at": "2026-11-02T16:40:00.868434+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "How Madoff fooled everyone",
@@ -212,7 +228,12 @@
       "source": "2026-11-03-short-how-madoff-fooled-everyone",
       "warnings": [],
       "question": "இந்த மிகப்பெரிய மோசடியை இவ்வளவு காலம் கண்டுபிடிக்க முடியாமல் போனது ஏன்?",
-      "created_at": "2026-11-03T12:29:34.527490+00:00"
+      "created_at": "2026-11-03T12:29:34.527490+00:00",
+      "stats": {
+        "views": 1,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "LiveWire stock",
@@ -225,7 +246,12 @@
       "source": "2026-11-03-short-livewire-stock",
       "warnings": [],
       "question": "இந்த மின்சார மோட்டார் சைக்கிள் நிறுவனம் மீண்டு வருமா?",
-      "created_at": "2026-11-03T12:41:56.074766+00:00"
+      "created_at": "2026-11-03T12:41:56.074766+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Rising cost of living",
@@ -240,9 +266,14 @@
         "Long video is only 7.7 min, under 8: no mid-roll ads on it"
       ],
       "question": "உங்கள் குடும்பத்தில் விலைவாசி உயர்வை எவ்வாறு சமாளிக்கிறீர்கள்?",
-      "created_at": "2026-11-03T15:29:44.174832+00:00"
+      "created_at": "2026-11-03T15:29:44.174832+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 4.0
+  "channel_median_views": 1.5
 }
