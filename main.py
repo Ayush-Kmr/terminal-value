@@ -190,7 +190,8 @@ SHORT_BEAT = {
                "viewers best did. LAST SENTENCE: short, repeating the opening's key word or number, and written "
                "to run straight into the FIRST sentence as one thought when the Short "
                "replays (e.g. last: 'And it all comes back to one number.' then first: "
-               "'$4 billion, gone in a day.'), so it loops without a pause. "
+               "'$4 billion, gone in a day.'), so it loops without a pause. Never say 'loop', "
+               "'looping', 'again' or 'back to the start': the replay must feel natural. "
                "No greeting, no sign-off, no 'subscribe'."),
 }
 
@@ -201,6 +202,15 @@ def hook_words(sc: dict) -> int:
     first = next((s.get("narration", "") for b in sc.get("beats", []) for s in b.get("shots", [])
                   if (s.get("narration") or "").strip()), "")
     return len(re.split(r"(?<=[.?!।])\s+", first.strip())[0].split())
+
+
+def names_loop(sc: dict) -> bool:
+    """The script says the quiet part out loud ("looping back to $28,000", test
+    41813474477): the loop must be heard, never announced."""
+    import re
+    text = " ".join(s.get("narration", "") for b in sc.get("beats", [])
+                    for s in b.get("shots", []))
+    return bool(re.search(r"\bloop(s|ing|ed)?\b|back to the (start|beginning)", text, re.I))
 
 
 def loops(sc: dict) -> bool:
@@ -239,7 +249,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         # No overrun: Shorts of 21-28 s held 60-110% of viewers, 42-44 s ones
         # 30% (reach report 2026-11-04).
         limit = int(seconds / 60 * wpm)
-        if hook_words(sc) <= 10 and sc["word_count"] <= limit and loops(sc):
+        if hook_words(sc) <= 10 and sc["word_count"] <= limit and loops(sc) \
+                and not names_loop(sc):
             break
         log.info("Short has a %d-word opening, %d words, loop %s; rewriting (%d)",
                  hook_words(sc), sc["word_count"], loops(sc), attempt + 1)

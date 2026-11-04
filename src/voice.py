@@ -373,6 +373,10 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
         # Never shorter than the narration itself: a clipped shot lets its
         # audio run on underneath the next shot's.
         shot["duration"] = max(float(min_s), spoken + pad)
+        if cfg.get_path("visuals.short") and shot is shots[-1]:
+            # The minimum shot length left 0.3 s of quiet before the replay
+            # (test 41813474477): the last line ends where its voice ends.
+            shot["duration"] = spoken + pad
         log.debug("shot %03d: %.2fs spoken, %.2fs on screen",
                   shot["index"], spoken, shot["duration"])
 
