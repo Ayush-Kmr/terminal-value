@@ -407,6 +407,8 @@ other subjects that share a word with the story (a bank's profits for a story
 about a fraud, health insurance for a story about grocery prices). Mark which
 items are directly about THIS story: the same subject, event, company, person
 or price. Background on the same subject counts; a different subject does not.
+A word with two meanings counts only in the story's meaning: "gas" at the pump
+is gasoline (petrol), not natural gas.
 
 {items}
 
