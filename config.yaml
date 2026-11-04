@@ -24,7 +24,7 @@ channel:
 
     We follow the stories Americans are searching for, from earnings and layoffs to the Fed, tariffs and AI deals, read the coverage, and explain each one in plain English with the numbers, the dates and the people involved.
 
-    New explainer every other day at 12 PM ET. New Shorts every day at 9 AM and 5 PM ET.
+    New explainers every Tuesday and Friday at 12 PM ET. New Shorts every day at 9 AM and 5 PM ET.
 
     Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. Nothing here is financial advice. If we get something wrong, tell us in the comments and we will correct it.
   # What Americans search for. Check against YouTube search suggestions.
@@ -52,7 +52,7 @@ channel:
     - "Subscribe for the story behind the headline: https://www.youtube.com/@terminalvaluedoc?sub_confirmation=1"
   # Closes every description, before the sources.
   cta: >-
-    New explainer every other day at 12 PM ET and two Shorts every day.
+    New explainers every Tuesday and Friday at 12 PM ET, and two Shorts every day.
     Subscribe so you never miss the story behind the headline.
   disclosure: >-
     This video was produced with AI: the script was written and the narration

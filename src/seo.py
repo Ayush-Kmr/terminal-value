@@ -92,6 +92,8 @@ Return a JSON array of objects:
                   language. The first sentence must START with the main search
                   term (the name of the person, company, place or event): it is
                   the only part of the description viewers see before "more".
+                  Write it as a normal sentence with normal capitals ("Rising
+                  costs in the US...", never "Rising cost of living usa is...").
                   Never start with "This video" or "The video"."""
 
 
@@ -126,7 +128,8 @@ SMALL_WORDS = {"a", "an", "and", "as", "at", "but", "by", "for", "in", "of", "on
                "the", "to", "vs", "with", "from", "is", "its", "over"}
 ACRONYMS = {"ai", "ceo", "cfo", "ipo", "gdp", "cpi", "sec", "etf", "ev", "evs", "fbi", "irs",
             "ibm", "amd", "tsmc", "ups", "ftc", "doj", "nyse", "opec", "imf", "usa", "uk", "eu",
-            "q1", "q2", "q3", "q4", "s&p", "at&t", "rbi", "idbi", "epfo", "ipl", "hdfc", "sbi"}
+            "q1", "q2", "q3", "q4", "s&p", "at&t", "rbi", "idbi", "epfo", "ipl", "hdfc", "sbi",
+            "tn", "tnpsc", "tneb", "tvk", "dmk", "lic", "upi", "emi", "gst", "pf", "lpg", "isro"}
 SPELLED = {"openai": "OpenAI", "xai": "xAI", "spacex": "SpaceX", "tiktok": "TikTok",
            "youtube": "YouTube", "jpmorgan": "JPMorgan", "coreweave": "CoreWeave",
            "iphone": "iPhone", "chatgpt": "ChatGPT", "paypal": "PayPal", "ebay": "eBay",
@@ -187,7 +190,7 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
 
     facts = [f for f in (facts or []) if f][:12]
     evidence = " ".join(str(x) for x in [company, angle, best_fact, *facts])
-    searches = keywords.for_story(company, language)
+    searches = keywords.for_story(company, language, context=evidence)
     options = llm.json_call(
         TITLE_PROMPT.format(
             company=company, angle=angle, fact=best_fact, maxlen=maxlen,
@@ -225,8 +228,18 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         t["searches"] = searches
         t["summary"] = re.sub(r"^(this|the) video (\w+ )?", "", t.get("summary", ""),
                               flags=re.I).strip()
+        t["summary"] = _proper_case(t["summary"], company)
         t["summary"] = t["summary"][:1].upper() + t["summary"][1:]
     return out
+
+
+def _proper_case(text: str, company: str) -> str:
+    """Names copied from a lower-case search phrase get their capitals back:
+    "Arista networks stock climbed", "cost of living usa" (2026-11-04 uploads)."""
+    if company and not company.islower():
+        text = re.sub(re.escape(company), company, text, flags=re.I)
+    return re.sub(r"\b(usa|uk|ai|fed|rbi|ceo|ipo|gdp)\b",
+                  lambda m: m[1].upper() if m[1] != "fed" else "Fed", text)
 
 
 def chapters(cfg: Config, shots: list[dict]) -> str:

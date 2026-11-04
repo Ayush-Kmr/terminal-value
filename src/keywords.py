@@ -39,8 +39,40 @@ def _core(subject: str) -> str:
     return " ".join(words[:3]).lower()
 
 
-def for_story(subject: str, language: str = "en", limit: int = 8) -> list[str]:
-    """Real search phrases about this story, best first."""
+# Words any search about a story may add. Anything else a suggestion adds must
+# appear in the story itself: autocomplete also returns what people type about
+# other things with the same name ("bernie madoff movie scene", "gas prices
+# starlito", "kalshi dance", "gas cylinder price tamil" on a US petrol story),
+# and those went out as tags (review of 2026-11-04 uploads).
+GENERIC = set("""
+news explained explain explainer today latest live update updates now new this week
+why how what when who is are was does do did so the a an in of to for on and vs
+stock stocks share shares price prices rate rates market markets money make makes
+work works crash fall falls drop rise rises up down going happened happening
+tamil india indian us usa america american english full video analysis meaning
+documentary story history expensive cheap costly cost costs
+""".split())
+
+
+def _relevant(phrase: str, core: str, context: str) -> bool:
+    words = re.findall(r"[a-z0-9]+|[\u0B80-\u0BFF]+", phrase.lower())
+    ctx = context.lower()
+    for w in words:
+        if w in GENERIC or w in core.split() or w.isdigit():
+            continue
+        # Endings vary ("trading"/"trades", Tamil case endings), so a longer
+        # word counts when its first four letters appear in the story.
+        stem = w[:4] if len(w) >= 5 else w      # "trading" ~ "trades"
+        if len(stem) < 3 or stem not in ctx:
+            return False
+    return True
+
+
+def for_story(subject: str, language: str = "en", limit: int = 8,
+              context: str = "") -> list[str]:
+    """Real search phrases about this story, best first. With `context` (the
+    story's own text), phrases that add words the story never mentions are
+    dropped."""
     core = _core(subject)
     if not core:
         return []
@@ -60,6 +92,8 @@ def for_story(subject: str, language: str = "en", limit: int = 8) -> list[str]:
             if language != "ta" and any(x in low for x in OTHER_LANGUAGES + ("tamil",)):
                 continue
             if language == "ta" and any(x in low for x in OTHER_LANGUAGES):
+                continue
+            if context and not _relevant(s, core, f"{subject} {context}"):
                 continue
             if s not in out:
                 out.append(s)

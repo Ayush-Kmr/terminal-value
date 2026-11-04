@@ -187,6 +187,33 @@ def translate(cfg: Config, title: str, lines: list[str], language: str,
     return out
 
 
+# Unicode blocks of the Indian scripts; a model writing Tamil sometimes slips a
+# few letters of another in ("আনুமானமாக", Bengali + Tamil, 2026-11-04).
+_INDIC = {"hi": (0x0900, 0x097F), "bn": (0x0980, 0x09FF), "pa": (0x0A00, 0x0A7F),
+          "gu": (0x0A80, 0x0AFF), "or": (0x0B00, 0x0B7F), "ta": (0x0B80, 0x0BFF),
+          "te": (0x0C00, 0x0C7F), "kn": (0x0C80, 0x0CFF), "ml": (0x0D00, 0x0D7F)}
+
+
+def _one_script(text: str, language: str) -> str:
+    """Letters of any other Indian script removed from the channel's text."""
+    own = _INDIC.get(language)
+    if not own or not text:
+        return text
+    def foreign(c: str) -> bool:
+        return 0x0900 <= ord(c) <= 0x0D7F and not own[0] <= ord(c) <= own[1]
+    # The whole word goes: half a word left behind reads as a different word.
+    words = [w for w in re.split(r"([ \t]+)", str(text)) if not any(map(foreign, w))]
+    return re.sub(r"[ \t]{2,}", " ", "".join(words))
+
+
+def _fit(text: str, limit: int) -> str:
+    """Cut at the last whole word: a hard cut left "...அதன் சவால்" (2026-11-02)."""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit + 1].rsplit(" ", 1)[0]
+    return cut.rstrip(" ,:;|-") or text[:limit]
+
+
 def _drawable(text: str) -> str:
     """The Tamil font has no $ sign: "$4.2 பில்லியன்" -> "4.2 பில்லியன் டாலர்"."""
     def money(m: re.Match) -> str:
@@ -317,7 +344,8 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     maxlen = seo.SHORT_TITLE_MAX if is_short else seo.TITLE_MAX
     nfacts = 4 if is_short else 7
     from . import keywords
-    searches = keywords.for_story(company, language)
+    searches = keywords.for_story(company, language, context=" ".join(
+        [en_title, str(research.get("summary", "")), *facts[:25]]))
     # Tamil viewers mostly search in English plus "tamil", so those phrases lead
     # the tags and hashtags. Everything the viewer reads stays in Tamil.
     core = keywords._core(company)
@@ -337,7 +365,7 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     # the picture stays Tamil only, and the Tamil font has no English letters.
     head = str(pkg.get("search_head") or "").strip()
     head = next((s for s in english if s.lower() == head.lower() and len(s) <= 40), hashhead)
-    full_title = f"{seo.headline_case(head)} | {title}"[:100]
+    full_title = _fit(f"{seo.headline_case(head)} | {title}", 100)
     summary = str(pkg.get("summary") or "").strip()
     local_facts = [str(f) for f in pkg.get("facts") or [] if f][:nfacts]
     # Real search phrases first, then the model's {name}-script ones.
@@ -376,6 +404,8 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
                    thumbnail=str(_thumbnail(cfg, meta, pkg, title, shots, src, workdir)),
                    runtime=f"{int(sum(s['duration'] for s in shots) // 60)}:"
                            f"{int(sum(s['duration'] for s in shots) % 60):02d}")
+    for key in ("title", "description", "question"):
+        out[key] = _one_script(out.get(key, ""), language)
     (workdir / "metadata.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     return out
