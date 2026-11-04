@@ -20,6 +20,8 @@ it today even though it sits fourth.
 |---|---|---|
 | `GEMINI_API_KEY` | <https://aistudio.google.com/apikey> | scripts, research, SEO |
 | `GROQ_API_KEY` | <https://console.groq.com/keys> | fallback when Gemini rate-limits |
+| `XAI_API_KEY` | <https://console.x.ai> | optional paid fallback (Grok) after Groq |
+| `OPENAI_API_KEY` | <https://platform.openai.com/api-keys> | optional paid fallback (GPT) after Grok; also web-searched research when Gemini's search runs out |
 | `CF_ACCOUNT_ID`, `CF_API_TOKEN` | <https://dash.cloudflare.com/profile/api-tokens> → "Workers AI" template | AI stills, 10k neurons/day free |
 | `PIXABAY_API_KEY` | <https://pixabay.com/api/docs/> | stock imagery |
 | `PEXELS_API_KEY` | <https://www.pexels.com/api/> | stock video (new keys are sometimes paused — skip if so) |

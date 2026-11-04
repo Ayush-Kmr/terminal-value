@@ -19,6 +19,8 @@ jobs:
         env:
           GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY:        ${{ secrets.GROQ_API_KEY }}
+          XAI_API_KEY:         ${{ secrets.XAI_API_KEY }}
+          OPENAI_API_KEY:      ${{ secrets.OPENAI_API_KEY }}
           ELEVENLABS_API_KEY:  ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           CF_ACCOUNT_ID:       ${{ secrets.CF_ACCOUNT_ID }}

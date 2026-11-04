@@ -224,8 +224,6 @@ def grounded_briefing(topic: str, angle: str, history: bool = False) -> tuple[st
     import os
 
     key = os.getenv("GEMINI_API_KEY")
-    if not key:
-        return "", []
     prompt = (
         f"Brief me on this news story as of today: {topic}\n"
         f"The question to answer: {angle}\n\n"
@@ -246,13 +244,46 @@ def grounded_briefing(topic: str, angle: str, history: bool = False) -> tuple[st
         )
     # Each model has its own free daily allowance, so a spent main model
     # does not have to mean a headlines-only video.
-    for model in llm.GEMINI_MODELS:
+    for model in llm.GEMINI_MODELS if key else ():
         try:
             return _grounded(key, model, prompt)
         except Exception as exc:  # noqa: BLE001
             log.warning("Grounded briefing on %s unavailable (%s)", model,
                         str(exc).splitlines()[0][:160])
+    # Gemini's search allowance spent: OpenAI's web search keeps the video on
+    # real, cited reporting instead of headlines only.
+    if os.getenv("OPENAI_API_KEY"):
+        for model in GPT_SEARCH_MODELS:
+            try:
+                return _grounded_gpt(model, prompt)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("Grounded briefing on %s unavailable (%s)", model,
+                            str(exc).splitlines()[0][:160])
     return "", []
+
+
+GPT_SEARCH_MODELS = ("gpt-5-mini", "gpt-4.1-mini")
+
+
+def _grounded_gpt(model: str, prompt: str) -> tuple[str, list[Source]]:
+    from openai import OpenAI
+
+    client = OpenAI(max_retries=2, timeout=180)
+    resp = client.responses.create(model=model, input=prompt,
+                                   tools=[{"type": "web_search"}])
+    text, sources, seen = resp.output_text or "", [], set()
+    for item in resp.output:
+        for part in getattr(item, "content", None) or []:
+            for a in getattr(part, "annotations", None) or []:
+                url = getattr(a, "url", None)
+                if getattr(a, "type", "") == "url_citation" and url and url not in seen:
+                    seen.add(url)
+                    sources.append(Source(getattr(a, "title", None) or "Source",
+                                          url, "press"))
+    if not text:
+        raise RuntimeError(f"{model} returned no briefing")
+    log.info("Grounded briefing (%s): %d chars, %d sources", model, len(text), len(sources))
+    return text, sources
 
 
 def _grounded(key: str, model: str, prompt: str) -> tuple[str, list[Source]]:

@@ -1,6 +1,7 @@
 """LLM access with automatic failover.
 
-Gemini (free tier) is primary; Groq is the fallback when Gemini rate-limits.
+Gemini (free tier) is primary. When it fails the chain is Groq (free), then
+xAI Grok, then OpenAI GPT; a paid provider is skipped when its key is unset.
 Everything structured goes through `json_call`, which retries on malformed output
 rather than letting a bad parse kill a pipeline run.
 """
@@ -53,6 +54,21 @@ def groq_models(client) -> list[str]:
 
 
 GEMINI_TIMEOUT = 180
+
+# Paid fallbacks behind Groq, both OpenAI-compatible. Like Groq, rank what the
+# account can actually use at call time so a retired name is never a 404.
+# provider: (key env, base url, preferred substrings, excluded substrings)
+PAID = {
+    "Grok": ("XAI_API_KEY", "https://api.x.ai/v1",
+             ("grok-4-fast-non-reasoning", "grok-4-fast", "grok-4", "grok-3-mini", "grok"),
+             ("image", "imagine", "vision", "video", "code", "embed")),
+    "GPT": ("OPENAI_API_KEY", None,
+            ("gpt-5-mini", "gpt-4.1-mini", "gpt-5", "gpt-4.1", "gpt-4o-mini"),
+            ("audio", "realtime", "transcribe", "tts", "search", "image", "codex",
+             "nano", "embed", "moderation", "instruct", "chat-latest", "pro", "-20")),
+}
+PAID_MODELS_PER_PROVIDER = 2
+_paid_models: dict[str, list[str]] = {}
 
 # Control tokens some open models leak into their text, e.g. "தன்<bos>3தேரா"
 # for Dhanteras in a Tamil description (2026-11-04). A digit glued between the
@@ -121,15 +137,65 @@ def _groq(prompt: str, system: str | None, temperature: float) -> str:
     raise last or RuntimeError("Groq returned nothing")
 
 
+def _paid(provider: str, prompt: str, system: str | None, temperature: float) -> str:
+    import os
+    from openai import OpenAI
+
+    key_env, base, preferred, exclude = PAID[provider]
+    key = os.getenv(key_env)
+    if not key:
+        raise RuntimeError(f"{key_env} not set")
+    client = OpenAI(api_key=key, base_url=base, max_retries=2, timeout=180)
+    if provider not in _paid_models:
+        ids = [m.id for m in client.models.list().data
+               if any(w in m.id.lower() for w in preferred)
+               and not any(x in m.id.lower() for x in exclude)]
+
+        def rank(i: str) -> int:
+            return next(n for n, want in enumerate(preferred) if want in i.lower())
+        _paid_models[provider] = sorted(ids, key=lambda i: (rank(i), len(i), i))[
+            :PAID_MODELS_PER_PROVIDER]
+        log.info("%s models: %s", provider, ", ".join(_paid_models[provider]) or "none")
+    messages = ([{"role": "system", "content": system}] if system else []) + [
+        {"role": "user", "content": prompt}]
+    last: Exception | None = None
+    for name in _paid_models[provider]:
+        if name in _exhausted:
+            continue
+        # GPT-5 and o-series models accept only the default temperature.
+        fixed = provider == "GPT" and re.match(r"(gpt-5|o\d)", name)
+        try:
+            resp = client.chat.completions.create(
+                model=name, messages=messages, max_completion_tokens=16384,
+                **({} if fixed else {"temperature": temperature}))
+            text = resp.choices[0].message.content
+            if text:
+                return _clean(text)
+            last = RuntimeError(f"{name} returned no text")
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            if any(c in str(exc) for c in ("401", "403", "404", "insufficient_quota")):
+                _exhausted.add(name)
+            log.warning("%s %s failed (%s)", provider, name, str(exc)[:160])
+    raise last or RuntimeError(f"No usable {provider} model")
+
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=30))
 def call(prompt: str, system: str | None = None, temperature: float = 0.7) -> str:
-    """Plain text completion. Falls back Gemini -> Groq."""
-    try:
-        return _gemini(prompt, system, temperature)
-    except Exception as exc:  # noqa: BLE001 - any provider error should fail over
-        log.warning("Gemini unavailable (%s); falling back to Groq",
-                    str(exc).splitlines()[0][:120])
-        return _groq(prompt, system, temperature)
+    """Plain text completion. Falls back Gemini -> Groq -> Grok -> GPT."""
+    chain = [("Gemini", lambda: _gemini(prompt, system, temperature)),
+             ("Groq", lambda: _groq(prompt, system, temperature))]
+    chain += [(p, lambda p=p: _paid(p, prompt, system, temperature)) for p in PAID]
+    last: Exception | None = None
+    for name, fn in chain:
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001 - any provider error should fail over
+            last = exc
+            if "not set" not in str(exc):
+                log.warning("%s unavailable (%s); trying the next provider",
+                            name, str(exc).splitlines()[0][:120])
+    raise last or RuntimeError("Every LLM provider failed")
 
 
 def _complete_items(raw: str) -> list[Any]:
