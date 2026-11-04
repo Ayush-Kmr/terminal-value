@@ -25,3 +25,11 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python3 scripts/watchdog.py
+      # Every evening, fine or not: today's uploads, warnings and failed jobs.
+      - name: Evening report
+        if: ${{ github.event.schedule == '0 13 * * *' || github.event_name == 'workflow_dispatch' }}
+        env:
+          GH_TOKEN:           ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 scripts/health.py
