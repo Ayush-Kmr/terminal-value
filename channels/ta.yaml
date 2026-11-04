@@ -23,22 +23,22 @@ channel:
     ஒவ்வொரு வீடியோவின் விளக்கத்திலும் ஆதாரங்கள் உள்ளன. ஸ்கிரிப்ட்டும் குரலும் வெளியான செய்திகளிலிருந்து செயற்கை நுண்ணறிவு மூலம் உருவாக்கப்படுகின்றன. இது நிதி ஆலோசனை அல்ல. தவறு இருந்தால் கருத்துகளில் சொல்லுங்கள், திருத்துவோம்.
   # English first: what Tamil viewers type into search.
   keywords:
+    - gold rate today tamil
+    - tamil nadu news today
     - business news tamil
+    - petrol price today tamil
+    - tn govt scheme tamil
     - share market news today in tamil
-    - stock market tamil news
-    - economy explained in tamil
-    - us economy tamil
-    - ai news tamil
+    - epfo news tamil
+    - rbi news tamil
+    - தங்கம் விலை இன்று
+    - தங்கம் விலை நிலவரம்
+    - பெட்ரோல் விலை இன்று
+    - தமிழ்நாடு அரசு திட்டம்
     - வணிகச் செய்திகள்
     - பங்குச் சந்தை செய்திகள்
-    - இன்றைய பங்குச் சந்தை
-    - அமெரிக்க பொருளாதாரம்
     - பொருளாதாரம் தமிழில்
-    - தங்கம் விலை நிலவரம்
-    - ஷேர் மார்க்கெட் நிலவரம்
-    - வணிக வரலாறு
-    - பொருளாதார விளக்கம்
-    - செயற்கை நுண்ணறிவு செய்திகள்
+    - விலைவாசி உயர்வு
   links:
     - "சந்தா செலுத்த: https://www.youtube.com/@TerminalValueTamil?sub_confirmation=1"
   cta: >-
