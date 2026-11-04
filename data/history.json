@@ -974,7 +974,43 @@
       "parent_url": "",
       "title_style": "curious",
       "queue": "",
-      "created_at": "2026-11-04T06:02:41.107366+00:00"
+      "created_at": "2026-11-04T06:02:41.107366+00:00",
+      "commented": true
+    },
+    {
+      "company": "Bernie Madoff",
+      "angle": "How did Bernie Madoff fool investors and regulators for decades?",
+      "title": "Bernie Madoff: How One Man Stole Billions in Plain Sight | How It Collapsed",
+      "region": "US",
+      "language": "en",
+      "video_id": "WWhmfoLUSQw",
+      "short_ids": [],
+      "kind": "long",
+      "question": "How can ordinary investors better spot red flags in high-return funds?",
+      "title_style": "search",
+      "queue": "long:Bernie Madoff",
+      "evergreen": "",
+      "history": "Bernie Madoff",
+      "runtime": "4:42",
+      "warnings": [
+        "Long video is only 4.7 min, under the 5-minute floor"
+      ],
+      "created_at": "2026-11-04T06:45:27.312371+00:00"
+    },
+    {
+      "company": "Kalshi",
+      "angle": "How does the prediction market Kalshi make its money?",
+      "title": "How Does Kalshi Actually Make Money? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "zR1nLYwRk4I",
+      "kind": "short",
+      "warnings": [],
+      "question": "Would prediction market fees stop you from placing short-term trades?",
+      "parent_url": "",
+      "title_style": "curious",
+      "queue": "shorts:Kalshi",
+      "created_at": "2026-11-04T06:47:48.531315+00:00"
     }
   ],
   "rejected_topics": [],
