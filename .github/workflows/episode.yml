@@ -37,7 +37,7 @@ on:
         type: boolean
         default: false
       tamil_only:
-        description: "Upload only the Tamil version (the English one is built but not uploaded)"
+        description: "Only the Tamil channel's run (skip the English channel)"
         type: boolean
         default: false
 
@@ -50,6 +50,7 @@ permissions:
 
 jobs:
   produce:
+    if: ${{ !inputs.tamil_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -108,7 +109,7 @@ jobs:
           KIND:                      ${{ inputs.kind }}
           PUBLISH:                   ${{ inputs.publish }}
           COUNT:                     ${{ inputs.count }}
-          NO_UPLOAD:                 ${{ inputs.no_upload || inputs.tamil_only }}
+          NO_UPLOAD:                 ${{ inputs.no_upload }}
         run: |
           args=()
           [ -n "$TOPIC" ] && args+=(--topic "$TOPIC" --region "${REGION:-US}")
@@ -153,12 +154,12 @@ jobs:
           git pull --rebase -q || true
           git push || true
 
-  # The Tamil channel: the same videos, translated and narrated in Tamil
-  # (src/follow.py), uploaded with the Tamil channel's own token. Skipped
-  # until the YT_REFRESH_TOKEN_TA secret exists.
+  # The Tamil channel, on its own stories (channels/ta-src.yaml): today's Tamil
+  # Nadu stories are picked and built in English without uploading, then
+  # translated and narrated in Tamil (src/follow.py) and uploaded with the
+  # Tamil channel's token. Runs beside the English job, never on its stories.
+  # Skipped until the YT_REFRESH_TOKEN_TA secret exists.
   tamil:
-    needs: produce
-    if: ${{ !cancelled() && needs.produce.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -194,7 +195,7 @@ jobs:
 
       - name: Install ffmpeg
         if: steps.on.outputs.go
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu libraqm0 libfribidi0
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu espeak-ng libraqm0 libfribidi0
 
       - run: pip install -r requirements.txt
         if: steps.on.outputs.go
@@ -217,11 +218,42 @@ jobs:
             .venv-indic/bin/pip install -q -r requirements-indic.txt
           fi
 
-      - uses: actions/download-artifact@v4
+      # The English voice builds the source version, as on the main channel.
+      - name: Cache source voice environment and model
         if: steps.on.outputs.go
+        uses: actions/cache@v4
         with:
-          name: episode-${{ github.run_number }}
-          path: en-builds
+          path: .venv-kokoro
+          key: kokoro-venv-${{ runner.os }}-${{ hashFiles('requirements-kokoro.txt') }}
+
+      - name: Install source voice model
+        if: steps.on.outputs.go
+        run: |
+          if [ ! -x .venv-kokoro/bin/python ]; then
+            python -m venv .venv-kokoro
+            .venv-kokoro/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+            .venv-kokoro/bin/pip install -q -r requirements-kokoro.txt
+          fi
+
+      - name: Pick and build today's Tamil stories
+        if: steps.on.outputs.go
+        env:
+          CHANNEL:            ta-src
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
+          CF_ACCOUNT_ID:      ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN:       ${{ secrets.CF_API_TOKEN }}
+          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
+          YT_CLIENT_ID:       ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET:   ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python main.py --kind shorts --no-upload
+          mkdir -p ta-src && find output -maxdepth 1 -mindepth 1 -type d -name '20*' -exec mv {} ta-src/ \;
+          ls ta-src
 
       - name: Produce Tamil versions
         if: steps.on.outputs.go
@@ -241,7 +273,7 @@ jobs:
           PUBLISH:            ${{ inputs.publish }}
           NO_UPLOAD:          ${{ inputs.no_upload }}
         run: |
-          args=(--follow en-builds)
+          args=(--follow ta-src)
           [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
@@ -252,6 +284,8 @@ jobs:
         with:
           name: tamil-${{ github.run_number }}
           path: |
+            ta-src/**/metadata.json
+            ta-src/**/research.json
             output/ta/**/final.mp4
             output/ta/**/short.mp4
             output/ta/**/metadata.json

@@ -22,10 +22,10 @@ log = logging.getLogger(__name__)
 
 
 def _search(yt, query: str, order: str = "relevance", after: datetime | None = None,
-            duration: str = "") -> list[dict[str, Any]]:
-    """Up to 25 US English results with their view counts."""
+            duration: str = "", region: str = "US", language: str = "en") -> list[dict[str, Any]]:
+    """Up to 25 results for a region and language, with their view counts."""
     params: dict[str, Any] = {"part": "id", "q": query, "type": "video", "maxResults": 25,
-                              "order": order, "regionCode": "US", "relevanceLanguage": "en"}
+                              "order": order, "regionCode": region, "relevanceLanguage": language}
     if after:
         params["publishedAfter"] = after.strftime("%Y-%m-%dT%H:%M:%SZ")
     if duration:
@@ -42,12 +42,15 @@ def _search(yt, query: str, order: str = "relevance", after: datetime | None = N
 def _gather(cfg: Config, queries: list[str], floor: int, **kw) -> list[dict[str, Any]]:
     yt = upload.client()
     found: dict[str, dict[str, Any]] = {}
+    kw.setdefault("region", cfg.get_path("viral.region_code", "US"))
+    kw.setdefault("language", cfg.get_path("viral.language", "en"))
     for q in queries:
         for v in _search(yt, q, **kw):
             if v["views"] >= floor and v["channel"] != cfg.get_path("channel.name"):
                 found[v["id"]] = v
-    # English titles only: the audience is American.
-    found = {k: v for k, v in found.items() if v["title"].isascii()}
+    # English titles only when the audience is American (viral.ascii_only).
+    if cfg.get_path("viral.ascii_only", True):
+        found = {k: v for k, v in found.items() if v["title"].isascii()}
     return sorted(found.values(), key=lambda v: v["views"], reverse=True)
 
 

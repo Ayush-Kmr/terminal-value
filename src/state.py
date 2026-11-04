@@ -14,7 +14,10 @@ from .config import ROOT, channel_key
 
 # Each channel keeps its own history: data/history.json for the main channel,
 # data/history.<CHANNEL>.json for the others.
-HISTORY = ROOT / "data" / (f"history.{channel_key()}.json" if channel_key() else "history.json")
+# A "<channel>-src" run (it picks and builds a channel's own stories, e.g.
+# ta-src for Tamil) reads that channel's history, so it never repeats a story.
+_KEY = channel_key().removesuffix("-src")
+HISTORY = ROOT / "data" / (f"history.{_KEY}.json" if _KEY else "history.json")
 
 
 def _blank() -> dict[str, Any]:

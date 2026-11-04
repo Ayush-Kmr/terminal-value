@@ -305,7 +305,9 @@ def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
     for query in dict.fromkeys(q for q in queries if q):
         try:
             r = requests.get("https://www.bing.com/news/search",
-                             params={"q": query, "format": "rss", "mkt": "en-US"},
+                             params={"q": query, "format": "rss",
+                                     "mkt": (cfg.get_path("research.bing_market", "en-US")
+                                             if cfg else "en-US")},
                              headers=ua, timeout=20)
             r.raise_for_status()
             found = ET.fromstring(r.content).findall(".//item")
@@ -402,7 +404,11 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     sources = list(sources) + article_sources
 
     query = (story.get("search_query") or topic) + ("" if history else " when:3d")
-    heads = trends.news_headlines("en-US", "US", query, limit=15)
+    ed = cfg.get_path("research.news_edition", {}) or {}
+    heads = trends.news_headlines(ed.get("hl", "en-US"), ed.get("gl", "US"), query, limit=15)
+    for extra in cfg.get_path("research.extra_editions", []) or []:
+        heads += trends.news_headlines(extra.get("hl"), extra.get("gl"),
+                                       story.get("search_query") or topic, limit=6)
     if story.get("language") == "hi":
         heads += trends.news_headlines("hi", "IN", story.get("search_query") or topic, limit=6)
 

@@ -70,7 +70,9 @@ def main() -> int:
             gh("run", "rerun", str(run["databaseId"]), "--failed")
             tell("🛠 Watchdog: the Tamil upload failed, so I restarted it.")
         else:
-            tell("⚠️ Watchdog: no Tamil upload in the last day, and nothing to restart.")
+            # The Tamil job picks its own stories, so it can run on its own.
+            gh("workflow", "run", "episode.yml", "--ref", "main", "-f", "tamil_only=true")
+            tell("🛠 Watchdog: no Tamil upload in the last day, so I started a Tamil-only run.")
     return 0
 
 

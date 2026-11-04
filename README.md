@@ -2,7 +2,7 @@
 
 Automated YouTube channel for a US audience: it finds the American business
 stories people are searching for and explains them in English: a 9-minute video
-every other day and two standalone Shorts a day. The Tamil channel republishes every video, entirely in Tamil (`src/follow.py`).
+every other day and two standalone Shorts a day. The Tamil channel makes its own videos on what is trending in Tamil Nadu (`channels/ta-src.yaml` picks and builds the story, `src/follow.py` narrates it in Tamil), never the English channel's stories.
 
 Channel: <https://www.youtube.com/@terminalvaluedoc>
 

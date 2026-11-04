@@ -111,22 +111,27 @@ def gather(cfg: Config) -> list[dict[str, Any]]:
     return blocks
 
 
-PICK_PROMPT = """You are the commissioning editor of a YouTube explainer channel
-whose audience is in the United States. Today is {today}. Choose the {n} best stories
-for today's video from the live signals below.
-
-How to rank:
-- Choose American business stories: US companies, markets, jobs, prices, the
-  Fed, tariffs, big tech and AI deals. Region weight: {weights}. A foreign
-  story qualifies only if it clearly moves American money, jobs or prices.
+US_AUDIENCE = "the United States"
+US_RULES = """- Choose American business stories: US companies, markets, jobs, prices, the
+  Fed, tariffs, big tech and AI deals. A foreign story qualifies only if it
+  clearly moves American money, jobs or prices.
 - Prefer everyday American money over company results: prices, rent, housing, cars,
   groceries, jobs, debt, the things a family feels. Frame a company story around
   what it changes for ordinary people. A big open question beats a recap.
-- Prefer stories that are BOTH searched and covered by several outlets today.
 - A VIRAL line is a video already doing big numbers on YouTube this week. If one
   with 1,000,000 views or more is about an American business story and breaks none
-  of the rules below, its subject goes FIRST, then the next biggest. We cover the
-  subject from our own reporting and never reuse the video, its script or its title.
+  of the rules below, its subject goes FIRST, then the next biggest."""
+
+PICK_PROMPT = """You are the commissioning editor of a YouTube explainer channel
+whose audience is in {audience}. Today is {today}. Choose the {n} best stories
+for today's video from the live signals below.
+
+How to rank:
+{rules}
+- Region weight: {weights}.
+- Prefer stories that are BOTH searched and covered by several outlets today.
+- We cover a viral video's subject from our own reporting and never reuse the
+  video, its script or its title.
 - Prefer stories with a "why" worth explaining for {minutes} minutes: a
   decision, a number, a conflict of interests, a consequence. A bare sports
   score, a film trailer, a celebrity birthday or a single-word search with no
@@ -224,10 +229,12 @@ def stock_move(cfg: Config) -> dict[str, Any] | None:
             "keywords": [topic, f"{topic} news", f"why is {topic} moving"]}
 
 
-def own_winners(st: dict[str, Any], limit: int = 6) -> str:
-    """Best-performing US stories first, from the numbers the weekly report saves."""
+def own_winners(st: dict[str, Any], limit: int = 6,
+                regions: list[str] | None = ("US", "MARKETS")) -> str:
+    """Best-performing stories first, from the numbers the weekly report saves
+    (only those of `regions`; empty = every region)."""
     eps = [e for e in st.get("episodes", []) if (e.get("stats") or {}).get("views")
-           and e.get("region") in ("US", "MARKETS")]
+           and (not regions or e.get("region") in regions)]
     eps.sort(key=lambda e: e["stats"]["views"], reverse=True)
     return "\n".join(f"- {e['stats']['views']:,} views: {e.get('title', '')}"
                      for e in eps[:limit]) or "- (no numbers yet)"
@@ -265,12 +272,14 @@ def pick(cfg: Config, n: int = 4) -> list[dict[str, Any]]:
 
     prompt = (
         PICK_PROMPT.format(
+            audience=cfg.get_path("trending.audience", US_AUDIENCE),
+            rules=str(cfg.get_path("trending.audience_rules", US_RULES)).strip(),
             today=f"{datetime.now(tz):%A %d %B %Y}", n=n,
             minutes=cfg.get_path("format.long.target_minutes", 6),
             weights=", ".join(f"{c} {r.get('weight', 0.5)}" for c, r in regions.items()),
             avoid="\n".join(f"- {a}" for a in cfg.get_path("trending.avoid", [])),
             covered="\n".join(f"- {c}" for c in covered) or "- (nothing yet)",
-            own=own_winners(st),
+            own=own_winners(st, regions=cfg.get_path("trending.own_regions", ["US", "MARKETS"])),
             signals="\n".join(lines)[:24000],
             codes=", ".join(regions),
         )

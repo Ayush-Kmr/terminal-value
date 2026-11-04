@@ -86,7 +86,8 @@ upload:
     "வர்த்தகம் & வரிகள்": [trade, tariff, tariffs, export, exports, import, imports, sanctions, oil, wto]
     "பொருளாதாரம் & வேலைகள்": [economy, economic, recession, jobs, unemployment, wages, gdp, consumer, dollar, debt, deficit]
 
-# Every story the main channel makes gets a Tamil version.
+# The Tamil channel follows its OWN builds: channels/ta-src.yaml picks today's
+# Tamil Nadu stories and builds them; nothing from the English channel.
 follow:
   adapt_to: Tamil Nadu         # viewer-impact lines rewritten for this audience
   # Audit 2026-11-04: single-stock Shorts (MARKETS) got 0 views here, and the

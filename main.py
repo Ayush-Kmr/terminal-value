@@ -352,8 +352,8 @@ def queued(args, kind: str, n: int) -> list[dict]:
     import yaml
 
     path = ROOT / "data" / "queue.yaml"
-    if args.topic or not path.exists():
-        return []
+    if args.topic or not path.exists() or not load().get_path("queue.enabled", True):
+        return []           # the queue holds the main channel's stories
     used = {e.get("queue") for e in state.load().get("episodes", [])}
     out = []
     for item in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get(kind, []):
@@ -457,9 +457,10 @@ def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
     stock - the day's biggest stock move, as before."""
     from src import trends
 
-    if args.topic:
+    second = cfg.get_path("format.short.second", "question")
+    if args.topic or second == "none":
         return stories
-    if cfg.get_path("format.short.second", "question") == "stock":
+    if second == "stock":
         move = trends.stock_move(cfg)
         if move:
             stories.insert(min(1, len(stories)), move)
