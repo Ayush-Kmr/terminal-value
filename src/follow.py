@@ -344,7 +344,7 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     frame = portrait(cfg) if is_short else cfg
     assets.redraw_cards(frame, shots, workdir / "assets", subject)
     assets.gather(frame, shots, workdir, subject)      # anything that did not copy
-    shots = voice.narrate_shots(cfg, shots, workdir, meta.get("region"), language)
+    shots = voice.narrate_shots(frame, shots, workdir, meta.get("region"), language)
     clips = render.build_shot_clips(frame, shots, workdir)
     video = render.concat_with_audio(frame, clips, shots, workdir,
                                      render.pick_music(cfg, company))

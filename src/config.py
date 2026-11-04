@@ -65,6 +65,7 @@ def portrait(cfg: Config) -> Config:
     out = Config(copy.deepcopy(dict(cfg)))
     vis = out.setdefault("visuals", {})
     vis["resolution"] = [1080, 1920]
+    vis["short"] = True          # renderer and voice: built to loop, no fades
     # Shorts have their own style (visuals.short_style), palette and fonts.
     # A channel drawing its own script (fonts.caption, e.g. Tamil) keeps its fonts.
     if vis.get("short_style"):

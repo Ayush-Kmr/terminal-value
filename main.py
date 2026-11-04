@@ -187,8 +187,10 @@ SHORT_BEAT = {
                "then why it matters to the viewer. 6-9 shots of ONE sentence each, under 12 "
                "words, so the picture changes every few seconds. Stay on one subject, with a "
                "real number in the first or second sentence, as the Shorts that held "
-               "viewers best did. LAST SENTENCE: short, repeating the opening's key word or number, and leading "
-               "straight back into the first sentence, so the Short loops without a pause. "
+               "viewers best did. LAST SENTENCE: short, repeating the opening's key word or number, and written "
+               "to run straight into the FIRST sentence as one thought when the Short "
+               "replays (e.g. last: 'And it all comes back to one number.' then first: "
+               "'$4 billion, gone in a day.'), so it loops without a pause. "
                "No greeting, no sign-off, no 'subscribe'."),
 }
 
@@ -234,7 +236,9 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     for attempt in range(3):
         sc = script_mod.write(tall, fb, "", language, beats=[beat],
                               total_words=int(seconds / 60 * wpm))
-        limit = int(seconds / 60 * wpm * 1.2)
+        # No overrun: Shorts of 21-28 s held 60-110% of viewers, 42-44 s ones
+        # 30% (reach report 2026-11-04).
+        limit = int(seconds / 60 * wpm)
         if hook_words(sc) <= 10 and sc["word_count"] <= limit and loops(sc):
             break
         log.info("Short has a %d-word opening, %d words, loop %s; rewriting (%d)",

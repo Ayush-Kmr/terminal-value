@@ -371,11 +371,13 @@ def concat_with_audio(
         start = random.Random(str(workdir.name)).uniform(0, 40)
         cmd += ["-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(music)]
         volume = float(cfg.get_path("audio.music_volume", 0.5))
+        looping = bool(cfg.get_path("visuals.short"))
         # The bed drops whenever the narrator speaks and comes back up in
         # the pauses, so it is heard without ever competing with the voice.
         chain += (
             f";[narr]asplit=2[say][key]"
-            f";[{idx+1}:a]aformat=channel_layouts=stereo,volume={volume},afade=t=in:d=1.5[bed]"
+            f";[{idx+1}:a]aformat=channel_layouts=stereo,volume={volume}"
+            f"{'' if looping else ',afade=t=in:d=1.5'}[bed]"
             # Measured: threshold 0.02 / ratio 5 left the bed ~20 dB under the
             # voice, inaudible on a phone. This sits it ~14 dB under.
             f";[bed][key]sidechaincompress=threshold=0.05:ratio=3:attack=20:release=400[duck]"
@@ -385,9 +387,12 @@ def concat_with_audio(
     else:
         amap = "[narr]"
 
-    fade = max(total - 1.2, 0)
+    # A Short replays straight into its first line, so it ends at full level
+    # (a 60 ms ramp only, against a click); a long video fades out.
+    tail = 0.06 if cfg.get_path("visuals.short") else 1.2
+    fade = max(total - tail, 0)
     chain += (f";{amap}loudnorm=I=-14:TP=-1.5:LRA=11,"
-              f"afade=t=out:st={fade:.3f}:d=1.2[final]")
+              f"afade=t=out:st={fade:.3f}:d={tail}[final]")
     cmd += ["-filter_complex", chain, "-map", "0:v", "-map", "[final]", "-t", f"{total:.3f}",
             "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-b:a", "192k", str(out)]
     _run(cmd)

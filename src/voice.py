@@ -364,6 +364,10 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
 
         # Pad so no shot is shorter than the minimum; hold shots get silence after.
         pad = hold_ms / 1000.0 if shot.get("emphasis") == "hold" else 0.25
+        if cfg.get_path("visuals.short"):
+            # A Short loops: silence before the replay reads as the end, and
+            # every pause is a moment to swipe.
+            pad = 0.05 if shot is shots[-1] else min(pad, 0.35)
         shot["audio"] = str(path)
         shot["spoken_duration"] = spoken
         # Never shorter than the narration itself: a clipped shot lets its

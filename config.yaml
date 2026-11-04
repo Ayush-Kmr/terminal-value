@@ -116,7 +116,7 @@ format:
     # 30-45 s is the length where completion drops most (Shorts playbook).
     second: question            # 2nd Short a day: question (searched-for question) | stock (biggest move)
     max_shot_words: 12
-    target_seconds: 28
+    target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     publish_times: ["09:00", "17:00"]   # ET
 
