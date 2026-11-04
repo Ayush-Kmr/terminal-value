@@ -95,8 +95,10 @@ def drop_off(cfg: Config, videos: list[dict], count: int = 3) -> list[str]:
     """For the newest long videos: the share of viewers left at each quarter."""
     from googleapiclient.discovery import build
 
+    # YouTube returns no retention curve for a video with only a handful of
+    # views, so the newest long videos with enough views, not simply the newest.
     longs = [v for v in sorted(videos, key=lambda x: x["published"], reverse=True)
-             if v["privacy"] == "public" and "M" in v["duration"]][:count]
+             if v["privacy"] == "public" and "M" in v["duration"] and v["views"] >= 20][:count]
     out = []
     try:
         ya = build("youtubeAnalytics", "v2", credentials=upload.credentials(),
@@ -107,7 +109,9 @@ def drop_off(cfg: Config, videos: list[dict], count: int = 3) -> list[str]:
                 startDate=v["published"][:10], endDate=str(date.today()),
                 metrics="audienceWatchRatio", dimensions="elapsedVideoTimeRatio",
                 filters=f"video=={v['id']}").execute().get("rows", [])
-            marks = {25: "1st quarter", 50: "half", 75: "3rd quarter"}
+            if not rows:
+                log.warning("No retention curve yet for %s (%d views)", v["id"], v["views"])
+            marks = {10: "first 10%", 25: "1st quarter", 50: "half", 75: "3rd quarter"}
             kept = [f"{name} {row[1] * 100:.0f}%" for pct, name in marks.items()
                     for row in rows if abs(row[0] * 100 - pct) < 0.51]
             if kept:

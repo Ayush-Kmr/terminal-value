@@ -431,14 +431,45 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
     log.info("YouTube status for %s: %s", video_id, yt_status)
 
 
+def evergreen_short(cfg) -> dict | None:
+    """The next question from data/evergreen.yaml not yet made as a Short."""
+    import yaml
+
+    path = ROOT / "data" / "evergreen.yaml"
+    if not path.exists():
+        return None
+    used = {e.get("queue") for e in state.load().get("episodes", [])}
+    for t in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("topics", []):
+        key = f"evergreen-short:{t['topic']}"
+        if key not in used:
+            return {"topic": t["topic"], "company": t["topic"], "angle": t["angle"],
+                    "region": "US", "language": "en", "search_query": t["topic"],
+                    "wiki_title": "", "keywords": list(t.get("search", []))[:4] or [t["topic"]],
+                    "queue": key}
+    return None
+
+
 def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
-    """The second Short of the day is a stock move: "iren stock" was the channel's
-    best search term by far."""
+    """The second Short of the day. format.short.second:
+    question (default) - a question people search for: a queued Short, else the
+      next evergreen question. Audit 2026-11-04: the question Shorts (AI bubble,
+      eggs, gas: 230/93/57 views) beat the single-stock ones (72/31/23).
+    stock - the day's biggest stock move, as before."""
     from src import trends
 
-    move = None if args.topic else trends.stock_move(cfg)
-    if move:
-        stories.insert(min(1, len(stories)), move)
+    if args.topic:
+        return stories
+    if cfg.get_path("format.short.second", "question") == "stock":
+        move = trends.stock_move(cfg)
+        if move:
+            stories.insert(min(1, len(stories)), move)
+        return stories
+    if any(str(s.get("queue", "")).startswith(("shorts:", "evergreen-short:"))
+           for s in stories[:2]):
+        return stories                  # a queued question is already in today's two
+    question = evergreen_short(cfg)
+    if question:
+        stories.insert(min(1, len(stories)), question)
     return stories
 
 

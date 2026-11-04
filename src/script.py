@@ -141,25 +141,34 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
         result = llm.json_call(prompt, temperature=0.8)
         if not isinstance(result, dict) or not result.get("shots"):
             raise RuntimeError(f"Beat {bid} came back without shots")
-        # Models write short. A long video that lands under 8 minutes cannot
-        # carry mid-roll ads, so a beat well under its length is rewritten once.
-        got = len(" ".join(s.get("narration", "") for s in result["shots"]).split())
-        if got < words * 0.9:
-            log.info("Beat %s came back at %d/%d words; asking for the full length",
-                     bid, got, words)
-            longer = llm.json_call(
-                prompt + f"\n\nIMPORTANT: a previous draft of this beat was only {got} "
-                f"words. It must be {words} words. Add depth from the facts above "
-                "(context, numbers, who said what, what it means for viewers), not padding.",
-                temperature=0.8)
-            if isinstance(longer, dict) and longer.get("shots"):
-                got2 = len(" ".join(s.get("narration", "") for s in longer["shots"]).split())
-                if got2 > got:
-                    result = longer
+        # Models write short (Groq, used when Gemini's quota runs out, most of
+        # all): a beat well under its length is asked for again, up to twice.
+        result = _lengthen(prompt, result, words, bid, tries=2)
         result["id"] = bid
+        result["_prompt"], result["_words"] = prompt, words
         out_beats.append(result)
         said_so_far.append(result.get("narration", ""))
         log.info("Beat %s written (%d shots)", bid, len(result.get("shots", [])))
+
+    # Still under format.long.min_minutes as a whole (seen: 4.7 min on a
+    # 6-minute target): the beats furthest under their length get one more go.
+    floor = float(cfg.get_path("format.long.min_minutes", 0)) * wpm
+    if not beats and floor:
+        total = sum(_count(b) for b in out_beats)
+        for b in sorted((b for b in out_beats if b.get("_prompt")),
+                        key=lambda b: _count(b) - b["_words"])[:3]:
+            if total >= floor:
+                break
+            before = _count(b)
+            better = _lengthen(b["_prompt"], b, b["_words"], b["id"], tries=1, force=True)
+            if better is not b:
+                better["id"] = b["id"]
+                out_beats[out_beats.index(b)] = better
+                total += _count(better) - before
+        log.info("Script length after top-up: %d words (floor %d)", total, floor)
+    for b in out_beats:
+        b.pop("_prompt", None)
+        b.pop("_words", None)
 
     script = {
         "company": fb["company"],
@@ -172,6 +181,31 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
     script["estimated_minutes"] = round(script["word_count"] / wpm, 1)
     log.info("Script: %d words, ~%s min", script["word_count"], script["estimated_minutes"])
     return script
+
+
+def _count(beat: dict) -> int:
+    return len(" ".join(s.get("narration", "") for s in beat.get("shots", [])).split())
+
+
+def _lengthen(prompt: str, result: dict, words: int, bid: str, tries: int = 2,
+              force: bool = False) -> dict:
+    """Ask again while a beat is under 90% of its length; keep the longest
+    draft. `force` asks even when the beat is near its length."""
+    best, got = result, _count(result)
+    for attempt in range(tries):
+        if got >= words * 0.9 and not force:
+            break
+        log.info("Beat %s at %d/%d words; asking for the full length (%d)",
+                 bid, got, words, attempt + 1)
+        longer = llm.json_call(
+            prompt + f"\n\nIMPORTANT: a previous draft of this beat was only {got} "
+            f"words. It must be at least {words} words. Add depth from the facts above "
+            "(context, numbers, who said what, what it means for viewers), not padding.",
+            temperature=0.8)
+        if isinstance(longer, dict) and longer.get("shots") and _count(longer) > got:
+            best, got = longer, _count(longer)
+        force = False
+    return best
 
 
 def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
