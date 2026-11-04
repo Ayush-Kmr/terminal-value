@@ -208,6 +208,31 @@ def _lengthen(prompt: str, result: dict, words: int, bid: str, tries: int = 2,
     return best
 
 
+def _figure(text: str) -> str:
+    """The headline figure of a sentence, e.g. "$4.2", "37%", "1,400"."""
+    import re
+
+    figures = re.findall(r"[$₹€£]?\d[\d,]*(?:\.\d+)?%?", text or "")
+    # Prefer the figure carrying a unit; a bare "7" is usually a date.
+    figures.sort(key=lambda f: (f[0] in "$₹€£" or f.endswith("%"), len(f)), reverse=True)
+    return figures[0].rstrip(",") if figures else ""
+
+
+def _no_blank_numbers(shot: dict) -> None:
+    """A stat card the writer left without its number would print a bare dash
+    (seen on a Groq-written Short, 2026-11-04). Take the figure from the
+    narration, or show the scene instead."""
+    spec = shot.get("visual_spec") or {}
+    if shot.get("visual_type") != "stat_reveal" or str(spec.get("value", "")).strip():
+        return
+    figure = _figure(shot.get("narration", ""))
+    if figure:
+        spec["value"] = figure
+    else:
+        shot["visual_type"] = "photo" if spec.get("stock_terms") else "ai_still"
+    shot["visual_spec"] = spec
+
+
 def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
     """The cold open gets a fixed, deliberately stark treatment."""
     import re
@@ -217,11 +242,7 @@ def _shots_for_hook(hook: str, fb: dict) -> list[dict[str, Any]]:
                  if s.strip()]
     shots = []
     for i, s in enumerate(sentences):
-        # The headline figure of the sentence, e.g. "$4.2", "37%", "1,400".
-        figures = re.findall(r"[$₹€£]?\d[\d,]*(?:\.\d+)?%?", s)
-        # Prefer the figure carrying a unit; a bare "7" is usually a date.
-        figures.sort(key=lambda f: (f[0] in "$₹€£" or f.endswith("%"), len(f)), reverse=True)
-        figure = figures[0].rstrip(",") if figures else ""
+        figure = _figure(s)
         shots.append({
             "narration": s,
             "visual_type": "stat_reveal" if figure else "ai_still",
@@ -293,5 +314,6 @@ def all_shots(script: dict, max_words: int = 0) -> list[dict[str, Any]]:
                                         "stock_terms": scenes[(len(flat)) % len(scenes)]}
             flat.append(piece)
     for i, s in enumerate(flat):
+        _no_blank_numbers(s)
         s["index"] = i
     return flat

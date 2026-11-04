@@ -52,6 +52,19 @@ def groq_models(client) -> list[str]:
     return _groq_models
 
 
+GEMINI_TIMEOUT = 180
+
+# Control tokens some open models leak into their text, e.g. "தன்<bos>3தேரா"
+# for Dhanteras in a Tamil description (2026-11-04). A digit glued between the
+# token and the next letter is part of the same junk.
+_LEAKED = re.compile(r"<(?:bos|eos|pad|unk|mask|/?s|start_of_turn|end_of_turn|\|[a-z_]+\|)>"
+                     r"(?:\d+(?=[^\W\d_]))?")
+
+
+def _clean(text: str) -> str:
+    return _LEAKED.sub("", text or "")
+
+
 def _gemini(prompt: str, system: str | None, temperature: float) -> str:
     import google.generativeai as genai
 
@@ -64,14 +77,17 @@ def _gemini(prompt: str, system: str | None, temperature: float) -> str:
             model = genai.GenerativeModel(name, system_instruction=system)
             resp = model.generate_content(
                 prompt, generation_config={"temperature": temperature,
-                                           "max_output_tokens": 16384})
-            return resp.text
+                                           "max_output_tokens": 16384},
+                # A stuck request otherwise hangs ten minutes before its 504
+                # (twice on 2026-11-04); a fresh try or Groq is quicker.
+                request_options={"timeout": GEMINI_TIMEOUT})
+            return _clean(resp.text)
         except Exception as exc:  # noqa: BLE001
             last = exc
             msg = str(exc)
             # A spent allowance or a retired name will not recover mid-run;
             # stop paying a failed request for it on every call.
-            if "429" in msg or "404" in msg:
+            if "429" in msg or "404" in msg or "504" in msg or "Deadline" in msg:
                 _exhausted.add(name)
             log.warning("Gemini %s failed (%s)", name, msg.splitlines()[0][:160])
     raise last or RuntimeError("Gemini quota used up for this run")
@@ -97,7 +113,7 @@ def _groq(prompt: str, system: str | None, temperature: float) -> str:
                 model=name, messages=messages, temperature=temperature,
                 max_tokens=max_tokens, **extra)
             if resp.choices[0].message.content:
-                return resp.choices[0].message.content
+                return _clean(resp.choices[0].message.content)
             last = RuntimeError(f"{name} returned no text")
         except Exception as exc:  # noqa: BLE001
             last = exc
