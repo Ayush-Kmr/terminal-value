@@ -33,13 +33,14 @@ LIMIT = 60          # newest uploads checked
 
 
 def _in(word: str, context: str) -> bool:
-    stem = word[:4] if len(word) >= 5 else word
-    return len(stem) >= 3 and stem in context
+    if len(word) < 3:                      # "ai", "us": whole word only
+        return re.search(rf"(?<![a-z0-9]){word}(?![a-z0-9])", context) is not None
+    return (word[:4] if len(word) >= 5 else word) in context
 
 
 def off_topic(tag: str, context: str) -> bool:
-    if tag != tag.lower():
-        return False
+    if tag != tag.lower() or not tag.isascii():
+        return False                       # chosen by the writer, not autocomplete
     words = [w for w in re.findall(r"[a-z0-9]+|[\u0B80-\u0BFF]+", tag)
              if w not in GENERIC and not w.isdigit()]
     seen = [_in(w, context) for w in words]
