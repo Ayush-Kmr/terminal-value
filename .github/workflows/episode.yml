@@ -57,6 +57,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
+        id: py
         with:
           python-version: "3.12"
           cache: pip
@@ -74,11 +75,12 @@ jobs:
           path: |
             .venv-kokoro
             ~/.cache/huggingface
-          key: kokoro-${{ runner.os }}-${{ hashFiles('requirements-kokoro.txt') }}
+          key: kokoro-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-kokoro.txt') }}
 
       - name: Install voice model
         run: |
-          if [ ! -x .venv-kokoro/bin/python ]; then
+          if ! .venv-kokoro/bin/python -c 'import sys' 2>/dev/null; then
+            rm -rf .venv-kokoro
             python -m venv .venv-kokoro
             .venv-kokoro/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
             .venv-kokoro/bin/pip install -q -r requirements-kokoro.txt
@@ -178,6 +180,7 @@ jobs:
         if: steps.on.outputs.go
 
       - uses: actions/setup-python@v5
+        id: py
         if: steps.on.outputs.go
         with:
           python-version: "3.12"
@@ -207,12 +210,13 @@ jobs:
           path: |
             .venv-indic
             ~/.cache/huggingface
-          key: indic-${{ runner.os }}-${{ hashFiles('requirements-indic.txt') }}
+          key: indic-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-indic.txt') }}
 
       - name: Install Tamil voice model
         if: steps.on.outputs.go
         run: |
-          if [ ! -x .venv-indic/bin/python ]; then
+          if ! .venv-indic/bin/python -c 'import sys' 2>/dev/null; then
+            rm -rf .venv-indic
             python -m venv .venv-indic
             .venv-indic/bin/pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
             .venv-indic/bin/pip install -q -r requirements-indic.txt
@@ -224,12 +228,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv-kokoro
-          key: kokoro-venv-${{ runner.os }}-${{ hashFiles('requirements-kokoro.txt') }}
+          key: kokoro-venv-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-kokoro.txt') }}
 
       - name: Install source voice model
         if: steps.on.outputs.go
         run: |
-          if [ ! -x .venv-kokoro/bin/python ]; then
+          if ! .venv-kokoro/bin/python -c 'import sys' 2>/dev/null; then
+            rm -rf .venv-kokoro
             python -m venv .venv-kokoro
             .venv-kokoro/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
             .venv-kokoro/bin/pip install -q -r requirements-kokoro.txt
