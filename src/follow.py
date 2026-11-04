@@ -147,6 +147,21 @@ def builds(root: Path) -> list[Path]:
     return sorted(found, key=lambda d: ("short" not in d.name, d.name))
 
 
+def fit(cfg: Config, folder: Path) -> int:
+    """How well an English Short suits this channel's viewers: the number of
+    follow.prefer_words in its subject, title and tags (whole words)."""
+    words = {w.lower() for w in cfg.get_path("follow.prefer_words", []) or []}
+    if not words:
+        return 0
+    try:
+        meta = json.loads((folder / "metadata.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return 0
+    text = " ".join([str(meta.get("company", "")), str(meta.get("title", "")),
+                     " ".join(meta.get("tags", []) or [])]).lower()
+    return len(words & set(re.findall(r"[a-z0-9]+", text)))
+
+
 def translate(cfg: Config, title: str, lines: list[str], language: str,
               note: str = "", latin: str = r"[A-Za-z]{2,}") -> list[str]:
     name = LANGUAGE_NAMES.get(language, language)
@@ -368,6 +383,8 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
 
 def run(cfg: Config, root: Path, publish: str = "slot", no_upload: bool = False) -> int:
     folders = builds(root)
+    # Best-suited Shorts first (follow.prefer_words); the long video stays last.
+    folders.sort(key=lambda d: ("short" not in d.name, -fit(cfg, d)))
     if not folders:
         log.info("Nothing to follow under %s", root)
         return 0

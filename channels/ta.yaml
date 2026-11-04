@@ -94,6 +94,14 @@ follow:
   # One Short a day until Tamil Shorts average 20+ views, then turn long back on.
   skip_regions: [MARKETS]
   max_shorts: 1
+  # The Short Tamil takes is the one closest to household money. Tamil data to
+  # 2026-11-04: egg prices 1,407 views, IDBI sale 446, EPFO pension 327; single
+  # stocks and US tech (Inovio, LiveWire, Kalshi, AI bubble) 0-3.
+  prefer_words: [price, prices, expensive, cost, costs, inflation, egg, eggs, food,
+                 grocery, groceries, rent, gas, petrol, fuel, gold, silver, salary,
+                 wages, pension, savings, loan, loans, mortgage, interest, rates, rate,
+                 tax, taxes, tariff, tariffs, jobs, layoffs, bank, banks, insurance, coffee,
+                 beef, childcare, health, india, indian, rupee, dollar]
   long: false
 
 format:
