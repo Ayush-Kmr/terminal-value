@@ -6,13 +6,17 @@ token (review of 2026-11-04: "bernie madoff movie scene", "kalshi dance",
     python scripts/clean_tags.py            # apply
     python scripts/clean_tags.py --dry-run  # only list what would change
 
-A tag stays when every word it adds is in the video's own title or
-description, or is a generic search word (src/keywords.py). The channel's
-standard tags and keywords always stay, and a video keeps at least 3 tags.
+Only the shape autocomplete produces is removed: an all-lower-case phrase
+that starts on the video's subject and then adds words the video never uses
+("bernie madoff | movie scene", "gas prices | starlito"). Tags the writer
+chose ("Indian Railways", "Q2 results") stay, as do the channel's standard
+tags and keywords; a video keeps at least 3 tags. Hindi videos (unlisted) are
+skipped.
 Each change costs 50 units of the 10,000-a-day YouTube quota.
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -21,11 +25,28 @@ sys.path.insert(0, str(ROOT))
 
 from src import upload  # noqa: E402
 from src.config import load  # noqa: E402
-from src.keywords import _relevant  # noqa: E402
+from src.keywords import GENERIC  # noqa: E402
 
 STANDARD = {"news explained", "tamil news", "business news tamil", "தமிழ் செய்திகள்",
             "hindi news"}
 LIMIT = 60          # newest uploads checked
+
+
+def _in(word: str, context: str) -> bool:
+    stem = word[:4] if len(word) >= 5 else word
+    return len(stem) >= 3 and stem in context
+
+
+def off_topic(tag: str, context: str) -> bool:
+    if tag != tag.lower():
+        return False
+    words = [w for w in re.findall(r"[a-z0-9]+|[\u0B80-\u0BFF]+", tag)
+             if w not in GENERIC and not w.isdigit()]
+    seen = [_in(w, context) for w in words]
+    if not seen or not seen[0] or all(seen):
+        return False
+    first_miss = seen.index(False)
+    return not any(seen[first_miss:])      # on-topic start, then only strangers
 
 
 def main() -> int:
@@ -48,9 +69,11 @@ def main() -> int:
     for i in range(0, len(ids[:LIMIT]), 50):
         for v in yt.videos().list(part="snippet", id=",".join(ids[i:i + 50])).execute()["items"]:
             sn = v["snippet"]
+            if re.search(r"[\u0900-\u097F]", sn["title"]):
+                continue
             tags = sn.get("tags") or []
-            context = f"{sn['title']} {sn.get('description', '')}"
-            keep = [t for t in tags if t.lower() in keep_always or _relevant(t, "", context)]
+            context = f"{sn['title']} {sn.get('description', '')}".lower()
+            keep = [t for t in tags if t.lower() in keep_always or not off_topic(t, context)]
             if len(keep) < 3:
                 keep = keep + [t for t in tags if t not in keep][:3 - len(keep)]
             drop = [t for t in tags if t not in keep]
