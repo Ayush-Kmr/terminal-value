@@ -54,6 +54,10 @@ voice:
   provider: indic
   match_ok: 0.75               # sound-skeleton match (src/voice.py): clean takes 0.85+, clipped ~0.6
   check_rounds: 1              # a full second and third take added two hours to a long video
+  # Tamil Shorts ran 36-49 s against 28 s in English and held only 22-36% of
+  # viewers (reach report 2026-11-04). 1.15x keeps every word clear (Whisper
+  # match 0.93-0.97 at 1.12x and 1.2x on real takes) and pitch is unchanged.
+  tempo: 1.15
   indic:
     description: >-
       Jaya speaks in a clear, confident and slightly expressive tone at a

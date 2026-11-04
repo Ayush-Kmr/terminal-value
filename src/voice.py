@@ -78,13 +78,15 @@ def _synthesise(text: str, out: Path, cfg: Config, voice_id: str) -> None:
     out.write_bytes(resp.content)
 
 
-def _polish(raw: Path, out: Path) -> None:
+def _polish(raw: Path, out: Path, tempo: float = 1.0) -> None:
     """Trim the silence the model leaves at either end. No compressor: it
-    lifts the quiet tail after every word, which is heard as room echo."""
+    lifts the quiet tail after every word, which is heard as room echo.
+    `tempo` speeds the take up without changing its pitch (voice.tempo)."""
     trim = "silenceremove=start_periods=1:start_threshold=-48dB:start_silence=0.05"
+    speed = f"atempo={tempo:.3f}," if abs(tempo - 1.0) > 0.005 else ""
     subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
-         f"{trim},areverse,{trim},areverse,highpass=f=75,"
+         f"{trim},areverse,{trim},areverse,{speed}highpass=f=75,"
          "alimiter=limit=0.89:level=disabled,afade=t=in:d=0.01",
          "-ar", "44100", "-ac", "1", "-b:a", "160k", str(out)],
         check=True,
@@ -149,8 +151,9 @@ def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> 
                          env={**os.environ, "TQDM_DISABLE": "1"})
     if res.returncode != 0:
         raise VoiceError(f"Indic voice run failed with exit code {res.returncode}")
+    tempo = float(cfg.get_path("voice.tempo", 1.0) or 1.0)
     for (_, path), raw in zip(todo, raws):
-        _polish(raw, path)
+        _polish(raw, path, tempo)
         raw.unlink()
 
 

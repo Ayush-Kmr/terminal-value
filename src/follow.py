@@ -35,7 +35,7 @@ Video: {title}
 Translate line by line. Each line is spoken over its own picture, so keep every
 line's meaning in that line: do not move facts between lines, merge or drop
 lines, or add anything. Keep it natural and spoken, as a {name} news presenter
-would say it, at about the same length as the English.
+would say it, {length}.
 
 Lines:
 {lines}
@@ -133,6 +133,13 @@ def adapt(cfg: Config, title: str, shots: list[dict]) -> int:
     return changed
 
 
+# Tamil runs longer than English when spoken, and a Short loses viewers with
+# every extra second (2026-11-04: 36-49 s Tamil Shorts held 22-36% of viewers).
+SHORT_NOTE = """This is a vertical Short of under 30 seconds. Say each line in as few words
+as natural spoken Tamil allows: no filler or connecting phrases, no repeating
+the subject, figures said once. Keep every fact and number in its line; cut
+only words. Aim for SHORTER than the English, not the same length."""
+
 SCREEN_NOTE = """These lines are short text printed on the picture of the video, not speech.
 Keep each one as short as the English. Digits, %, $ and dates as digits stay; every
 word, name, month and unit goes into Tamil script ("$4 billion" -> "4 பில்லியன் டாலர்",
@@ -172,6 +179,8 @@ def translate(cfg: Config, title: str, lines: list[str], language: str,
         for attempt in range(3):
             got = llm.json_call(TRANSLATE_PROMPT.format(
                 name=name, title=title, rules=f"{language_rules(language)}\n{note}",
+                length=("as briefly as the meaning allows" if note is SHORT_NOTE
+                        else "at about the same length as the English"),
                 lines=listing, n=len(part)), temperature=0.3)
             got = got.get("lines") if isinstance(got, dict) else got
             # Latin letters are read badly by the Tamil voice ("பinflation").
@@ -323,7 +332,8 @@ def produce(cfg: Config, src: Path, workdir: Path) -> dict:
     adapt(cfg, en_title, shots)
     spoken = [s for s in shots if (s.get("narration") or "").strip()]
     for shot, line in zip(spoken, translate(cfg, en_title,
-                                            [s["narration"] for s in spoken], language)):
+                                            [s["narration"] for s in spoken], language,
+                                            SHORT_NOTE if is_short else "")):
         shot["narration"] = line
     (workdir / "script.json").write_text(
         json.dumps(shots, indent=2, ensure_ascii=False), encoding="utf-8")
