@@ -337,7 +337,7 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 209,
+        "views": 210,
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 109,
@@ -654,7 +654,7 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 258,
+        "views": 256,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 25,
@@ -733,7 +733,7 @@
       "warnings": [],
       "created_at": "2026-10-30T13:00:19.902734+00:00",
       "stats": {
-        "views": 535,
+        "views": 533,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 31,
@@ -794,7 +794,7 @@
       "warnings": [],
       "created_at": "2026-11-01T12:01:32.048352+00:00",
       "stats": {
-        "views": 13,
+        "views": 15,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 187,
@@ -887,9 +887,9 @@
       "queue": "shorts:Gas prices",
       "created_at": "2026-11-02T16:03:09.420207+00:00",
       "stats": {
-        "views": 57,
+        "views": 58,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -955,7 +955,7 @@
       "queue": "shorts:How Madoff fooled everyone",
       "created_at": "2026-11-03T12:12:28.027839+00:00",
       "stats": {
-        "views": 31,
+        "views": 30,
         "likes": 0,
         "comments": 1
       },
@@ -977,9 +977,9 @@
       "created_at": "2026-11-04T06:02:41.107366+00:00",
       "commented": true,
       "stats": {
-        "views": 23,
+        "views": 17,
         "likes": 0,
-        "comments": 1
+        "comments": 0
       }
     },
     {
@@ -1029,5 +1029,5 @@
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 55.0
+  "channel_median_views": 55.5
 }
