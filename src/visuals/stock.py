@@ -50,6 +50,15 @@ def pexels_video(query: str, dest: Path) -> dict | None:
             files = [f for f in video.get("video_files", []) if (f.get("width") or 0) >= 1280]
             if not files:
                 continue
+            if ("pexels", video.get("id")) in _used_clips:
+                continue
+            # Pexels gives no tags, but the page address describes the clip
+            # (".../video/a-pelican-at-a-fish-market-123/"). Unchecked, its first
+            # hit for "fresh vegetables market stall" was that pelican, and a
+            # neon OPEN sign stood in for a cooperative store (2026-11-04).
+            if not _fits(query, _slug_words(video.get("url", ""))):
+                continue
+            _used_clips.add(("pexels", video.get("id")))
             best = min(files, key=lambda f: abs((f.get("width") or 0) - 1920))
             out = dest.with_suffix(".mp4")
             if _download(best["link"], out):
@@ -87,12 +96,23 @@ def pixabay_image(query: str, dest: Path) -> dict | None:
 _used_clips: set = set()
 
 
+def _stem(word: str) -> str:
+    return word[:-3] + "y" if word.endswith("ies") else word.rstrip("s")
+
+
+def _slug_words(url: str) -> str:
+    """"https://www.pexels.com/video/fresh-vegetables-at-a-market-855564/" ->
+    "fresh vegetables at a market"."""
+    m = re.search(r"/video/([^/?#]+)", url or "")
+    return re.sub(r"[-_]+", " ", re.sub(r"-?\d+/?$", "", m[1])) if m else ""
+
+
 def _fits(query: str, tags: str) -> bool:
     """Stock search returns near misses ("telecommunications store" found a clothes
     rack), so a clip's own tags must share at least two words with the request."""
-    wanted = {w for w in re.findall(r"[a-z]+", query.lower()) if len(w) > 3}
-    have = set(re.findall(r"[a-z]+", str(tags).lower()))
-    return len(wanted & have) >= min(2, len(wanted))
+    wanted = {_stem(w) for w in re.findall(r"[a-z]+", query.lower()) if len(w) > 3}
+    have = {_stem(w) for w in re.findall(r"[a-z]+", str(tags).lower())}
+    return bool(wanted) and len(wanted & have) >= min(2, len(wanted))
 
 
 def pixabay_video(query: str, dest: Path) -> dict | None:
