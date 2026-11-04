@@ -77,14 +77,32 @@ def native_script(cfg: Config) -> bool:
     return bool(font) and features.check("raqm")
 
 
+# Capitalised words that are not a subject: sentence starts, pronouns, links.
+_NOT_KEY = {
+    "the", "this", "that", "that's", "these", "those", "there", "there's", "then", "than",
+    "and", "but", "now", "here", "here's", "what", "what's", "when", "where", "which", "while",
+    "who", "why", "how", "it's", "its", "they", "their", "they're", "we're", "you", "your",
+    "you're", "our", "his", "her", "she", "he's", "she's", "for", "from", "with", "into",
+    "after", "before", "because", "since", "just", "still", "even", "also", "only", "so",
+    "yet", "not", "one", "some", "most", "many", "every", "each", "today", "tonight",
+}
+
+
 def _keyword(words: list[str]) -> int | None:
-    """Caption News puts one word per caption on the honey block: a figure if
-    there is one, else the longest long word."""
+    """Caption News puts at most one word per caption on the honey block: a
+    figure if there is one ($4, 17.4%), else a name (Arista, Jayshree). An
+    ordinary word is never picked, so a caption without either has no block."""
     for i, w in enumerate(words):
         if re.search(r"\d", w):
             return i
-    longest = max(range(len(words)), key=lambda i: len(words[i]), default=None)
-    return longest if longest is not None and len(words[longest].strip(".,?!")) >= 6 else None
+    bare = [w.strip(".,?!:;\"'“”‘’()") for w in words]
+    for i, b in enumerate(bare):              # a name: Arista, Jayshree, Fed
+        if len(b) >= 3 and b[:1].isupper() and not b.isupper() and b.lower() not in _NOT_KEY:
+            return i
+    for i, b in enumerate(bare):              # an acronym: AI, CEO, IPO
+        if b.isupper() and b.isalpha() and 2 <= len(b) <= 5 and b.lower() not in _NOT_KEY:
+            return i
+    return None
 
 
 def _draw_slam(cfg: Config, size: tuple[int, int], words: list[str], key: int | None,

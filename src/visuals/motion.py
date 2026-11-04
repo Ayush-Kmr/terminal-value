@@ -497,7 +497,8 @@ def quote_card(spec: dict, cfg: dict, out: Path) -> Path:
     line_h = int(size * 1.28)
     attr = str(spec.get("caption", "")).strip()
     block = len(lines) * line_h + (s.px(96) if attr else 0)
-    y = s.cy - block / 2 + s.px(40)
+    # The quote mark is drawn above the first line: keep it below the label.
+    y = max(s.cy - block / 2 + s.px(40), s.top + s.px(190))
     x = s.left + (0 if s.portrait else s.px(40))
 
     mark, d = s.layer(0.1, FADE, 0.6)
