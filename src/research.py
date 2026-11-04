@@ -348,6 +348,12 @@ def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
     return "\n\n".join(parts), sources
 
 
+def _local_note(cfg: Config) -> str:
+    """A channel's own rule for which local figures to keep (Tamil: Chennai prices)."""
+    note = str(cfg.get_path("research.local_note", "") or "").strip()
+    return f"\n\nFor this channel's viewers:\n{note}" if note else ""
+
+
 NEWS_EXTRACT_PROMPT = """You are a news researcher building a fact base for an
 explainer video. Today is {today}.
 
@@ -437,7 +443,8 @@ def build_news(cfg: Config, story: dict[str, Any]) -> FactBase:
     data = llm.json_call(
         NEWS_EXTRACT_PROMPT.format(
             today=f"{datetime.now():%d %B %Y}", topic=topic, angle=angle,
-            material=material[:16000], beat_ids=beat_ids),
+            material=material[:16000], beat_ids=beat_ids)
+        + _local_note(cfg),
         temperature=0.2,
     )
 

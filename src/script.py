@@ -138,6 +138,9 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
             quotes=_json.dumps(fb.get("quotes", [])[:6], ensure_ascii=False),
             previous=" ".join(said_so_far)[-1500:] or "(nothing yet)",
         )
+        note = str(cfg.get_path("script.local_note", "") or "").strip()
+        if note:
+            prompt += f"\n- For this channel's viewers: {note}"
         result = llm.json_call(prompt, temperature=0.8)
         if not isinstance(result, dict) or not result.get("shots"):
             raise RuntimeError(f"Beat {bid} came back without shots")

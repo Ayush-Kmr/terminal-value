@@ -153,6 +153,7 @@ def _english(text: str) -> str:
 
 def spoken(text: str, language: str) -> str:
     """Narration with every figure written out in words."""
+    text = re.sub(r"(\d)\.0+(?![\d.])", r"\1", str(text))   # "$3,958.00" is said "3,958"
     language = language if language in CURRENCY else "en"
     if language == "en":
         text = _english(text)

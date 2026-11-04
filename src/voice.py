@@ -231,9 +231,35 @@ def _words(text: str, language: str | None) -> list[str]:
                       spoken(text, language or "en").lower())
 
 
+# Tamil letters and English letters folded into one rough set of consonant
+# sounds. Tamil script does not mark k/g, t/d, p/b or s/j apart, and Whisper
+# writes loanwords ("December", "Gold Futures") and figures in English letters
+# and digits, so a word-for-word match marked full, clear Tamil takes as 0.2-0.4
+# (2026-11-04). Compared as sound skeletons, a clean take scores high and a
+# clipped or garbled one still falls well below.
+_TA_SOUND = dict(zip("கஙசஞடணதநபமயரலவழளறனஜஷஸஹ", "knsntntnpmyrlvllrnsssh"))
+_EN_SOUND = str.maketrans("gdbfwzjqcx", "ktppvsskss")
+
+
+def _skeleton(text: str, language: str | None) -> str:
+    text = spoken(text, language or "en").lower()
+    out = []
+    for ch in text:
+        if ch in _TA_SOUND:
+            out.append(_TA_SOUND[ch])
+        elif "a" <= ch <= "z" and ch not in "aeiouh":
+            out.append(ch.translate(_EN_SOUND))
+    return re.sub(r"(.)\1+", r"\1", "".join(out))
+
+
 def match(script_text: str, heard: str, language: str | None) -> float:
     """0-1: how much of the script the take really says. Catches the cloned
     voice's failure modes: a clipped ending, a repeated phrase, mumbling."""
+    if language == "ta":
+        a, b = _skeleton(script_text, language), _skeleton(heard, language)
+        if not a:
+            return 1.0
+        return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
     a, b = _words(script_text, language), _words(heard, language)
     if not a:
         return 1.0

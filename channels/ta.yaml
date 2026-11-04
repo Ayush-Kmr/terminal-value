@@ -52,7 +52,7 @@ voice:
   # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine. The English
   # voice cannot speak Tamil. Jaya is the model's recommended Tamil speaker.
   provider: indic
-  match_ok: 0.5                # Whisper hears Tamil less exactly than English
+  match_ok: 0.75               # sound-skeleton match (src/voice.py): clean takes 0.85+, clipped ~0.6
   check_rounds: 1              # a full second and third take added two hours to a long video
   indic:
     description: >-
