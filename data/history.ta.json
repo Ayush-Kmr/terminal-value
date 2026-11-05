@@ -274,7 +274,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Kalshi",
@@ -306,7 +307,21 @@
       "source": "2026-11-04-short-tn-govt-special-vegetable-kit-for-diwali",
       "warnings": [],
       "question": "உங்கள் பகுதியில் இந்த சிறப்பு காய்கறி தொகுப்பு கிடைக்கிறதா?",
-      "created_at": "2026-11-04T11:43:20.163891+00:00"
+      "created_at": "2026-11-04T11:43:20.163891+00:00",
+      "commented": true
+    },
+    {
+      "company": "Crude Oil Price Drop and RBI Policy Relief",
+      "angle": "Will the drop in global crude oil prices to $94 give relief to Indian consumers at the fuel pump and influence the RBI's upcoming policy?",
+      "title": "Crude Oil Price Tamil | கச்சா எண்ணெய் விலை மற்றும் ஆர்பிஐ வட்டி விகிதம்",
+      "region": "IN",
+      "language": "ta",
+      "video_id": "VplxH2reot8",
+      "kind": "short",
+      "source": "2026-11-05-short-crude-oil-price-drop-and-rbi-policy-relief",
+      "warnings": [],
+      "question": "அடுத்த மாதம் ஆர்பிஐ வட்டி விகிதத்தை உயர்த்துமா?",
+      "created_at": "2026-11-05T11:50:08.968699+00:00"
     }
   ],
   "rejected_topics": [],
