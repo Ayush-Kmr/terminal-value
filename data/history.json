@@ -1042,7 +1042,8 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "shorts:Childcare costs",
-      "created_at": "2026-11-04T11:34:33.172223+00:00"
+      "created_at": "2026-11-04T11:34:33.172223+00:00",
+      "commented": true
     },
     {
       "company": "Car insurance prices",
@@ -1057,7 +1058,38 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "shorts:Car insurance prices",
-      "created_at": "2026-11-04T11:38:26.045994+00:00"
+      "created_at": "2026-11-04T11:38:26.045994+00:00",
+      "commented": true
+    },
+    {
+      "company": "Beef prices",
+      "angle": "Why are US beef prices at records?",
+      "title": "Why Is Beef So Expensive? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "7VXXBNtDO-s",
+      "kind": "short",
+      "warnings": [],
+      "question": "Has the rise in beef prices changed what you buy?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "shorts:Beef prices",
+      "created_at": "2026-11-05T11:33:11.257058+00:00"
+    },
+    {
+      "company": "Market Drop Wipes Out Trillion Dollars",
+      "angle": "What caused the massive market sell-off that erased over a trillion dollars in value from equities?",
+      "title": "Market drop pushes Nasdaq Composite down 2.9% #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "Go_IvmMTLco",
+      "kind": "short",
+      "warnings": [],
+      "question": "How much do AI stocks affect your portfolio?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-05T11:40:13.748708+00:00"
     }
   ],
   "rejected_topics": [],
