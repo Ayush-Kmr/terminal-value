@@ -102,11 +102,15 @@ def pick_ideas(cfg: Config, n: int, topic: str = "") -> list[dict]:
         return [{"id": f"manual-{datetime.now():%Y%m%d%H%M}", "premise": topic, "cast": keys}]
     used = {e.get("idea") for e in state.load().get("episodes", [])}
     month = datetime.now().month
-    # Out-of-season ideas wait for their months; in-season ones go first.
+    # An idea with dates runs only on those days (India time) and goes first;
+    # out-of-season ideas wait for their months; in-season ones come next.
+    today = datetime.now(upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata")))
+    day = today.date().isoformat()
     fresh = [i for i in _ideas(cfg) if i["id"] not in used
-             and (not i.get("months") or month in i["months"])]
+             and (not i.get("months") or month in i["months"])
+             and (not i.get("dates") or day in [str(d) for d in i["dates"]])]
     random.Random(datetime.now().strftime("%Y%m%d")).shuffle(fresh)
-    fresh.sort(key=lambda i: not i.get("months"))            # stable: seasonal first
+    fresh.sort(key=lambda i: (not i.get("dates"), not i.get("months")))   # stable
     out = fresh[:n]
     while len(out) < n:
         out.append(invent(cfg, [*[i["premise"] for i in out], *recent_titles()]))

@@ -1,8 +1,35 @@
 # Skit premises for the Bhojpuri comedy channel (src/skit.py). One is used per
 # skit and never repeated; when all are used the model invents a new one.
 # months: optional, the premise is picked first in those months (1-12).
+# dates: optional, the premise runs only on those days (India time) and first;
+#   this week's festival skits (docs/BHOJPURI-WEEK-PLAN.md).
 # cast: who is in it (keys of skit.characters in channels/bh.yaml).
 ideas:
+  # ---- week of 2026-11-09: Diwali -> Bhai Dooj -> Chhath ----
+  - id: diwali-leftover-mithai
+    premise: The day after Diwali, Chacha hides the leftover sweets all over the house "for safety", forgets where, and Chachi finds them one by one in very silly places.
+    cast: [lallan, phoolmati]
+    dates: [2026-11-09]
+  - id: bhai-dooj-gift
+    premise: On Bhai Dooj, Bablu has no money for a gift for his sister, so he "gifts" her a free online course link; Chachi makes him pay in a funnier way.
+    cast: [bablu, phoolmati, lallan]
+    dates: [2026-11-10, 2026-11-11]
+  - id: chhath-thekua
+    premise: Chhath preparations; Chacha insists on making the thekua himself because he saw a cooking reel, and the kitchen turns into a battlefield.
+    cast: [lallan, phoolmati, bablu]
+    dates: [2026-11-12, 2026-11-13]
+  - id: chhath-train-home
+    premise: Everyone is rushing home to Bihar for Chhath; Bablu calls from the packed train and Chacha gives him "expert" advice on finding a seat.
+    cast: [bablu, lallan]
+    dates: [2026-11-12, 2026-11-13, 2026-11-14]
+  - id: chhath-ghat-selfie
+    premise: At the Chhath ghat, Bablu wants the perfect selfie with the sunset while Chachi tries to keep the family focused on the puja, and Chacha photobombs every shot.
+    cast: [bablu, phoolmati, lallan]
+    dates: [2026-11-14, 2026-11-15]
+  - id: wedding-card-arrives
+    premise: Wedding season begins; the first wedding card of the season arrives and Chacha plans which relative's wedding has the best food, like a general planning a war.
+    cast: [lallan, phoolmati]
+    dates: [2026-11-15, 2026-11-16]
   - id: chacha-selfie
     premise: Lallan Chacha gets his first smartphone and cannot understand why every photo shows his own face (the front camera is on).
     cast: [lallan, bablu]
