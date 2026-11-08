@@ -7,9 +7,9 @@
 
 channel:
   name: "Bhojpuri AI Comedy"
-  handle: "@BhojpuriAIComedy"            # set in Studio; the API cannot change it
+  handle: "@BhojpuriAIComedyShorts"      # set in Studio 2026-11-08 (@BhojpuriAIComedy was taken)
   channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads refuse to go anywhere else
-  url: "https://www.youtube.com/channel/UC5QnQWBbS5AVKvgxsZl4V3w"
+  url: "https://www.youtube.com/@BhojpuriAIComedyShorts"
   tagline: "ललन चाचा के घर, रोज नया बवाल!"
   # Bhojpuri. Number reading and the voice treat it as Hindi (same script).
   language: bho
