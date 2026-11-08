@@ -1157,7 +1157,8 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "shorts:Coffee prices",
-      "created_at": "2026-11-07T10:43:26.433160+00:00"
+      "created_at": "2026-11-07T10:43:26.433160+00:00",
+      "commented": true
     },
     {
       "company": "Global Stocks $2.5T Sell-Off and Market Volatility",
@@ -1172,7 +1173,38 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-07T10:47:19.470358+00:00"
+      "created_at": "2026-11-07T10:47:19.470358+00:00",
+      "commented": true
+    },
+    {
+      "company": "Global Stock Sell-Off and Tech Market Volatility",
+      "angle": "Why are global markets experiencing extreme volatility and massive tech sell-offs following recent economic shifts?",
+      "title": "Global Stock Market Today Falls by 5.5% #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "umbey2EjMU8",
+      "kind": "short",
+      "warnings": [],
+      "question": "How closely do you follow daily stock market movements?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-08T10:46:17.239408+00:00"
+    },
+    {
+      "company": "The Fed",
+      "angle": "What does the Federal Reserve actually do, and how does a rate change reach your mortgage and credit card?",
+      "title": "Fed Rates And Stock Market: Why 3.71% Yields Matter Now #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "3ze1qKLxsvc",
+      "kind": "short",
+      "warnings": [],
+      "question": "Would you choose a stable asset or a risky investment right now?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "evergreen-short:The Fed",
+      "created_at": "2026-11-08T10:48:55.917547+00:00"
     }
   ],
   "rejected_topics": [],
