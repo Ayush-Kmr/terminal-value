@@ -7,7 +7,14 @@ One skit = one vertical Short of 35-45 s: three recurring cartoon characters
 (skit.characters in channels/bh.yaml) in a short dialogue that ends on a
 punchline. Per line: a cartoon picture of the speaker (Cloudflare FLUX, with
 the character's full look in every prompt so they stay recognisable), the line
-in that character's own voice (Indic Parler-TTS), and big word captions.
+in that character's own voice (Indic Parler-TTS), the picture talking along
+with that voice and the speaker's name tag (src/animate.py), big word captions
+timed from the take, and comedy sound effects (assets/sfx, scripts/make_sfx.py)
+with a ba-dum-tss after the punchline.
+
+Premises: one a day from what India is watching on YouTube right now (the
+trending chart, videos with a million views or more; the subject only, never
+the video or the real people in it), the rest from data/bhojpuri_ideas.yaml.
 Everything is free: the free LLM chain, the free image tier, an open voice
 model on the runner.
 """
@@ -18,13 +25,14 @@ import json
 import logging
 import random
 import re
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
 import requests
 import yaml
 
-from . import captions, gate, llm, render, shorts, state, upload, voice
+from . import animate, captions, gate, llm, render, shorts, state, upload, voice
 from .config import ROOT, Config, env, portrait
 
 log = logging.getLogger(__name__)
@@ -38,7 +46,7 @@ Shorts channel. The same three cartoon characters appear in every video:
 
 Today's premise: {premise}
 Characters in this skit: {in_skit}
-
+{trend}
 Write ONE skit of {lo}-{hi} dialogue lines, {max_words} words in all at most.
 - LANGUAGE: real, natural spoken Bhojpuri as people in Bhojpur, Ara, Buxar,
   Chhapra and Siwan talk at home (बा, बानी, बाड़ऽ, बाड़ी, रउआ, तोहार, हमार, काहे,
@@ -69,6 +77,10 @@ Return a JSON object:
                           expression in this moment, as a picture (e.g. "holding a
                           phone far from his face, squinting, shocked")
                 with    - optional: key of one other character visible in the picture
+                sfx     - a comedy sound effect at the START of this line, or "none":
+                          boing (something silly or a fall), pop (a sudden idea or
+                          surprise), ding (a "smart" idea), gasp (shock or drama),
+                          whoosh (someone rushes in). At most 3 lines get one.
   summary   - one funny sentence in Bhojpuri (Devanagari) for the description
   tags      - 6 short English or Hinglish search tags (e.g. "chacha bhatija comedy")
 {feedback}"""
@@ -174,6 +186,11 @@ def write(cfg: Config, idea: dict) -> dict:
             cast="\n".join(f"- {k}: {c['name']} ({c['name_bho']}): {c['role'].strip()}"
                            for k, c in chars.items()),
             premise=idea["premise"], in_skit=", ".join(chars[c]["name"] for c in cast),
+            trend=(f"This premise comes from what India is watching on YouTube right now "
+                   f"({idea['keyword']}). Make that link obvious in the first two lines, "
+                   "so people who know it get the joke, but never name or portray a real "
+                   "person: say 'the hero', 'the cricket team', 'the new film'.\n"
+                   if idea.get("keyword") else ""),
             lo=lo, hi=hi, max_words=cfg.get_path("skit.max_words", 85),
             max_line_words=cfg.get_path("skit.max_line_words", 14),
             keys=", ".join(cast), feedback=feedback), temperature=0.9)
@@ -223,6 +240,12 @@ def tall_frame(src: Path, dest: Path) -> Path:
     from PIL import Image, ImageFilter
 
     img = Image.open(src).convert("RGB")
+    # FLUX sometimes draws cinema letterbox bars: trim near-black edge rows.
+    import numpy as np
+    rows = np.asarray(img.convert("L")).mean(axis=1)
+    lit = np.where(rows > 14)[0]
+    if len(lit) and (lit[0] > 4 or lit[-1] < len(rows) - 5):
+        img = img.crop((0, int(lit[0]), img.width, int(lit[-1]) + 1))
     w, h = img.size
     if h / w > 1.6:                                  # already tall
         img.resize((1080, int(1080 * h / w))).crop((0, 0, 1080, 1920)).save(dest, quality=94)
@@ -284,20 +307,30 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
                       "visual_type": "ai_still", "asset": str(pic),
                       "speaker": line["speaker"]})
     shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
-    clips = render.build_shot_clips(tall, shots, workdir)
+    # Comic timing: a beat of silence before the punchline, and time after it
+    # for the ba-dum-tss while the last picture holds.
+    if len(shots) > 1:
+        shots[-2]["duration"] = float(shots[-2]["duration"]) + 0.35
+    shots[-1]["duration"] = float(shots[-1]["duration"]) + 1.5
+    clips = talking_clips(tall, shots, workdir, sk["lines"])
     seed = idea["id"]
     video = render.concat_with_audio(tall, clips, shots, workdir, render.pick_music(cfg, seed))
+    video = add_sfx(video, sound_events(shots, sk["lines"]), workdir)
     out = shorts.finish(cfg, video, workdir / "short.mp4", str(sk.get("hook") or sk["title"]),
                         shots=shots)
 
     in_skit = list(dict.fromkeys(s["speaker"] for s in shots))
     phrases = cfg.get_path("skit.search_phrases", ["Bhojpuri Comedy"])
     phrase = phrases[len(state.load().get("episodes", [])) % len(phrases)]
-    title = f"{str(sk['title']).strip()} 😂 | {phrase}"
-    if len(title) > 90:
-        title = f"{str(sk['title']).strip()[:60]} 😂 | {phrase}"
+    head = str(sk["title"]).strip()
+    title = f"{head} 😂 | {idea['keyword']} | {phrase}" if idea.get("keyword") \
+        else f"{head} 😂 | {phrase}"
+    if len(title) > 95:
+        title = f"{head[:50]} 😂 | {phrase}"
     names = ", ".join(f"{chars[c]['name_bho']} ({chars[c]['name']})" for c in in_skit)
-    tags = list(dict.fromkeys([*(str(t) for t in sk.get("tags") or []),
+    tags = list(dict.fromkeys([*([str(idea["keyword"]), f"{idea['keyword']} comedy"]
+                                 if idea.get("keyword") else []),
+                               *(str(t) for t in sk.get("tags") or []),
                                *[p.lower() for p in phrases],
                                *(chars[c]["name"].lower() for c in in_skit),
                                "funny video", "comedy shorts", "bhojpuri"]))[:20]
@@ -315,11 +348,166 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     meta = {"title": title[:100], "description": description, "tags": tags,
             "language": yt_lang, "path": str(out), "captions": str(srt),
             "idea": idea["id"], "premise": idea["premise"], "characters": in_skit,
+            "keyword": idea.get("keyword", ""), "source": idea.get("source", {}),
             "runtime": round(sum(float(s["duration"]) for s in shots), 1)}
     (workdir / "metadata.json").write_text(
         json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     log.info("Skit built: %s (%.1f s)", out, meta["runtime"])
     return meta
+
+
+# --------------------------------------------------------------- motion + sound
+def talking_clips(cfg: Config, shots: list[dict], workdir: Path, lines: list[dict]) -> list[Path]:
+    """One talking clip per line, timed to that line's take (src/animate.py).
+    Clips run render.XFADE long so the join stays in step."""
+    chars = cfg.get_path("skit.characters", {})
+    folder = workdir / "clips"
+    folder.mkdir(parents=True, exist_ok=True)
+    out = []
+    for shot in shots:
+        who = chars.get(shot["speaker"], {})
+        dest = folder / f"clip_{shot['index']:03d}.mp4"
+        animate.talking_clip(Path(shot["asset"]), Path(shot["audio"]) if shot.get("audio") else None,
+                             float(shot["duration"]) + render.XFADE, dest,
+                             name=who.get("name_bho", ""), colour=who.get("colour", "#FF4D6D"),
+                             vis=cfg.get("visuals", {}), seed=shot["index"])
+        shot["clip"] = str(dest)
+        out.append(dest)
+    return out
+
+
+SFX = {"boing", "pop", "ding", "gasp", "whoosh"}
+
+
+def sound_events(shots: list[dict], lines: list[dict]) -> list[tuple[str, float, float]]:
+    """(effect, start second, volume): the script's picks at their lines (at
+    most 3), and the rimshot just after the punchline's last word."""
+    out, t = [], 0.0
+    for shot, line in zip(shots, lines):
+        fx = str(line.get("sfx") or "none").lower().strip()
+        if fx in SFX and len(out) < 3:
+            out.append((fx, max(t - 0.05, 0.0), 0.9))
+        t += float(shot["duration"])
+    last = shots[-1]
+    end = sum(float(s["duration"]) for s in shots[:-1]) + float(
+        last.get("spoken_duration") or last["duration"])
+    out.append(("rimshot", end + 0.2, 1.4))
+    return out
+
+
+def add_sfx(video: Path, events: list[tuple[str, float, float]], workdir: Path) -> Path:
+    """Lay the sound effects over the finished mix, each at its moment."""
+    folder = ROOT / "assets" / "sfx"
+    events = [e for e in events if (folder / f"{e[0]}.wav").exists()]
+    if not events:
+        return video
+    inputs, parts = ["-i", str(video)], []
+    for i, (fx, at, vol) in enumerate(events, 1):
+        inputs += ["-i", str(folder / f"{fx}.wav")]
+        ms = int(at * 1000)
+        parts.append(f"[{i}:a]aformat=channel_layouts=stereo,volume={vol},"
+                     f"adelay={ms}|{ms}[s{i}]")
+    mix = "[0:a]" + "".join(f"[s{i}]" for i in range(1, len(events) + 1))
+    graph = ";".join(parts) + f";{mix}amix=inputs={len(events) + 1}:duration=first:" \
+        "normalize=0,alimiter=limit=0.95[a]"
+    out = workdir / "final_sfx.mp4"
+    res = subprocess.run(
+        ["ffmpeg", "-y", *inputs, "-filter_complex", graph, "-map", "0:v", "-map", "[a]",
+         "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", str(out)], capture_output=True, text=True)
+    if res.returncode != 0:
+        log.warning("Sound effects skipped: %s", res.stderr[-400:])
+        return video
+    log.info("Sound effects: %s", ", ".join(f"{fx}@{at:.1f}s" for fx, at, _ in events))
+    return out
+
+
+# --------------------------------------------------------------- trending
+TREND_PROMPT = """These videos are trending on YouTube in India right now, each
+with a million views or more:
+
+{videos}
+
+Our channel makes 40-second Bhojpuri family comedy skits with three cartoon
+characters in a Bihar village house:
+{cast}
+
+Pick the {n} trending SUBJECTS that make the funniest, safest skit for these
+characters: a cricket match, a new film or song everyone is talking about, a
+festival, a viral challenge, a new phone, the weather, prices. SKIP anything
+about politics, religion, crime, death, accidents, disasters, war, adult
+content or a real person's private life. Take the subject only: never retell
+the video, and never name or portray a real person in the premise (say "the
+new film", "the cricket team", "the famous singer").
+
+Return a JSON array of {n} objects:
+  video_id - from the list
+  keyword  - 2-4 words people would search for this subject on YouTube, in
+             English or Hinglish (e.g. "India vs Australia", "Chhath Puja")
+  premise  - one English sentence: the comic situation for our characters
+  cast     - two or three of {keys}"""
+
+BLOCK = re.compile(r"\b(modi|rahul|bjp|congress|election|vote|minister|murder|killed|death|died|"
+                   r"accident|crash|attack|war|bomb|terror|rape|arrest|police|court|hindu|muslim|"
+                   r"temple|mosque|masjid|jihad|riot|flood|earthquake|funeral|suicide|"
+                   r"18\+|sexy|hot\b)", re.I)
+
+
+def trending(cfg: Config, n: int = 1) -> list[dict]:
+    """Premises from India's trending chart, videos at 1M+ views. Nothing (not
+    a failure) when the API or the model says no: the idea bank covers it."""
+    if n <= 0:
+        return []
+    try:
+        yt = upload.client()
+        seen, vids = set(), []
+        floor = int(cfg.get_path("skit.trending.min_views", 1_000_000))
+        for cat in cfg.get_path("skit.trending.categories", ["", "24", "23", "17", "10"]):
+            kw = {"videoCategoryId": cat} if cat else {}
+            try:
+                items = yt.videos().list(part="snippet,statistics", chart="mostPopular",
+                                         regionCode="IN", maxResults=50, **kw
+                                         ).execute().get("items", [])
+            except Exception as exc:  # noqa: BLE001 - some categories have no chart
+                log.info("Trending chart %s unavailable: %s", cat or "all", str(exc)[:100])
+                continue
+            for v in items:
+                views = int(v.get("statistics", {}).get("viewCount", 0))
+                title = v["snippet"]["title"]
+                if v["id"] in seen or views < floor or BLOCK.search(title):
+                    continue
+                seen.add(v["id"])
+                vids.append({"id": v["id"], "title": title, "views": views,
+                             "channel": v["snippet"].get("channelTitle", "")})
+        used = {(e.get("source") or {}).get("video_id") for e in state.load().get("episodes", [])}
+        used |= {str(e.get("keyword", "")).lower() for e in state.load().get("episodes", [])[-20:]}
+        vids = [v for v in vids if v["id"] not in used][:60]
+        log.info("Trending in India at %d+ views: %d videos", floor, len(vids))
+        if not vids:
+            return []
+        chars = cfg.get_path("skit.characters", {})
+        keys = list(chars)
+        picks = llm.json_call(TREND_PROMPT.format(
+            videos="\n".join(f"- {v['id']} | {v['title']} | {v['channel']} | "
+                             f"{v['views'] / 1e6:.1f}M views" for v in vids),
+            cast="\n".join(f"- {c['name']}: {c['role'].strip()}" for c in chars.values()),
+            n=n, keys=keys), temperature=0.7)
+        by_id = {v["id"]: v for v in vids}
+        out = []
+        for p in picks if isinstance(picks, list) else []:
+            v = by_id.get(str(p.get("video_id")))
+            if not v or not p.get("premise") or str(p.get("keyword", "")).lower() in used:
+                continue
+            out.append({"id": f"trend-{v['id']}", "premise": str(p["premise"]),
+                        "keyword": str(p.get("keyword") or "").strip()[:40],
+                        "cast": [c for c in p.get("cast") or keys if c in keys] or keys,
+                        "source": {"video_id": v["id"], "title": v["title"],
+                                   "views": v["views"]}})
+            log.info("Trending premise: %s (from %r, %.1fM views)", out[-1]["keyword"],
+                     v["title"][:70], v["views"] / 1e6)
+        return out[:n]
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Trending premises unavailable: %s", str(exc)[:200])
+        return []
 
 
 def slug(text: str) -> str:
@@ -331,7 +519,10 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
     """Today's skits, each at its own publish slot. A skit that fails gives
     way to a spare idea, so one bad draft does not lose a slot."""
     n = count or int(cfg.get_path("skit.per_day", 2))
-    queue = pick_ideas(cfg, n + 2, topic)
+    # The trending skit takes the evening slot (the second), when India watches most.
+    trend = [] if topic else trending(cfg, min(n, int(cfg.get_path("skit.trending.per_day", 1))))
+    bank = pick_ideas(cfg, n - len(trend) + 2, topic)
+    queue = [*bank[: n - len(trend)], *trend, *bank[n - len(trend):]]
     times = upload.slots(cfg, "short", n)
     st = state.load()
     done, failures = [], []
@@ -354,6 +545,7 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
             state.record_episode(st, {
                 "company": idea["premise"][:80], "title": meta["title"], "idea": idea["id"],
                 "characters": meta["characters"], "language": "bho", "video_id": sid,
+                "keyword": meta["keyword"], "source": meta["source"],
                 "kind": "short", "runtime": meta["runtime"]})
             state.save(st)
             gate.notify("\n".join([

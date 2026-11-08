@@ -310,7 +310,7 @@ def _join(cfg: Config, shots: list[dict], workdir: Path) -> Path:
             kind, dur = ("wipeleft", WIPE) if new_beat else ("fade", hard)
             if new_beat:
                 wipes.append(at)
-        elif style == motion.CAPTION:
+        elif style == motion.CAPTION or cfg.get_path("visuals.hard_cuts"):
             kind, dur = "fade", hard
         else:
             kind, dur = (move if new_beat else cuts[i % len(cuts)]), XFADE

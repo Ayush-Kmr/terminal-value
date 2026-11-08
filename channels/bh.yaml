@@ -56,16 +56,23 @@ skit:
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
   search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]
+  # One skit a day on what India is watching: YouTube's India trending chart,
+  # videos with 1M+ views; the subject only, never the video or real people.
+  trending:
+    per_day: 1
+    min_views: 1000000
+    categories: ["", "24", "23", "17", "10"]   # all, entertainment, comedy, sports, music
   # Pictures: Cloudflare Workers AI (FLUX schnell), one per line. Every prompt
   # carries the character's full look, so they stay recognisable from shot to shot.
   style: >-
-    colourful 3D animated cartoon film still, cute exaggerated characters with
+    colourful 3D animated cartoon scene, full-frame, cute exaggerated characters with
     big heads and big expressive eyes, soft warm lighting, vibrant saturated
     colours, high detail, centred composition, characters in the middle of the
-    frame, no text, no letters, no subtitles, no watermark
+    frame, no letterbox bars, no borders, no text, no letters, no subtitles, no watermark
   characters:
     lallan:
       name: Lallan Chacha
+      colour: "#E8590C"
       name_bho: ललन चाचा
       role: >-
         the head of the house, a proud 62-year-old village uncle who thinks he
@@ -82,6 +89,7 @@ skit:
         lively pace, with a dramatic tone. The recording is very clear and close up.
     phoolmati:
       name: Phoolmati Chachi
+      colour: "#D6336C"
       name_bho: फूलमती चाची
       role: >-
         Lallan's sharp-tongued, quick-witted wife who runs the house and always
@@ -95,6 +103,7 @@ skit:
         with a playful scolding tone. The recording is very clear and close up.
     bablu:
       name: Bablu
+      colour: "#1C7ED6"
       name_bho: बबलू
       role: >-
         their 19-year-old nephew, glued to his smartphone, wants to be an
@@ -132,6 +141,7 @@ format:
 visuals:
   style: classic
   short_style: classic           # bright cartoon pictures: no news grade
+  hard_cuts: true                # comedy cuts on the line, no dissolves
   palette:
     bg: "#1B1030"
     surface: "#2A1A48"
