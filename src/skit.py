@@ -124,6 +124,18 @@ def invent(cfg: Config, avoid: list[str]) -> dict:
 
 # --------------------------------------------------------------- script
 LATIN = re.compile(r"[A-Za-z]")
+# Models write the Bhojpuri lengthening mark ऽ as a Latin "s" (कsले, रहs).
+AVAGRAHA = re.compile(r"(?<=[\u0900-\u097F])[sS](?![A-Za-z])")
+
+
+def tidy(sk: dict) -> dict:
+    """Fix the script habits a redraft never cures, before checking it."""
+    for key in ("title", "hook", "summary"):
+        if isinstance(sk.get(key), str):
+            sk[key] = AVAGRAHA.sub("ऽ", sk[key]).strip()
+    for x in sk.get("lines") or []:
+        x["text"] = AVAGRAHA.sub("ऽ", str(x.get("text", ""))).strip()
+    return sk
 
 
 def problems(cfg: Config, sk: dict, cast: list[str]) -> list[str]:
@@ -165,8 +177,7 @@ def write(cfg: Config, idea: dict) -> dict:
             lo=lo, hi=hi, max_words=cfg.get_path("skit.max_words", 85),
             max_line_words=cfg.get_path("skit.max_line_words", 14),
             keys=", ".join(cast), feedback=feedback), temperature=0.9)
-        if not isinstance(sk, dict):
-            sk = {}
+        sk = tidy(sk) if isinstance(sk, dict) else {}
         wrong = problems(cfg, sk, cast)
         if not wrong:
             return sk
