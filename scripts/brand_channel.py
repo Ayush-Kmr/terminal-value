@@ -60,7 +60,8 @@ def main() -> int:
     channel_block.update({
         "description": about,
         "keywords": keywords,
-        "defaultLanguage": cfg.get_path("channel.language", "en"),
+        "defaultLanguage": cfg.get_path("channel.youtube_language")
+        or cfg.get_path("channel.language", "en"),
         "country": cfg.get_path("channel.country", "US"),
     })
 

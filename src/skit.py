@@ -250,7 +250,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     tall = portrait(cfg)
     tall["visuals"]["shot_seconds"] = cfg.get_path("format.short.shot_seconds", [1.5, 7])
     chars = cfg.get_path("skit.characters", {})
-    yt_lang = cfg.get_path("skit.youtube_language", "hi")
+    yt_lang = cfg.get_path("channel.youtube_language", "hi")
 
     sk = write(cfg, idea)
     (workdir / "script.json").write_text(

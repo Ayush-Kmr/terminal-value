@@ -11,9 +11,11 @@ channel:
   channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads refuse to go anywhere else
   url: "https://www.youtube.com/channel/UC5QnQWBbS5AVKvgxsZl4V3w"
   tagline: "ललन चाचा के घर, रोज नया बवाल!"
-  # Bhojpuri. Number reading and the voice treat it as Hindi (same script);
-  # YouTube's language fields are set to Hindi (skit.youtube_language).
+  # Bhojpuri. Number reading and the voice treat it as Hindi (same script).
   language: bho
+  # YouTube has no Bhojpuri in its language list ("bho" fails branding
+  # validation), so every YouTube language field says Hindi.
+  youtube_language: hi
   country: IN
   timezone: Asia/Kolkata
   about: |
@@ -53,7 +55,6 @@ skit:
   max_words: 85                  # ~35-45 s once voiced
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
-  youtube_language: hi           # YouTube has no Bhojpuri in its language list
   search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]
   # Pictures: Cloudflare Workers AI (FLUX schnell), one per line. Every prompt
   # carries the character's full look, so they stay recognisable from shot to shot.
