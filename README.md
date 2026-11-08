@@ -2,7 +2,7 @@
 
 Automated YouTube channel for a US audience: it finds the American business
 stories people are searching for and explains them in English: a 9-minute video
-every other day and two standalone Shorts a day. The Tamil channel makes its own videos on what is trending in Tamil Nadu (`channels/ta-src.yaml` picks and builds the story, `src/follow.py` narrates it in Tamil), never the English channel's stories.
+every other day and two standalone Shorts a day. A second channel, **Bhojpuri AI Comedy**, makes two cartoon comedy skit Shorts a day in Bhojpuri with three recurring characters (`channels/bh.yaml`, `src/skit.py`; see SETUP.md §11). It shares nothing with the news pipeline.
 
 Channel: <https://www.youtube.com/@terminalvaluedoc>
 
@@ -10,7 +10,7 @@ Channel: <https://www.youtube.com/@terminalvaluedoc>
 
 | Workflow | When | What it does |
 |---|---|---|
-| **Episode** | daily 03:30 UTC | Tuesdays and Fridays (`format.long.days`): top story → research → script → voice → 1 long video. Every day: 2 standalone Shorts on the next stories |
+| **Episode** | daily 03:30 UTC | Tuesdays and Fridays (`format.long.days`): top story → research → script → voice → 1 long video. Every day: 2 standalone Shorts on the next stories. Beside it, the `bhojpuri` job: 2 Bhojpuri comedy skits |
 | **Reach report** | Mondays 08:45 IST | pulls view counts into `reports/` and `data/history.json` |
 | **Doctor** | on demand | tests every API key with one small call each |
 | **Brand channel** | on demand | applies `assets/brand/` and the About text in `config.yaml` |

@@ -1,6 +1,6 @@
 name: Telegram bot
 
-# Answers the bot's slash commands (/status, /english, /tamil, ...). There is
+# Answers the bot's slash commands (/status, /english, /bhojpuri, ...). There is
 # no server: one run listens to Telegram for 5 h 45 min, then starts the next.
 # GitHub delayed five-minute schedules by hours, which left commands unanswered.
 # The hourly schedule only restarts the bot if that chain ever breaks.
@@ -33,7 +33,7 @@ jobs:
           YT_CLIENT_ID:        ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET:    ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN:    ${{ secrets.YT_REFRESH_TOKEN }}
-          YT_REFRESH_TOKEN_TA: ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          YT_REFRESH_TOKEN_BH: ${{ secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA }}
           TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
           GITHUB_TOKEN:        ${{ github.token }}

@@ -269,7 +269,7 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
     keywords = [k for k in keywords if not re.search(r"\d", k)] or keywords
     # The first short phrase, the subject; long ones make unreadable tags.
     for k in [k for k in keywords if len(k.split()) <= 3][:1] or keywords[:1]:
-        word = re.sub(r"[^0-9A-Za-zऀ-ॿ\u0B80-\u0BFF]", "", k.title() if k.isascii() else k)
+        word = re.sub(r"[^0-9A-Za-zऀ-ॿ]", "", k.title() if k.isascii() else k)
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
     names = cfg.get_path("upload.hashtags", {}) or {}
@@ -277,10 +277,7 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
                   if n in names), cfg.get_path("upload.hashtag_default", "#business"))
     if topic not in tags:
         tags.append(topic)
-    if language == "ta":                  # searched English tags come first
-        tags.insert(1, "#tamilnews")
-    else:
-        tags.append({"hi": "#hindinews"}.get(language, "#businessnews"))
+    tags.append({"hi": "#hindinews"}.get(language, "#businessnews"))
     return " ".join(tags)
 
 
@@ -300,7 +297,7 @@ def description(cfg: Config, summary: str, chapter_text: str, sources: list[dict
     if facts:
         # The facts the video is built on: real words for search to match,
         # and the viewer can check them against the sources below.
-        label = {"ta": "முக்கிய தகவல்கள்", "hi": "मुख्य तथ्य"}.get(language, "KEY FACTS")
+        label = {"hi": "मुख्य तथ्य"}.get(language, "KEY FACTS")
         parts.append(label + "\n" + "\n".join(f"• {f}" for f in facts[:7]))
     if cfg.get_path("channel.cta"):
         links = [str(x) for x in cfg.get_path("channel.links", []) or [] if x]
@@ -331,12 +328,9 @@ def tags(company: str, keywords: list[str], language: str = "en",
     old "<topic> explained / news / hindi" variants only padded the list.
     `extra` (search phrases in the channel's own script) goes first."""
     base = [*(extra or [])[:10], company, *keywords[:6]]
-    if language != "ta":
-        base.append("news explained")
+    base.append("news explained")
     if language == "hi":
         base += ["hindi news"]
-    elif language == "ta":
-        base += ["tamil news", "business news tamil", "தமிழ் செய்திகள்"]
     out, total, seen = [], 0, set()
     for t in base[:14]:
         t = str(t).strip()[:60]

@@ -6,6 +6,7 @@
     python main.py --publish slot           schedule for the next slot instead of posting at once
     python main.py --no-upload              build only, leave the files on disk
     python main.py --reach                  performance report only
+    CHANNEL=bh python main.py --skit        the Bhojpuri channel's comedy skits (src/skit.py)
 """
 from __future__ import annotations
 
@@ -17,8 +18,9 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from src import (assets, captions, engage, factcheck, follow, gate, hooks, reach, render,
-                 research, script as script_mod, seo, shorts, state, thumbnail, upload, voice)
+from src import (assets, captions, engage, factcheck, gate, hooks, reach, render,
+                 research, script as script_mod, seo, shorts, skit, state, thumbnail, upload,
+                 voice)
 from src.config import ROOT, Config, latin_only, load, portrait
 
 logging.basicConfig(
@@ -35,7 +37,7 @@ def slug(text: str) -> str:
 
 def save_shots(shot_list: list[dict], workdir: Path) -> None:
     """The finished shot list, with picture paths relative to the build
-    folder: the Tamil channel (src/follow.py) rebuilds the video from it."""
+    folder, kept with the build artifacts."""
     out = []
     for s in shot_list:
         s = dict(s)
@@ -585,11 +587,11 @@ def run(args) -> int:
         print(path.read_text(encoding="utf-8"))
         return 0
 
+    if args.skit:
+        return skit.run(cfg, args.publish, args.no_upload, args.count, args.topic or "")
+
     if not args.no_upload:
         engage.post_questions(cfg)
-
-    if args.follow:
-        return follow.run(cfg, Path(args.follow), args.publish, args.no_upload)
 
     if todays_kind(cfg, args) == "shorts":
         return run_shorts_day(cfg, args)
@@ -733,9 +735,9 @@ def main() -> int:
     ap.add_argument("--no-gates", action="store_true")
     ap.add_argument("--no-shorts", action="store_true")
     ap.add_argument("--reach", action="store_true")
-    ap.add_argument("--follow", metavar="DIR",
-                    help="second channel (CHANNEL=ta): publish the main channel's builds "
-                         "found under DIR again in this channel's language")
+    ap.add_argument("--skit", action="store_true",
+                    help="the Bhojpuri channel (CHANNEL=bh): today's comedy skits; "
+                         "with --topic, a skit on that premise")
     args = ap.parse_args()
 
     try:

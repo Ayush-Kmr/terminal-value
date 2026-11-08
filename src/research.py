@@ -380,7 +380,7 @@ def article_texts(queries: list[str], limit: int = 6, per_article: int = 2600,
 
 
 def _local_note(cfg: Config) -> str:
-    """A channel's own rule for which local figures to keep (Tamil: Chennai prices)."""
+    """A channel's own rule for which local figures to keep (e.g. which city's prices)."""
     note = str(cfg.get_path("research.local_note", "") or "").strip()
     return f"\n\nFor this channel's viewers:\n{note}" if note else ""
 

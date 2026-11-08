@@ -193,7 +193,7 @@ def story_layout(cfg: Config, words: str, figure: str, entity: str, way: str,
     - the subject's picture behind, darkened, with a red falling or green
       rising market line over the right half when the story has a direction,
     - lots of plain dark space, and an accent bar along the bottom (brand).
-    Text in Tamil (or another non-Latin script) is drawn with the channel's
+    Text in Devanagari (or another non-Latin script) is drawn with the channel's
     caption font when Pillow can shape it."""
     from .captions import native_script
     from .visuals.motion import _fit

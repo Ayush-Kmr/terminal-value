@@ -70,7 +70,7 @@ def _groups(words: list[tuple[str, float, float]], size: int = 3,
 
 
 def native_script(cfg: Config) -> bool:
-    """Captions can be drawn in the narration's own script (Tamil): the
+    """Captions can be drawn in the narration's own script (Devanagari): the
     channel names a font for it (visuals.fonts.caption) and Pillow has the
     text shaper such scripts need (libraqm, which needs libfribidi)."""
     font = cfg.get_path("visuals.fonts.caption")

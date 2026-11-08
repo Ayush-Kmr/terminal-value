@@ -91,7 +91,7 @@ _verified: str | None = None
 def check_channel(cfg: Config, yt) -> str:
     """The channel the token belongs to, refusing to go on when it is not the
     one config names. Two channels share this repo; a token mix-up must never
-    put a Tamil video on the English channel or the other way round."""
+    put a Bhojpuri skit on the English channel or the other way round."""
     global _verified
     if _verified:
         return _verified

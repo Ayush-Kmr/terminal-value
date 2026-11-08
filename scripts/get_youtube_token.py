@@ -2,12 +2,12 @@
 """One-time OAuth: produces the YT_REFRESH_TOKEN the pipeline needs.
 
     python scripts/get_youtube_token.py ~/Downloads/client_secret_XXXX.json
-    python scripts/get_youtube_token.py ~/Downloads/client_secret_XXXX.json --secret YT_REFRESH_TOKEN_TA
+    python scripts/get_youtube_token.py ~/Downloads/client_secret_XXXX.json --secret YT_REFRESH_TOKEN_BH
 
 Sign in with the Google account that OWNS the channel. When that account has
 more than one channel, Google asks which one: pick the channel this token is
-for (the English one for YT_REFRESH_TOKEN, the Tamil one for
-YT_REFRESH_TOKEN_TA). Google will warn that the app is unverified — that is
+for (the English one for YT_REFRESH_TOKEN, Bhojpuri AI Comedy for
+YT_REFRESH_TOKEN_BH). Google will warn that the app is unverified — that is
 expected, it is your own app. Click Advanced, then Continue.
 
 With --secret NAME the token is also saved straight into the repo's GitHub

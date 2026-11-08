@@ -1,6 +1,6 @@
 """Speak a batch of lines in an Indian language with AI4Bharat's Indic
-Parler-TTS (Apache-2.0). Used for narration languages the cloned voice
-cannot speak, such as Tamil.
+Parler-TTS (Apache-2.0). Used for the Bhojpuri channel's skits, where each
+character has a voice of their own.
 
 Runs in its own virtualenv (requirements-indic.txt): the model pins an older
 transformers than the main pipeline uses. src/voice.py calls this once per
@@ -10,9 +10,9 @@ on Hugging Face: accept its terms once and set HF_TOKEN.
     python scripts/indic_tts.py jobs.json
 
 jobs.json:
-    {"speaker": "Jaya",
-     "description": "Jaya speaks at a moderate pace ...",
-     "items": [{"text": "...", "out": ".../shot_000.wav"}]}
+    {"description": "Rohit speaks at a moderate pace ...",
+     "items": [{"text": "...", "out": ".../shot_000.wav",
+                "description": "optional: this line's own voice"}]}
 """
 from __future__ import annotations
 
@@ -67,15 +67,17 @@ def main() -> int:
     print(f"Indic voice ready on {device} in {time.time() - started:.0f}s", flush=True)
 
     # Every chunk of every line, generated in length-sorted batches.
+    # A line's own description (its character's voice) wins over the default.
     pieces = [(i, j, c) for i, item in enumerate(jobs["items"])
               for j, c in enumerate(chunks(item["text"]))]
+    descs = [item.get("description") or jobs.get("description", "") for item in jobs["items"]]
     order = sorted(range(len(pieces)), key=lambda k: len(pieces[k][2]))
     audio: dict[tuple[int, int], np.ndarray] = {}
-    desc = jobs["description"]
     for b in range(0, len(order), BATCH):
         batch = [pieces[k] for k in order[b:b + BATCH]]
         t0 = time.time()
-        d = desc_tok([desc] * len(batch), return_tensors="pt", padding=True).to(device)
+        d = desc_tok([descs[i] for i, _, _ in batch], return_tensors="pt",
+                     padding=True).to(device)
         p = tok([c for _, _, c in batch], return_tensors="pt", padding=True).to(device)
         with torch.no_grad():
             gen = model.generate(input_ids=d.input_ids, attention_mask=d.attention_mask,

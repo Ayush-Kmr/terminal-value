@@ -27,8 +27,7 @@ from src import upload  # noqa: E402
 from src.config import load  # noqa: E402
 from src.keywords import GENERIC  # noqa: E402
 
-STANDARD = {"news explained", "tamil news", "business news tamil", "தமிழ் செய்திகள்",
-            "hindi news"}
+STANDARD = {"news explained", "hindi news"}
 LIMIT = 60          # newest uploads checked
 
 

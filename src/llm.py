@@ -71,7 +71,7 @@ PAID_MODELS_PER_PROVIDER = 2
 _paid_models: dict[str, list[str]] = {}
 
 # Control tokens some open models leak into their text, e.g. "தன்<bos>3தேரா"
-# for Dhanteras in a Tamil description (2026-11-04). A digit glued between the
+# for Dhanteras in a non-English description (2026-11-04). A digit glued between the
 # token and the next letter is part of the same junk.
 _LEAKED = re.compile(r"<(?:bos|eos|pad|unk|mask|/?s|start_of_turn|end_of_turn|\|[a-z_]+\|)>"
                      r"(?:\d+(?=[^\W\d_]))?")

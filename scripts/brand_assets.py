@@ -20,8 +20,7 @@ sys.path.insert(0, str(ROOT))
 from src.config import PALETTE_DEFAULT, load  # noqa: E402
 
 OUT = ROOT / "assets" / "brand"
-TAMIL_FONT = ROOT / "assets" / "fonts" / "NotoSansTamil-Bold.ttf"
-TAMIL_OUT = OUT / "ta"
+BH_OUT = OUT / "bh"
 
 # A share price that climbs, peaks and collapses. The channel's whole subject
 # in one line; used as the backdrop of the banner and the avatar's mark.
@@ -141,38 +140,59 @@ def watermark(pal) -> Path:
     return out
 
 
-def tamil(pal) -> None:
-    """The Tamil channel's own banner and watermark. Needs Pillow with libraqm."""
-    W, H = 2048, 1152
-    src = Image.open(OUT / "banner.png").convert("RGB")
-    d = ImageDraw.Draw(src)
-    cx, cy = W // 2, H // 2
-    d.rectangle([cx - 640, cy - 150, cx + 640, cy + 190], fill=pal["bg"])
-    d.text((cx, cy - 30), "டெர்மினல் வேல்யூ தமிழ்", font=ImageFont.truetype(str(TAMIL_FONT), 104),
-           fill=pal["ink"], anchor="mm")
-    d.rectangle([cx - 50, cy + 44, cx + 50, cy + 50], fill=pal["accent"])
-    d.text((cx, cy + 100), "செய்திக்குப் பின்னால் இருக்கும் கதை",
-           font=ImageFont.truetype(str(TAMIL_FONT), 44), fill=pal["muted"], anchor="mm")
-    d.text((cx, cy + 158), "தினமும் புதிய வீடியோ",
-           font=ImageFont.truetype(str(TAMIL_FONT), 34), fill=pal["accent"], anchor="mm")
-    TAMIL_OUT.mkdir(parents=True, exist_ok=True)
-    src.save(TAMIL_OUT / "banner.png", optimize=True)
+def bhojpuri() -> None:
+    """The Bhojpuri comedy channel's banner, avatar and watermark, in its own
+    palette and Devanagari font (CHANNEL=bh settings). Needs Pillow with libraqm."""
+    import os
 
-    S = 4
-    n = 150 * S
-    img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
-    m = ImageDraw.Draw(img)
-    m.text((n / 2, n * 0.44), "த", font=ImageFont.truetype(str(TAMIL_FONT), int(n * 0.62)),
-           fill=pal["ink"], anchor="mm", stroke_width=S * 2, stroke_fill="#06080B")
-    w = int(n * 0.04)
-    m.line([(n * 0.22, n * 0.80), (n * 0.56, n * 0.80)], fill=pal["accent"], width=w)
-    m.line([(n * 0.56, n * 0.80), (n * 0.78, n * 0.90)], fill=pal["danger"], width=w)
-    img.resize((150, 150), Image.LANCZOS).save(TAMIL_OUT / "watermark.png", optimize=True)
-    for size, path in ((800, TAMIL_OUT / "avatar.png"),):
-        bg = Image.new("RGBA", (n, n), pal["bg"])
-        bg.alpha_composite(img)
-        bg.convert("RGB").resize((size, size), Image.LANCZOS).save(path, optimize=True)
-    print(f"{TAMIL_OUT.relative_to(ROOT)}: banner, watermark, avatar")
+    os.environ["CHANNEL"] = "bh"
+    cfg = load()
+    pal = {**PALETTE_DEFAULT, **(cfg.get_path("visuals.palette") or {})}
+    path = ROOT / cfg.get_path("visuals.fonts.display")
+
+    def baloo(size: int, weight: str = "ExtraBold") -> ImageFont.FreeTypeFont:
+        f = ImageFont.truetype(str(path), size)
+        f.set_variation_by_name(weight)
+        return f
+
+    BH_OUT.mkdir(parents=True, exist_ok=True)
+    W, H = 2048, 1152
+    y = np.linspace(0, 1, H)[:, None, None]
+    top, bot = np.array([0x3A, 0x1C, 0x6B]), np.array([0x14, 0x0A, 0x28])
+    img = Image.fromarray((top + (bot - top) * y).repeat(W, axis=1).astype("uint8"))
+    d = ImageDraw.Draw(img)
+    rng = np.random.default_rng(5)
+    for _ in range(46):                       # confetti, kept out of the safe area
+        x, yy = int(rng.integers(0, W)), int(rng.integers(0, H))
+        if abs(x - W / 2) < 560 and abs(yy - H / 2) < 230:
+            continue
+        r = int(rng.integers(6, 16))
+        d.ellipse([x - r, yy - r, x + r, yy + r],
+                  fill=[pal["accent"], pal["danger"], "#38D9A9", "#4DABF7"][int(rng.integers(0, 4))])
+    cx, cy = W // 2, H // 2               # 1235x338 centre is safe on every device
+    d.text((cx, cy - 40), "भोजपुरी AI कॉमेडी", font=baloo(132), fill=pal["accent"],
+           anchor="mm", stroke_width=8, stroke_fill="#0B0614")
+    d.text((cx, cy + 70), "ललन चाचा · फूलमती चाची · बबलू", font=baloo(50, "Bold"),
+           fill=pal["ink"], anchor="mm")
+    d.text((cx, cy + 135), "रोज दू गो नया कॉमेडी वीडियो",
+           font=baloo(40, "SemiBold"), fill=pal["muted"], anchor="mm")
+    img.save(BH_OUT / "banner.png", optimize=True)
+
+    S, n = 4, 800
+    av = Image.new("RGB", (n, n), pal["accent"])
+    a = ImageDraw.Draw(av)
+    a.text((n / 2, n * 0.40), "भोजपुरी", font=baloo(190), fill=pal["bg"], anchor="mm")
+    a.rectangle([n * 0.18, n * 0.555, n * 0.82, n * 0.80], fill=pal["bg"])
+    a.text((n / 2, n * 0.675), "AI कॉमेडी", font=baloo(120), fill=pal["accent"], anchor="mm")
+    av.save(BH_OUT / "avatar.png", optimize=True)
+
+    m = 150 * S
+    wm = Image.new("RGBA", (m, m), (0, 0, 0, 0))
+    w = ImageDraw.Draw(wm)
+    w.ellipse([m * 0.06, m * 0.06, m * 0.94, m * 0.94], fill=pal["accent"])
+    w.text((m / 2, m * 0.50), "भो", font=baloo(int(m * 0.52)), fill=pal["bg"], anchor="mm")
+    wm.resize((150, 150), Image.LANCZOS).save(BH_OUT / "watermark.png", optimize=True)
+    print(f"{BH_OUT.relative_to(ROOT)}: banner, avatar, watermark")
 
 
 def main() -> int:
@@ -181,7 +201,7 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     for path in (banner(cfg, pal), avatar(pal), watermark(pal)):
         print(f"{path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
-    tamil(pal)
+    bhojpuri()
     return 0
 
 

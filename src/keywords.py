@@ -2,9 +2,7 @@
 
 YouTube's own search suggestions (the autocomplete under the search box) are
 the best free signal of demand: each one is a phrase real viewers searched.
-Titles and tags are written around them. Tamil viewers mostly search in
-English with "tamil" added ("gold rate tamil", "share market news today in
-tamil"), so the Tamil channel asks for both forms.
+Titles and tags are written around them.
 """
 from __future__ import annotations
 
@@ -15,7 +13,7 @@ import requests
 
 log = logging.getLogger(__name__)
 URL = "https://suggestqueries.google.com/complete/search"
-OTHER_LANGUAGES = ("hindi", "telugu", "malayalam", "kannada", "marathi", "bengali", "gujarati")
+OTHER_LANGUAGES = ("hindi", "tamil", "telugu", "malayalam", "kannada", "marathi", "bengali", "gujarati")
 
 
 def suggestions(query: str, hl: str = "en", gl: str = "US") -> list[str]:
@@ -42,25 +40,25 @@ def _core(subject: str) -> str:
 # Words any search about a story may add. Anything else a suggestion adds must
 # appear in the story itself: autocomplete also returns what people type about
 # other things with the same name ("bernie madoff movie scene", "gas prices
-# starlito", "kalshi dance", "gas cylinder price tamil" on a US petrol story),
+# starlito", "kalshi dance", "gas cylinder price hindi" on a US petrol story),
 # and those went out as tags (review of 2026-11-04 uploads).
 GENERIC = set("""
 news explained explain explainer today latest live update updates now new this week
 why how what when who is are was does do did so the a an in of to for on and vs
 stock stocks share shares price prices rate rates market markets money make makes
 work works crash fall falls drop rise rises up down going happened happening
-tamil india indian us usa america american english full video analysis meaning
+india indian us usa america american english full video analysis meaning
 documentary story history expensive cheap costly cost costs
 """.split())
 
 
 def _relevant(phrase: str, core: str, context: str) -> bool:
-    words = re.findall(r"[a-z0-9]+|[\u0B80-\u0BFF]+", phrase.lower())
+    words = re.findall(r"[a-z0-9]+", phrase.lower())
     ctx = context.lower()
     for w in words:
         if w in GENERIC or w in core.split() or w.isdigit():
             continue
-        # Endings vary ("trading"/"trades", Tamil case endings), so a longer
+        # Endings vary ("trading"/"trades"), so a longer
         # word counts when its first four letters appear in the story.
         stem = w[:4] if len(w) >= 5 else w      # "trading" ~ "trades"
         if len(stem) < 3 or stem not in ctx:
@@ -77,21 +75,16 @@ def for_story(subject: str, language: str = "en", limit: int = 8,
     if not core:
         return []
     key = core.split()[0]
-    if language == "ta":
-        queries = [(f"{core} tamil", "en"), (f"{core} news tamil", "en"), (core, "ta")]
-    else:
-        queries = [(core, "en"), (f"{core} news", "en"), (f"{core} explained", "en")]
-        if " " not in core:                    # a company or ticker on its own
-            queries.insert(0, (f"{core} stock", "en"))
+    queries = [(core, "en"), (f"{core} news", "en"), (f"{core} explained", "en")]
+    if " " not in core:                        # a company or ticker on its own
+        queries.insert(0, (f"{core} stock", "en"))
     out: list[str] = []
     for q, hl in queries:
-        for s in suggestions(q, hl, "IN" if language == "ta" else "US"):
+        for s in suggestions(q, hl, "US"):
             low = s.lower()
             if not re.search(rf"(?<![\w]){re.escape(key)}(?![\w])", low):
                 continue                       # about something else ("irene ...")
-            if language != "ta" and any(x in low for x in OTHER_LANGUAGES + ("tamil",)):
-                continue
-            if language == "ta" and any(x in low for x in OTHER_LANGUAGES):
+            if any(x in low for x in OTHER_LANGUAGES):
                 continue
             if context and not _relevant(s, core, f"{subject} {context}"):
                 continue

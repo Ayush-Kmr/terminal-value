@@ -36,10 +36,13 @@ on:
         description: "Build only, do not upload"
         type: boolean
         default: false
-      tamil_only:
-        description: "Only the Tamil channel's run (skip the English channel)"
+      bhojpuri_only:
+        description: "Only the Bhojpuri channel's run (skip the English channel)"
         type: boolean
         default: false
+      premise:
+        description: "Bhojpuri channel: a skit premise to use (blank = next idea)"
+        required: false
 
 concurrency:
   group: episode
@@ -50,7 +53,7 @@ permissions:
 
 jobs:
   produce:
-    if: ${{ !inputs.tamil_only }}
+    if: ${{ !inputs.bhojpuri_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -123,18 +126,12 @@ jobs:
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
 
-      # Marks the folder the artifact is rooted at, so each build keeps its
-      # folder name when the Tamil job downloads it.
-      - run: mkdir -p output && echo "${{ github.run_id }}" > output/run.txt
-        if: always()
-
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: episode-${{ github.run_number }}
           path: |
-            output/run.txt
             output/**/shots.json
             output/**/assets/*
             !output/**/assets/*.frames
@@ -158,24 +155,24 @@ jobs:
           git pull --rebase -q || true
           git push || true
 
-  # The Tamil channel, on its own stories (channels/ta-src.yaml): today's Tamil
-  # Nadu stories are picked and built in English without uploading, then
-  # translated and narrated in Tamil (src/follow.py) and uploaded with the
-  # Tamil channel's token. Runs beside the English job, never on its stories.
-  # Skipped until the YT_REFRESH_TOKEN_TA secret exists.
-  tamil:
+  # The Bhojpuri comedy channel (channels/bh.yaml, src/skit.py): two cartoon
+  # skit Shorts a day with Lallan Chacha, Phoolmati Chachi and Bablu, each
+  # character in their own Indic Parler-TTS voice. Runs beside the English job
+  # and shares nothing with it. Skipped until the channel's token secret exists
+  # (YT_REFRESH_TOKEN_BH; the same channel's earlier secret is used until then).
+  bhojpuri:
     runs-on: ubuntu-latest
-    timeout-minutes: 330
+    timeout-minutes: 150
     steps:
-      - name: Is the Tamil channel set up?
+      - name: Is the Bhojpuri channel set up?
         id: on
         env:
-          TOKEN: ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          TOKEN: ${{ secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA }}
         run: |
           if [ -n "$TOKEN" ] || [ "${{ inputs.no_upload }}" = "true" ]; then
             echo "go=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::No YT_REFRESH_TOKEN_TA secret yet, so no Tamil videos. See SETUP.md, 'Tamil channel'."
+            echo "::notice::No Bhojpuri channel token yet, so no skits. See SETUP.md, 'Bhojpuri channel'."
           fi
 
       - uses: actions/checkout@v4
@@ -188,24 +185,15 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      # libraqm + libfribidi let Pillow shape Tamil script for the captions.
-      # Every long Tamil run was killed about an hour into narration. Extra swap
-      # and a memory log guard against, and show, running out of memory.
-      - name: Add swap and log memory
-        if: steps.on.outputs.go
-        run: |
-          sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2
-          sudo mkswap /swapfile2 && sudo swapon /swapfile2
-          (while true; do echo "MEM $(free -m | awk 'NR==2{print $3"/"$2}') swap $(free -m | awk 'NR==3{print $3}')"; sleep 300; done) &
-
+      # libraqm + libfribidi let Pillow shape Devanagari for the captions.
       - name: Install ffmpeg
         if: steps.on.outputs.go
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu espeak-ng libraqm0 libfribidi0
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu libraqm0 libfribidi0
 
       - run: pip install -r requirements.txt
         if: steps.on.outputs.go
 
-      - name: Cache Tamil voice environment and model
+      - name: Cache voice environment and model
         if: steps.on.outputs.go
         uses: actions/cache@v4
         with:
@@ -214,7 +202,7 @@ jobs:
             ~/.cache/huggingface
           key: indic-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-indic.txt') }}
 
-      - name: Install Tamil voice model
+      - name: Install voice model
         if: steps.on.outputs.go
         run: |
           if ! .venv-indic/bin/python -c 'import sys' 2>/dev/null; then
@@ -224,50 +212,10 @@ jobs:
             .venv-indic/bin/pip install -q -r requirements-indic.txt
           fi
 
-      # The English voice builds the source version, as on the main channel.
-      - name: Cache source voice environment and model
-        if: steps.on.outputs.go
-        uses: actions/cache@v4
-        with:
-          path: .venv-kokoro
-          key: kokoro-venv-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-kokoro.txt') }}
-
-      - name: Install source voice model
-        if: steps.on.outputs.go
-        run: |
-          if ! .venv-kokoro/bin/python -c 'import sys' 2>/dev/null; then
-            rm -rf .venv-kokoro
-            python -m venv .venv-kokoro
-            .venv-kokoro/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
-            .venv-kokoro/bin/pip install -q -r requirements-kokoro.txt
-          fi
-
-      - name: Pick and build today's Tamil stories
+      - name: Make today's skits
         if: steps.on.outputs.go
         env:
-          CHANNEL:            ta-src
-          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
-          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
-          XAI_API_KEY:        ${{ secrets.XAI_API_KEY }}
-          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
-          CF_ACCOUNT_ID:      ${{ secrets.CF_ACCOUNT_ID }}
-          CF_API_TOKEN:       ${{ secrets.CF_API_TOKEN }}
-          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
-          YT_CLIENT_ID:       ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET:   ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_TA }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python main.py --kind shorts --no-upload
-          mkdir -p ta-src && find output -maxdepth 1 -mindepth 1 -type d -name '20*' -exec mv {} ta-src/ \;
-          ls ta-src
-
-      - name: Produce Tamil versions
-        if: steps.on.outputs.go
-        env:
-          CHANNEL:            ta
+          CHANNEL:            bh
           HF_TOKEN:           ${{ secrets.HF_TOKEN }}
           GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
@@ -275,17 +223,20 @@ jobs:
           OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
           CF_ACCOUNT_ID:      ${{ secrets.CF_ACCOUNT_ID }}
           CF_API_TOKEN:       ${{ secrets.CF_API_TOKEN }}
-          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
           YT_CLIENT_ID:       ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET:   ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_TA }}
+          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+          PREMISE:            ${{ inputs.premise }}
           PUBLISH:            ${{ inputs.publish }}
+          COUNT:              ${{ inputs.count }}
           NO_UPLOAD:          ${{ inputs.no_upload }}
         run: |
-          args=(--follow ta-src)
+          args=(--skit)
+          [ -n "$PREMISE" ] && args+=(--topic "$PREMISE")
           [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
+          [ -n "$COUNT" ] && args+=(--count "$COUNT")
           [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
           python main.py "${args[@]}"
 
@@ -293,14 +244,12 @@ jobs:
         if: always() && steps.on.outputs.go
         uses: actions/upload-artifact@v4
         with:
-          name: tamil-${{ github.run_number }}
+          name: bhojpuri-${{ github.run_number }}
           path: |
-            ta-src/**/metadata.json
-            ta-src/**/research.json
-            output/ta/**/final.mp4
-            output/ta/**/short.mp4
-            output/ta/**/metadata.json
-            output/ta/**/script.json
+            output/**/short.mp4
+            output/**/metadata.json
+            output/**/script.json
+            output/**/assets/scene_*.jpg
           retention-days: 7
 
       - name: Commit history
@@ -308,7 +257,7 @@ jobs:
         run: |
           git config user.name "terminal-value-bot"
           git config user.email "noreply@users.noreply.github.com"
-          git add data/history.ta.json || true
-          git diff --staged --quiet || git commit -m "chore: tamil episode history [skip ci]"
+          git add data/history.bh.json || true
+          git diff --staged --quiet || git commit -m "chore: bhojpuri episode history [skip ci]"
           git pull --rebase -q || true
           git push || true

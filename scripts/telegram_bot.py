@@ -44,7 +44,7 @@ def _channels() -> list[dict]:
             "token": os.getenv("YT_REFRESH_TOKEN")}]
     for f in sorted((ROOT / "channels").glob("*.yaml")):
         ch = (yaml.safe_load(f.read_text(encoding="utf-8")) or {}).get("channel", {})
-        key = {"ta": "tamil"}.get(f.stem, f.stem)
+        key = {"bh": "bhojpuri"}.get(f.stem, f.stem)
         out.append({"key": key, "name": ch.get("name", f.stem), "id": ch.get("channel_id"),
                     "token": os.getenv(f"YT_REFRESH_TOKEN_{f.stem.upper()}")})
     return [c for c in out if c["id"]]
@@ -53,7 +53,7 @@ def _channels() -> list[dict]:
 COMMANDS = [
     ("status", "Both channels at a glance + last run"),
     ("english", "English channel: stats and latest videos"),
-    ("tamil", "Tamil channel: stats and latest videos"),
+    ("bhojpuri", "Bhojpuri comedy channel: stats and latest videos"),
     ("today", "Everything uploaded in the last 24 hours"),
     ("schedule", "Videos waiting to go public, with times"),
     ("week", "Last 7 days: views, watch time, subscribers"),
@@ -187,7 +187,7 @@ def video_line(v: dict) -> str:
 
 
 def flag(ch: dict) -> str:
-    return "🇮🇳 Tamil" if ch["key"] == "tamil" else "🇬🇧 English"
+    return "😂 Bhojpuri" if ch["key"] == "bhojpuri" else "🇬🇧 English"
 
 
 def summary(ch: dict) -> str:
@@ -249,7 +249,7 @@ def run_line(run: dict, jobs: bool = True) -> str:
             js = gh(f"actions/runs/{run['id']}/jobs").get("jobs", [])
         except requests.RequestException:
             return line
-        names = {"produce": "English", "tamil": "Tamil"}
+        names = {"produce": "English", "bhojpuri": "Bhojpuri"}
         line += "\n     " + " · ".join(f"{names.get(j['name'], j['name'])} "
                                        f"{ICON.get(j['conclusion'], '⏳')}" for j in js)
     return line
@@ -345,7 +345,7 @@ def cmd_next(_: list[dict]) -> str:
             f"🎬 Long video: every {cfg['format']['long']['every_days']} days, "
             f"public at {long_times} ET\n"
             f"📱 Shorts: {cfg['format']['short']['per_day']} a day, public at {short_times} ET\n"
-            "🇮🇳 The Tamil channel gets every video, in Tamil, at its own times.")
+            "😂 The Bhojpuri channel: two comedy skits a day, public at 12:30 and 19:30 IST.")
 
 
 def cmd_review(chs: list[dict]) -> str:

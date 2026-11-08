@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DAY = timedelta(hours=24)
 IST = timezone(timedelta(hours=5, minutes=30))
-CHANNELS = (("English", "data/history.json", 2), ("Tamil", "data/history.ta.json", 1))
+CHANNELS = (("English", "data/history.json", 2), ("Bhojpuri", "data/history.bh.json", 2))
 # Workflows that run on a schedule; their failures matter. One-off buttons
 # (Clean tags, Brand channel...) are reported too when they fail.
 QUIET = {"Telegram bot"}      # restarts itself every hour; one failure is noise
@@ -67,7 +67,7 @@ def todays_run(now: datetime) -> str:
     if now - when > DAY:
         return "⚠️ The daily run did not start today"
     jobs = json.loads(gh("run", "view", str(r["databaseId"]), "--json", "jobs"))["jobs"]
-    names = {"produce": "English", "tamil": "Tamil"}
+    names = {"produce": "English", "bhojpuri": "Bhojpuri"}
     icon = {"success": "✅", "failure": "❌", "skipped": "⏭", "cancelled": "⛔"}
     parts = [f"{names.get(j['name'], j['name'])} {icon.get(j.get('conclusion'), '⏳')}"
              for j in jobs]

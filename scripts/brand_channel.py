@@ -89,6 +89,23 @@ def main() -> int:
         failures += 1
         print(f"FAIL banner/description: {exc}")
 
+    # ---- name ------------------------------------------------------------
+    # The API may ignore a new title (YouTube moved renames into Studio); a
+    # failure here is only a warning: rename in Studio -> Customisation.
+    name = cfg.get_path("channel.name")
+    if name and ch["snippet"]["title"] != name:
+        try:
+            yt.channels().update(part="brandingSettings", body={
+                "id": ch["id"],
+                "brandingSettings": {"channel": {**channel_block, "title": name}},
+            }).execute()
+            now = yt.channels().list(part="snippet", id=ch["id"]).execute()["items"][0]
+            print(f"{'OK  ' if now['snippet']['title'] == name else 'WARN'} channel name: "
+                  f"{now['snippet']['title']!r} (wanted {name!r}; if different, rename in Studio)")
+        except Exception as exc:  # noqa: BLE001
+            print(f"WARN channel name not changed by the API ({str(exc)[:160]}); "
+                  "rename in Studio -> Customisation -> Basic info")
+
     # ---- audience --------------------------------------------------------
     try:
         yt.channels().update(part="status", body={

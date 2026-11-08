@@ -53,9 +53,9 @@ def tell(text: str) -> None:
 
 def main() -> int:
     now = datetime.now(timezone.utc)
-    english, tamil = fresh("data/history.json", now), fresh("data/history.ta.json", now)
+    english, bhojpuri = fresh("data/history.json", now), fresh("data/history.bh.json", now)
     run = latest_run()
-    if english and tamil:
+    if english and bhojpuri:
         print("Both channels uploaded today")
         return 0
     if run.get("status") and run["status"] != "completed":
@@ -68,11 +68,11 @@ def main() -> int:
         started = datetime.fromisoformat(run["createdAt"].replace("Z", "+00:00"))
         if run.get("conclusion") == "failure" and now - started < WINDOW:
             gh("run", "rerun", str(run["databaseId"]), "--failed")
-            tell("🛠 Watchdog: the Tamil upload failed, so I restarted it.")
+            tell("🛠 Watchdog: the Bhojpuri upload failed, so I restarted it.")
         else:
-            # The Tamil job picks its own stories, so it can run on its own.
-            gh("workflow", "run", "episode.yml", "--ref", "main", "-f", "tamil_only=true")
-            tell("🛠 Watchdog: no Tamil upload in the last day, so I started a Tamil-only run.")
+            # The Bhojpuri job makes its own skits, so it can run on its own.
+            gh("workflow", "run", "episode.yml", "--ref", "main", "-f", "bhojpuri_only=true")
+            tell("🛠 Watchdog: no Bhojpuri upload in the last day, so I started a Bhojpuri-only run.")
     return 0
 
 

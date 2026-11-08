@@ -5,7 +5,7 @@ model, run on the build machine, clear American English at no cost per character
 "clone" speaks in the channel
 owner's own cloned voice with an open model that runs on the build machine and
 costs nothing per character; "indic" is AI4Bharat's open Indic Parler-TTS, also
-run on the build machine, for languages the clone cannot speak (Tamil);
+run on the build machine, for the Bhojpuri skits (a voice per character);
 "elevenlabs" calls the ElevenLabs API.
 
 Per-shot rendering (rather than one long file) means a re-write of one sentence
@@ -133,7 +133,8 @@ def _clone_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None
 def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> None:
     """Speak every missing shot in one run of scripts/indic_tts.py (its own
     virtualenv). Figures are spelled out in words first: the model reads
-    Tamil script, not digits."""
+    words, not digits. A shot whose character has a voice of their own leaves
+    it beside the take as shot_NNN.desc (src/skit.py)."""
     python = (os.environ.get("INDIC_PYTHON")
               or str(ROOT / ".venv-indic" / "bin" / "python"))
     if not Path(python).exists():
@@ -143,7 +144,10 @@ def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> 
     jobs.write_text(json.dumps({
         "description": cfg.get_path("voice.indic.description", ""),
         "items": [{"text": spoken(text, cfg.get_path("channel.language", "en")),
-                   "out": str(raw)} for (text, _), raw in zip(todo, raws)],
+                   "out": str(raw),
+                   "description": (path.with_suffix(".desc").read_text(encoding="utf-8")
+                                   if path.with_suffix(".desc").exists() else "")}
+                  for (text, path), raw in zip(todo, raws)],
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     log.info("Indic voice: speaking %d shots", len(todo))
     res = subprocess.run([python, str(ROOT / "scripts" / "indic_tts.py"), str(jobs)],
@@ -215,7 +219,7 @@ def transcribe(path: Path, language: str | None) -> dict | None:
                     files={"file": (path.name, f)},
                     data={"model": "whisper-large-v3-turbo", "response_format": "verbose_json",
                           "timestamp_granularities[]": "word",
-                          "language": language if language in ("hi", "en", "ta") else "en"},
+                          "language": language if language in ("hi", "en") else "en"},
                     timeout=60)
             if r.status_code == 429:          # ~20 requests a minute on the free tier
                 import time
@@ -230,39 +234,13 @@ def transcribe(path: Path, language: str | None) -> dict | None:
 
 
 def _words(text: str, language: str | None) -> list[str]:
-    return re.findall(r"[a-z0-9']+|[\u0900-\u097F]+|[\u0B80-\u0BFF]+",
+    return re.findall(r"[a-z0-9']+|[\u0900-\u097F]+",
                       spoken(text, language or "en").lower())
-
-
-# Tamil letters and English letters folded into one rough set of consonant
-# sounds. Tamil script does not mark k/g, t/d, p/b or s/j apart, and Whisper
-# writes loanwords ("December", "Gold Futures") and figures in English letters
-# and digits, so a word-for-word match marked full, clear Tamil takes as 0.2-0.4
-# (2026-11-04). Compared as sound skeletons, a clean take scores high and a
-# clipped or garbled one still falls well below.
-_TA_SOUND = dict(zip("கஙசஞடணதநபமயரலவழளறனஜஷஸஹ", "knsntntnpmyrlvllrnsssh"))
-_EN_SOUND = str.maketrans("gdbfwzjqcx", "ktppvsskss")
-
-
-def _skeleton(text: str, language: str | None) -> str:
-    text = spoken(text, language or "en").lower()
-    out = []
-    for ch in text:
-        if ch in _TA_SOUND:
-            out.append(_TA_SOUND[ch])
-        elif "a" <= ch <= "z" and ch not in "aeiouh":
-            out.append(ch.translate(_EN_SOUND))
-    return re.sub(r"(.)\1+", r"\1", "".join(out))
 
 
 def match(script_text: str, heard: str, language: str | None) -> float:
     """0-1: how much of the script the take really says. Catches the cloned
     voice's failure modes: a clipped ending, a repeated phrase, mumbling."""
-    if language == "ta":
-        a, b = _skeleton(script_text, language), _skeleton(heard, language)
-        if not a:
-            return 1.0
-        return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
     a, b = _words(script_text, language), _words(heard, language)
     if not a:
         return 1.0
@@ -275,7 +253,7 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
     keep whichever take matched best. Returns each file's transcript."""
     heard: dict[Path, dict] = {}
     score: dict[Path, float] = {}
-    # Whisper hears Tamil less exactly than English, so the bar is set per
+    # Whisper hears Bhojpuri (as Hindi) less exactly than English, so the bar is set per
     # channel; a lower bar still catches a take that skips or garbles a line.
     match_ok = float(cfg.get_path("voice.match_ok", MATCH_OK))
     for path, text in todo_text.items():

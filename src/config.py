@@ -25,14 +25,14 @@ class Config(dict):
 
 
 def channel_key() -> str:
-    """Which channel this run is for: "" is the main (English) channel; "ta"
-    is the Tamil one, set with the CHANNEL environment variable."""
+    """Which channel this run is for: "" is the main (English) channel; "bh"
+    is the Bhojpuri comedy one, set with the CHANNEL environment variable."""
     key = (os.getenv("CHANNEL") or "").strip().lower()
     return "" if key in ("", "en", "main") else key
 
 
 # Lists of named things a channel file replaces whole instead of adding to.
-REPLACE = {"topic_playlists"}
+REPLACE = {"topic_playlists", "title_series", "hashtags", "playlists", "credits"}
 
 
 def _merge(base: dict, over: dict) -> dict:
@@ -67,7 +67,7 @@ def portrait(cfg: Config) -> Config:
     vis["resolution"] = [1080, 1920]
     vis["short"] = True          # renderer and voice: built to loop, no fades
     # Shorts have their own style (visuals.short_style), palette and fonts.
-    # A channel drawing its own script (fonts.caption, e.g. Tamil) keeps its fonts.
+    # A channel drawing its own script (fonts.caption, e.g. Devanagari) keeps its fonts.
     if vis.get("short_style"):
         vis["style"] = vis["short_style"]
     vis["palette"] = {**(vis.get("palette") or {}), **(vis.get("short_palette") or {})}
@@ -114,17 +114,6 @@ LANGUAGE_RULES = {
         "ALL ON-SCREEN TEXT (headline, value, caption, chart title and labels, timeline "
         "events) must be in ENGLISH using Latin letters only: the renderer cannot draw "
         "Devanagari. Image search terms and image prompts are always in English."
-    ),
-    "ta": (
-        "LANGUAGE: Write all NARRATION in Tamil, in Tamil script, as spoken by a "
-        "Tamil news explainer: simple everyday Tamil a family at home follows easily, "
-        "not stiff written Tamil. Explain any hard money word in plain words. Keep "
-        "common English terms and proper names the way Tamil speakers say them, but "
-        "spelled in Tamil script (கம்பெனி, டெக்னாலஜி, என்விடியா, ராய்ட்டர்ஸ்). The narrator reads "
-        "Tamil script only, so no English letters at all, even in names. Write numbers, years, "
-        "percentages and amounts as digits with their symbol (2026, 5.5%, ₹500, "
-        "$4 பில்லியன்): they are read out in Tamil automatically. "
-        "Every word is in Tamil script, on screen too: no English letters anywhere."
     ),
     "en": (
         "LANGUAGE: Write narration in clear American English for a general US viewer, "

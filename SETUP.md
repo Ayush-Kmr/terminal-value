@@ -126,33 +126,41 @@ the Tuesday/Friday publish slots so you have time to review.
 
 ---
 
-## 11. Tamil channel (same videos, in Tamil)
+## 11. Bhojpuri comedy channel (Bhojpuri AI Comedy)
 
-Every day, after the English videos are made, the **Episode** workflow's
-`tamil` job translates each one shot by shot, narrates it in Tamil with
-AI4Bharat's open Indic Parler-TTS (free, runs inside GitHub Actions, voice
-"Jaya") and uploads it to the Tamil channel at the same publish slots. Same
-stories, same pictures. Settings live in `channels/ta.yaml`; its history in
-`data/history.ta.json`. The job does nothing until step 3 below is done.
+A second channel, on the same Google account, that has nothing to do with the
+news: every day the **Episode** workflow's `bhojpuri` job makes two comedy skit
+Shorts (35-45 s) with three recurring cartoon characters, Lallan Chacha,
+Phoolmati Chachi and their nephew Bablu, and schedules them for 12:30 and 19:30
+IST. `src/skit.py` does it all: it takes a premise from
+`data/bhojpuri_ideas.yaml` (or invents one when they run out), the free LLM
+chain writes the dialogue in Bhojpuri, Cloudflare FLUX draws each line as a
+cartoon, AI4Bharat's open Indic Parler-TTS speaks each character in their own
+voice (free, runs inside GitHub Actions), and captions are burned in
+Devanagari. Settings, characters and voices live in `channels/bh.yaml`; its
+history in `data/history.bh.json`. It is the channel that used to be Terminal
+Value Tamil (`UC5QnQWBbS5AVKvgxsZl4V3w`), rebranded on 2026-11-08.
 
-1. **Create the channel** on the same Google account: youtube.com → profile
-   picture → Settings → *Add or manage your channel(s)* → **Create a channel**.
-   Name it (e.g. *Terminal Value Tamil*). Then verify it at
-   <https://www.youtube.com/verify> (each channel is verified separately).
-2. **Hugging Face token** (the Tamil voice model is free but asks you to accept
-   its terms once): sign up at <https://huggingface.co/join>, open
-   <https://huggingface.co/ai4bharat/indic-parler-tts> and click **Agree and
-   access**, then make a *Read* token at
-   <https://huggingface.co/settings/tokens> and save it as the GitHub secret
-   `HF_TOKEN`.
-3. **YouTube token for the Tamil channel**, from the repo folder:
+- **Test a skit without uploading:** Actions → Episode → Run workflow, tick
+  `bhojpuri_only` and `no_upload`, optionally type a `premise`. The video is in
+  the run's `bhojpuri-N` artifact.
+- **Add premises:** append to `data/bhojpuri_ideas.yaml` (`months:` makes one
+  seasonal).
+- **Token:** the job signs in with the secret `YT_REFRESH_TOKEN_BH`, falling
+  back to the channel's older secret until that one exists. To make it:
 
    ```bash
-   .venv/bin/python scripts/get_youtube_token.py ~/Downloads/client_secret_*.json --secret YT_REFRESH_TOKEN_TA
+   .venv/bin/python scripts/get_youtube_token.py ~/Downloads/client_secret_*.json --secret YT_REFRESH_TOKEN_BH
    ```
 
-   When Google asks which channel, pick the **Tamil** one. The script prints the
-   channel's name and ID: the ID goes in `channel.channel_id` in
-   `channels/ta.yaml` (uploads refuse to go anywhere else).
-4. Actions → **Brand channel** → Run workflow with channel `ta` (banner, About,
-   keywords). Upload `assets/brand/avatar.png` as the profile picture by hand.
+   When Google asks which channel, pick **Bhojpuri AI Comedy**.
+- **Voice model:** gated on Hugging Face. The secret `HF_TOKEN` must belong to
+  an account that clicked **Agree and access** on
+  <https://huggingface.co/ai4bharat/indic-parler-tts>.
+- **Branding:** Actions → **Brand channel** with channel `bh` (banner, About,
+  keywords, watermark from `assets/brand/bh/`; it also tries the name).
+  Upload `assets/brand/bh/avatar.png` as the profile picture, and set the
+  handle, in Studio: the API cannot.
+- **Old Tamil library:** Actions → **Library cleanup** with channel `bh`,
+  language `ta` unlists the old Tamil videos and makes the Tamil playlists
+  private (run it with `dry_run` first).

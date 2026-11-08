@@ -640,7 +640,7 @@ def chart(spec: dict, cfg: dict, out: Path) -> Path:
         fp = font_manager.FontProperties(fname=str(mono))
         for lab in ax.get_xticklabels() + ax.get_yticklabels():
             lab.set_fontproperties(fp)
-    # Matplotlib cannot join Tamil letters, so those labels are drawn by Pillow.
+    # Matplotlib cannot join Indic letters, so those labels are drawn by Pillow.
     native = bool((cfg.get("fonts") or {}).get("caption"))
     if native:
         ax.set_xticks(range(len(xs)))

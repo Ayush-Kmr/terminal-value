@@ -251,11 +251,12 @@ def build_shot_clips(cfg: Config, shots: list[dict], workdir: Path,
 
 
 def pick_music(cfg: Config, seed: str) -> Path | None:
-    """One of the beds in assets/music, chosen by the story so the same
-    video always gets the same track and different videos vary."""
+    """One of the beds in assets/music (or the channel's audio.music_dir),
+    chosen by the story so the same video always gets the same track and
+    different videos vary."""
     if not cfg.get_path("audio.music", True):
         return None
-    tracks = sorted((ROOT / "assets" / "music").glob("*.mp3"))
+    tracks = sorted((ROOT / cfg.get_path("audio.music_dir", "assets/music")).glob("*.mp3"))
     if not tracks:
         return None
     return tracks[int(hashlib.sha1(seed.encode("utf-8")).hexdigest(), 16) % len(tracks)]

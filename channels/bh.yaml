@@ -1,0 +1,168 @@
+# ============================================================
+#  The Bhojpuri comedy channel. Laid over config.yaml when CHANNEL=bh, so only
+#  what differs is here. It makes its own videos: short comedy skits with three
+#  recurring cartoon characters, written, voiced and drawn by AI (src/skit.py).
+#  Nothing from the English channel's news pipeline is used.
+# ============================================================
+
+channel:
+  name: "Bhojpuri AI Comedy"
+  handle: "@BhojpuriAIComedy"            # set in Studio; the API cannot change it
+  channel_id: "UC5QnQWBbS5AVKvgxsZl4V3w"   # uploads refuse to go anywhere else
+  url: "https://www.youtube.com/channel/UC5QnQWBbS5AVKvgxsZl4V3w"
+  tagline: "ललन चाचा के घर, रोज नया बवाल!"
+  # Bhojpuri. Number reading and the voice treat it as Hindi (same script);
+  # YouTube's language fields are set to Hindi (skit.youtube_language).
+  language: bho
+  country: IN
+  timezone: Asia/Kolkata
+  about: |
+    ललन चाचा, फूलमती चाची आ उनकर भतीजा बबलू: एगो गाँव, एगो घर, आ रोज नया बवाल! 😂
+
+    Bhojpuri comedy Shorts every day: Lallan Chacha, Phoolmati Chachi and their nephew Bablu, in short funny skits from village life. Smartphones, power cuts, weddings, exams, WhatsApp forwards and more.
+
+    रोज दू गो नया कॉमेडी वीडियो: दुपहरिया साढ़े बारह बजे आ साँझ साढ़े सात बजे।
+
+    Every video is made with AI: the story, the voices and the pictures. The characters are made up; any likeness to real people is a coincidence. Clean family comedy, no vulgarity.
+  keywords:
+    - bhojpuri comedy
+    - bhojpuri comedy video
+    - bhojpuri funny video
+    - bhojpuri ai comedy
+    - ai comedy video
+    - funny cartoon comedy
+    - bihari comedy
+    - desi comedy
+    - village comedy
+    - bhojpuri shorts
+    - भोजपुरी कॉमेडी
+    - भोजपुरी कॉमेडी वीडियो
+    - चाचा भतीजा कॉमेडी
+  links:
+    - "Subscribe: https://www.youtube.com/channel/UC5QnQWBbS5AVKvgxsZl4V3w?sub_confirmation=1"
+  cta: >-
+    रोज नया बवाल देखे खातिर चैनल के सब्सक्राइब करीं! 🔔
+  disclosure: >-
+    This video is made with AI: the script, the voices and the pictures. The
+    characters are made up. / ई वीडियो AI से बनल बा।
+
+# The whole skit format. src/skit.py reads everything under here.
+skit:
+  per_day: 2
+  lines: [6, 9]                  # dialogue lines per skit
+  max_words: 85                  # ~35-45 s once voiced
+  max_line_words: 14
+  ideas: data/bhojpuri_ideas.yaml
+  youtube_language: hi           # YouTube has no Bhojpuri in its language list
+  search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]
+  # Pictures: Cloudflare Workers AI (FLUX schnell), one per line. Every prompt
+  # carries the character's full look, so they stay recognisable from shot to shot.
+  style: >-
+    colourful 3D animated cartoon film still, cute exaggerated characters with
+    big heads and big expressive eyes, soft warm lighting, vibrant saturated
+    colours, high detail, centred composition, characters in the middle of the
+    frame, no text, no letters, no subtitles, no watermark
+  characters:
+    lallan:
+      name: Lallan Chacha
+      name_bho: ललन चाचा
+      role: >-
+        the head of the house, a proud 62-year-old village uncle who thinks he
+        knows everything, especially about phones and the internet, and is
+        always wrong; stubborn, dramatic, lovable
+      look: >-
+        Lallan Chacha, a chubby 62-year-old Indian village uncle with a round
+        belly, thick grey handlebar moustache, bald head with white hair on the
+        sides, round black glasses, white kurta, white dhoti and a red-and-white
+        checked gamchha towel on his shoulder
+      voice: >-
+        Rohit speaks in a deep, slightly hoarse and very expressive voice at a
+        lively pace, with a dramatic tone. The recording is very clear and close up.
+    phoolmati:
+      name: Phoolmati Chachi
+      name_bho: फूलमती चाची
+      role: >-
+        Lallan's sharp-tongued, quick-witted wife who runs the house and always
+        wins the argument; she loves TV serials and gossip
+      look: >-
+        Phoolmati Chachi, a plump 55-year-old Indian village aunty in a bright
+        red-and-yellow cotton saree with the end over her head, a big round red
+        bindi, red sindoor in her hair parting and green glass bangles
+      voice: >-
+        Divya speaks in a loud, sharp and very expressive voice at a fast pace,
+        with a playful scolding tone. The recording is very clear and close up.
+    bablu:
+      name: Bablu
+      name_bho: बबलू
+      role: >-
+        their 19-year-old nephew, glued to his smartphone, wants to be an
+        influencer, lazy but smart, always has a shortcut
+      look: >-
+        Bablu, a skinny 19-year-old Indian village boy with spiky gelled black
+        hair, a thin moustache, a bright yellow t-shirt, blue ripped jeans, white
+        earphones round his neck and a smartphone in his hand
+      voice: >-
+        Aman speaks in a cheerful, energetic and expressive voice at a fast pace.
+        The recording is very clear and close up.
+
+voice:
+  # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine. Each
+  # character's own description (skit.characters.*.voice) picks the speaker.
+  provider: indic
+  # Whisper hears Bhojpuri as Hindi and spells it the Hindi way, so a clean
+  # take scores lower than in English. The bar still catches a dropped line.
+  match_ok: 0.45
+  check_rounds: 1
+  tempo: 1.1
+  indic:
+    description: >-
+      Rohit speaks in a clear, expressive voice at a lively pace. The recording
+      is very clear and close up.
+
+localize:
+  languages: {}
+
+format:
+  short:
+    publish_times: ["12:30", "19:30"]   # India time: lunch and evening
+    shot_seconds: [1.5, 7]             # one picture per line, however short
+
+visuals:
+  style: classic
+  short_style: classic           # bright cartoon pictures: no news grade
+  palette:
+    bg: "#1B1030"
+    surface: "#2A1A48"
+    ink: "#FFFFFF"
+    muted: "#FFE7A3"
+    accent: "#FFD23F"
+    danger: "#FF4D6D"
+  fonts:                         # Devanagari on every card and caption (OFL)
+    display: "assets/fonts/Baloo2-Variable.ttf"
+    body:    "assets/fonts/Baloo2-Variable.ttf"
+    mono:    "assets/fonts/Baloo2-Variable.ttf"
+    caption: "assets/fonts/Baloo2-Variable.ttf"
+  font_weights: {display: ExtraBold, body: Bold, mono: Bold, caption: ExtraBold}
+  labels:
+    wordmark: भोजपुरी AI कॉमेडी
+
+audio:
+  music_dir: assets/music/comedy
+  music_volume: 0.14
+  credits:
+    Fluffing-a-Duck: "Fluffing a Duck"
+    Monkeys-Spinning-Monkeys: "Monkeys Spinning Monkeys"
+    Sneaky-Snitch: "Sneaky Snitch"
+
+upload:
+  category_id: 23                # Comedy
+  playlists:
+    hi: "भोजपुरी कॉमेडी Shorts"
+  hashtag_default: "#bhojpuricomedy"
+  hashtags: {}
+  title_series: {}
+  # A playlist per character: a skit joins the playlist of everyone in it.
+  topic_playlists:
+    "Lallan Chacha Comedy": [lallan]
+    "Phoolmati Chachi Comedy": [phoolmati]
+    "Bablu Comedy": [bablu]

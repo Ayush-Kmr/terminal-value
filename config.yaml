@@ -252,7 +252,7 @@ visuals:
     accent:  "#FFC21A"        # honey: the point, gains, the keyword block
     gold:    "#FFC21A"
     danger:  "#FF4A3D"        # losses, the bad number
-  short_fonts:                 # not used by a channel that sets fonts.caption (Tamil)
+  short_fonts:                 # not used by a channel that sets fonts.caption (the Bhojpuri channel's Devanagari)
     display: "assets/fonts/InterTight-Variable.ttf"
     body:    "assets/fonts/InterTight-Variable.ttf"
     mono:    "assets/fonts/IBMPlexMono-Medium.ttf"

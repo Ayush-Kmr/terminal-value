@@ -1,13 +1,20 @@
 name: Library cleanup
 
-# Unlists every public video in one narration language on the main channel
-# (they keep their views and links) and makes that language's playlist private,
-# then files existing videos into their title-series playlists.
+# Unlists every public video in one narration language on one channel (they
+# keep their views and links) and makes that language's playlists private.
+# On the main channel it then files existing videos into their title-series
+# playlists. Channel bh + language ta clears the old Tamil library off the
+# channel that is now Bhojpuri AI Comedy.
 on:
   workflow_dispatch:
     inputs:
+      channel:
+        description: "Which channel"
+        type: choice
+        options: [main, bh]
+        default: main
       language:
-        description: "Narration language code"
+        description: "Narration language code (hi, ta)"
         default: hi
       dry_run:
         description: "Only list what would change"
@@ -29,12 +36,13 @@ jobs:
         env:
           YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_REFRESH_TOKEN: ${{ inputs.channel == 'bh' && (secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA) || secrets.YT_REFRESH_TOKEN }}
+          CHANNEL:          ${{ inputs.channel == 'main' && '' || inputs.channel }}
           LANG_CODE:        ${{ inputs.language }}
           DRY:              ${{ inputs.dry_run && '--dry-run' || '' }}
         run: python scripts/unlist_language.py "$LANG_CODE" $DRY
       - name: Series playlists
-        if: ${{ !inputs.dry_run }}
+        if: ${{ !inputs.dry_run && inputs.channel == 'main' }}
         env:
           YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}

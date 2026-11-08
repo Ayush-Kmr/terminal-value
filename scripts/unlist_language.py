@@ -4,11 +4,14 @@ language's playlist private, on the channel of the current token.
 
     python scripts/unlist_language.py hi            # unlist the Hindi videos
     python scripts/unlist_language.py hi --dry-run  # only list them
+    CHANNEL=bh python scripts/unlist_language.py ta # the old Tamil videos and
+                                                    # playlists on the Bhojpuri channel
 
 Unlisted videos keep their views, comments and links; they leave the channel
 page, search and recommendations. Undo in Studio (Visibility -> Public).
 Videos are found in data/history.json and, as a check, by script: a title in
-Devanagari counts as Hindi.
+Devanagari counts as Hindi, one in Tamil script as Tamil. Playlists named in
+that script (or the language's playlist in config) are made private too.
 """
 from __future__ import annotations
 
@@ -23,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 from src import upload  # noqa: E402
 from src.config import load  # noqa: E402
 
-SCRIPTS = {"hi": r"[ऀ-ॿ]", "ta": r"[஀-௿]"}
+SCRIPTS = {"hi": r"[ऀ-ॿ]", "ta": r"[஀-௿]"}   # Tamil: the channel's old library
 
 
 def main() -> int:
@@ -33,7 +36,8 @@ def main() -> int:
     cfg = load()
     yt = upload.client()
     upload.check_channel(cfg, yt)
-    eps = json.loads((ROOT / "data" / "history.json").read_text(encoding="utf-8"))["episodes"]
+    from src.state import HISTORY
+    eps = json.loads(HISTORY.read_text(encoding="utf-8"))["episodes"] if HISTORY.exists() else []
     ids = {e["video_id"] for e in eps if e.get("language") == lang and e.get("video_id")}
 
     uploads = yt.channels().list(part="contentDetails", mine=True).execute()["items"][0][
@@ -52,7 +56,9 @@ def main() -> int:
         for v in yt.videos().list(part="snippet,status", id=",".join(all_ids[i:i + 50])
                                   ).execute().get("items", []):
             title = v["snippet"]["title"]
-            if v["id"] not in ids and not (pattern and re.search(pattern, title)):
+            text = f"{title} {v['snippet'].get('description', '')}"
+            if v["id"] not in ids and not (pattern and re.search(pattern, title if lang == "hi"
+                                                                 else text)):
                 continue
             if v["status"]["privacyStatus"] != "public":
                 print(f"Already {v['status']['privacyStatus']}: {v['id']} {title[:70]}")
@@ -66,8 +72,10 @@ def main() -> int:
     name = cfg.get_path(f"upload.playlists.{lang}")
     for p in yt.playlists().list(part="snippet,status", mine=True, maxResults=50
                                  ).execute().get("items", []):
-        if name and p["snippet"]["title"] == name and p["status"]["privacyStatus"] != "private":
-            print(f"{'Would make' if dry else 'Made'} playlist private: {name}")
+        title = p["snippet"]["title"]
+        if (title == name or (lang == "ta" and pattern and re.search(pattern, title))) \
+                and p["status"]["privacyStatus"] != "private":
+            print(f"{'Would make' if dry else 'Made'} playlist private: {title}")
             if not dry:
                 yt.playlists().update(part="snippet,status", body={
                     "id": p["id"], "snippet": {"title": p["snippet"]["title"],

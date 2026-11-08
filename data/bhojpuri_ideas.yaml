@@ -1,0 +1,135 @@
+# Skit premises for the Bhojpuri comedy channel (src/skit.py). One is used per
+# skit and never repeated; when all are used the model invents a new one.
+# months: optional, the premise is picked first in those months (1-12).
+# cast: who is in it (keys of skit.characters in channels/bh.yaml).
+ideas:
+  - id: chacha-selfie
+    premise: Lallan Chacha gets his first smartphone and cannot understand why every photo shows his own face (the front camera is on).
+    cast: [lallan, bablu]
+  - id: chachi-serial
+    premise: Phoolmati Chachi's TV serial is about to reveal the villain when the power goes off; she blames Lallan Chacha for everything.
+    cast: [phoolmati, lallan]
+  - id: bablu-influencer
+    premise: Bablu wants to become a famous reels influencer and makes Chacha act in his video, but Chacha keeps looking straight into the camera and saying hello.
+    cast: [bablu, lallan]
+  - id: whatsapp-forward
+    premise: Chacha believes a WhatsApp forward that says drinking tea upside down cures everything, and Chachi catches him trying it.
+    cast: [lallan, phoolmati]
+  - id: wifi-password
+    premise: The whole village thinks Bablu's WiFi password is a secret mantra; Chacha tries to say it to the buffalo.
+    cast: [lallan, bablu]
+  - id: wedding-feast
+    premise: At a village wedding, Chacha plans to eat at every counter before the food finishes, but Chachi has a plan of her own.
+    cast: [lallan, phoolmati]
+    months: [11, 12, 1, 2]
+  - id: exam-result
+    premise: Bablu's exam result is out and he tries to convince Chacha that 35 percent is actually a very high score.
+    cast: [bablu, lallan, phoolmati]
+    months: [4, 5, 6]
+  - id: online-shopping
+    premise: Chachi orders a saree online and Chacha thinks the delivery boy is a thief; Bablu has to explain cash on delivery.
+    cast: [phoolmati, lallan, bablu]
+  - id: chhath-ghat
+    premise: Chacha wants to reserve the best spot on the Chhath ghat a week early and ties his gamchha there; the whole family has to guard it.
+    cast: [lallan, phoolmati, bablu]
+    months: [10, 11]
+  - id: voice-assistant
+    premise: Bablu sets up a voice assistant and Chacha argues with it like a real person because it will not understand Bhojpuri.
+    cast: [lallan, bablu]
+  - id: gym-chacha
+    premise: Chacha decides to join a gym to impress Chachi and treats every machine like a farm tool.
+    cast: [lallan, phoolmati]
+  - id: power-cut-summer
+    premise: A summer power cut; Chacha invents a fan run by Bablu cycling, and Bablu negotiates his pay.
+    cast: [lallan, bablu]
+    months: [5, 6, 7]
+  - id: monsoon-roof
+    premise: The roof leaks in the monsoon and Chacha says it is not a leak, it is a free shower; Chachi is not amused.
+    cast: [lallan, phoolmati]
+    months: [7, 8, 9]
+  - id: holi-colour
+    premise: On Holi, Chacha swears nobody will colour him this year and hides inside a drum; Bablu finds him with a drone.
+    cast: [lallan, bablu]
+    months: [3]
+  - id: diet-plan
+    premise: The doctor puts Chacha on a diet, and he tries to prove that litti chokha counts as a salad.
+    cast: [lallan, phoolmati]
+  - id: video-call
+    premise: Chachi's first video call with her sister; she holds the phone to her ear and shouts, and Chacha gives wrong advice.
+    cast: [phoolmati, lallan]
+  - id: upi-payment
+    premise: Chacha pays the vegetable seller by scanning the QR code with the phone held upside down and insists the money went to the moon.
+    cast: [lallan, bablu]
+  - id: train-ticket
+    premise: Chacha and Chachi travel by train for the first time in years; Chacha argues with the ticket checker that his gamchha reserved the seat.
+    cast: [lallan, phoolmati]
+  - id: bablu-job
+    premise: Bablu tells the family he got a job "work from home" and Chacha thinks it means he will be doing the housework.
+    cast: [bablu, lallan, phoolmati]
+  - id: buffalo-insurance
+    premise: Chacha wants to buy life insurance for his buffalo and fills the form himself, with hilarious answers.
+    cast: [lallan, bablu]
+  - id: chachi-cricket
+    premise: The cricket match is on; Chachi does not understand cricket but keeps predicting every wicket correctly, driving Chacha mad.
+    cast: [phoolmati, lallan]
+  - id: auto-correct
+    premise: Chacha sends a romantic message to Chachi but auto-correct changes every word, and she reads it out loud to the whole family.
+    cast: [lallan, phoolmati, bablu]
+  - id: guest-arrives
+    premise: Unexpected relatives are coming; Chacha and Bablu try every trick to pretend nobody is at home.
+    cast: [lallan, bablu, phoolmati]
+  - id: chacha-english
+    premise: Chacha wants to speak English to impress a city guest and translates Bhojpuri sayings word for word.
+    cast: [lallan, bablu]
+  - id: ludo-fight
+    premise: A game of online Ludo between Chacha and Chachi turns into a full family court case.
+    cast: [lallan, phoolmati, bablu]
+  - id: weather-app
+    premise: Chacha trusts his knee pain more than Bablu's weather app to forecast rain; they bet a samosa on it.
+    cast: [lallan, bablu]
+  - id: fake-diet-chachi
+    premise: Chachi announces she is fasting for health, but every few minutes she "just tastes" something in the kitchen.
+    cast: [phoolmati, lallan]
+  - id: bablu-haircut
+    premise: Bablu comes home with a trendy haircut and Chacha thinks a crow attacked him.
+    cast: [bablu, lallan, phoolmati]
+  - id: tractor-gps
+    premise: Bablu puts GPS on Chacha's phone to find the market, and the voice keeps saying "turn left" into a pond.
+    cast: [lallan, bablu]
+  - id: ai-chacha
+    premise: Bablu shows Chacha an AI chatbot; Chacha asks it to find a good bride for Bablu and the AI asks too many questions.
+    cast: [lallan, bablu]
+  - id: chachi-ringtone
+    premise: Chachi sets a loud devotional ringtone and it goes off at the worst moment while Chacha pretends to be asleep to avoid work.
+    cast: [phoolmati, lallan]
+  - id: diwali-cleaning
+    premise: Diwali cleaning day; Chacha keeps "finding" old things he refuses to throw away, including a broken radio he talks to.
+    cast: [lallan, phoolmati]
+    months: [10, 11]
+  - id: winter-bath
+    premise: In the cold winter, Chacha invents a hundred excuses to skip his bath; Chachi has a bucket ready.
+    cast: [lallan, phoolmati]
+    months: [12, 1, 2]
+  - id: bablu-girlfriend
+    premise: Bablu is secretly on a phone call with his friend and Chachi thinks he is talking to a girl; the whole house listens in.
+    cast: [bablu, phoolmati, lallan]
+  - id: lottery-dream
+    premise: Chacha dreams he won one crore rupees and starts spending it at breakfast, until Chachi brings him back to earth.
+    cast: [lallan, phoolmati]
+  - id: kite-festival
+    premise: Makar Sankranti; Chacha claims he was the kite champion of the district and his kite gets stuck on the first try.
+    cast: [lallan, bablu]
+    months: [1]
+  - id: password-forgot
+    premise: Chacha changes his phone password to keep it "safe" and forgets it, then tries every family member's birthday.
+    cast: [lallan, bablu, phoolmati]
+  - id: mango-tree
+    premise: Mango season; Chacha guards the mango tree all night, and Bablu tries to sneak mangoes with a drone and a fishing rod.
+    cast: [lallan, bablu]
+    months: [5, 6, 7]
+  - id: doctor-online
+    premise: Chachi books an online doctor appointment and the doctor sees only Chacha's moustache through the camera.
+    cast: [phoolmati, lallan]
+  - id: new-scooter
+    premise: Chacha buys an electric scooter and keeps looking for where to put petrol; Bablu teaches him to ride it.
+    cast: [lallan, bablu]

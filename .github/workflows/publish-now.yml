@@ -7,7 +7,7 @@ on:
       channel:
         description: "Which channel"
         type: choice
-        options: [main, ta]
+        options: [main, bh]
         default: main
 
 jobs:
@@ -25,6 +25,6 @@ jobs:
         env:
           YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ inputs.channel == 'ta' && secrets.YT_REFRESH_TOKEN_TA || secrets.YT_REFRESH_TOKEN }}
+          YT_REFRESH_TOKEN: ${{ inputs.channel == 'bh' && (secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA) || secrets.YT_REFRESH_TOKEN }}
           CHANNEL:          ${{ inputs.channel }}
         run: python scripts/publish_now.py
