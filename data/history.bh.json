@@ -47,6 +47,43 @@
         "likes": 0,
         "comments": 0
       }
+    },
+    {
+      "company": "Phoolmati tasks Lallan and Bablu with the dreaded annual Diwali house cleaning, ",
+      "title": "दिवाली के सफाई वाला जुगाड़ 😂 | Diwali ki safai | Bhojpuri AI Comedy",
+      "idea": "trend-msqssP9FSO0",
+      "characters": [
+        "phoolmati",
+        "lallan",
+        "bablu"
+      ],
+      "language": "bho",
+      "video_id": "GjQ9j48z4Dw",
+      "keyword": "Diwali ki safai",
+      "source": {
+        "video_id": "msqssP9FSO0",
+        "title": "Agar aapko Diwali par ghar ki safai karni hai 🏠 #reels #shorts #shortvideo",
+        "views": 163728330
+      },
+      "kind": "short",
+      "runtime": 22.1,
+      "created_at": "2026-11-09T12:12:41.469141+00:00"
+    },
+    {
+      "company": "At a village wedding, Chacha plans to eat at every counter before the food finis",
+      "title": "ललन चाचा के ब्याह वाला मास्टरप्लान 😂 | Bhojpuri Comedy Video",
+      "idea": "wedding-feast",
+      "characters": [
+        "lallan",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "GktzDtD1gmA",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "runtime": 22.1,
+      "created_at": "2026-11-09T12:23:45.398213+00:00"
     }
   ],
   "rejected_topics": [],
