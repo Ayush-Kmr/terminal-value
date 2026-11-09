@@ -299,6 +299,16 @@ def duration(path: Path) -> float:
     return float(res.stdout.strip())
 
 
+def _playable(path: Path) -> bool:
+    """The take exists and ffprobe reads a duration from it."""
+    if not path.exists() or path.stat().st_size < 1024:
+        return False
+    try:
+        return duration(path) > 0.1
+    except Exception:  # noqa: BLE001 - unreadable audio
+        return False
+
+
 def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
                   region: str | None = None, language: str | None = None) -> list[dict]:
     """Synthesise one audio file per shot; attach real durations."""
@@ -312,6 +322,18 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
         missing = [(text, path) for text, path in todo if not path.exists()]
         if missing:
             _speak_batch(cfg, missing, language, audio_dir)
+        # A take the model wrote broken (empty or unreadable) is spoken again once;
+        # still broken, the run fails here with a clear reason, not deep in ffprobe.
+        broken = [(text, path) for text, path in todo if not _playable(path)]
+        if broken:
+            log.warning("Voice: %d broken take(s), speaking again: %s", len(broken),
+                        ", ".join(p.name for _, p in broken))
+            for _, path in broken:
+                path.unlink(missing_ok=True)
+            _speak_batch(cfg, broken, language, audio_dir)
+            still = [p.name for _, p in broken if not _playable(p)]
+            if still:
+                raise RuntimeError(f"Voice takes still broken: {', '.join(still)}")
         # Kokoro says a line the same way every time, so a second take cannot help:
         # its transcripts are still needed for the caption timings.
         heard = (check_takes(cfg, {path: text for text, path in todo}, audio_dir, language,

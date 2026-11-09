@@ -292,7 +292,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
 
     sk = write(cfg, idea)
     (workdir / "script.json").write_text(
-        json.dumps({"idea": idea, **sk}, indent=2, ensure_ascii=False),
+        json.dumps({"idea": idea, **sk}, indent=2, ensure_ascii=False, default=str),
         encoding="utf-8")
     log.info("Skit: %s (%d lines)", sk.get("title"), len(sk["lines"]))
 
