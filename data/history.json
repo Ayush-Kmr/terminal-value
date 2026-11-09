@@ -14,9 +14,9 @@
         "views": 105,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 18,
-        "avg_pct": 74.81,
-        "minutes": 8
+        "avg_duration_s": 10,
+        "avg_pct": 40,
+        "minutes": 0
       }
     },
     {
@@ -92,7 +92,7 @@
       "warnings": [],
       "created_at": "2026-10-14T15:26:50.299162+00:00",
       "stats": {
-        "views": 99,
+        "views": 100,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 12,
@@ -111,11 +111,11 @@
       "warnings": [],
       "created_at": "2026-10-14T15:32:54.507639+00:00",
       "stats": {
-        "views": 375,
+        "views": 376,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
-        "avg_pct": 78.94,
+        "avg_pct": 78.46,
         "minutes": 54
       }
     },
@@ -259,12 +259,12 @@
       "warnings": [],
       "created_at": "2026-10-19T17:34:24.707133+00:00",
       "stats": {
-        "views": 129,
+        "views": 131,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 53,
-        "avg_pct": 36.23,
-        "minutes": 35
+        "avg_duration_s": 52,
+        "avg_pct": 35.39,
+        "minutes": 36
       }
     },
     {
@@ -337,12 +337,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 210,
+        "views": 300,
         "likes": 2,
         "comments": 0,
-        "avg_duration_s": 109,
-        "avg_pct": 21.55,
-        "minutes": 169
+        "avg_duration_s": 111,
+        "avg_pct": 21.9,
+        "minutes": 256
       }
     },
     {
@@ -356,12 +356,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 111,
+        "views": 116,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
-        "avg_pct": 62.33,
-        "minutes": 18
+        "avg_pct": 61.86000000000001,
+        "minutes": 19
       }
     },
     {
@@ -435,12 +435,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:22:56.859675+00:00",
       "stats": {
-        "views": 30,
+        "views": 43,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 148,
-        "avg_pct": 28.050000000000004,
-        "minutes": 42
+        "avg_duration_s": 172,
+        "avg_pct": 32.51,
+        "minutes": 95
       }
     },
     {
@@ -454,11 +454,11 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 113,
+        "views": 115,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
-        "avg_pct": 56.74,
+        "avg_pct": 56.61999999999999,
         "minutes": 15
       }
     },
@@ -511,8 +511,8 @@
       "warnings": [],
       "created_at": "2026-10-25T09:32:35.580675+00:00",
       "stats": {
-        "views": 8,
-        "likes": 0,
+        "views": 9,
+        "likes": 1,
         "comments": 0,
         "avg_duration_s": 4,
         "avg_pct": 10.24,
@@ -554,11 +554,11 @@
       "warnings": [],
       "created_at": "2026-10-26T11:44:47.545945+00:00",
       "stats": {
-        "views": 411,
+        "views": 413,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 30,
-        "avg_pct": 78.99,
+        "avg_duration_s": 29,
+        "avg_pct": 78.45,
         "minutes": 68
       }
     },
@@ -597,11 +597,11 @@
       ],
       "created_at": "2026-10-28T11:41:57.269368+00:00",
       "stats": {
-        "views": 4,
+        "views": 6,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 45,
-        "avg_pct": 9.77,
+        "avg_duration_s": 32,
+        "avg_pct": 7.000000000000001,
         "minutes": 1
       }
     },
@@ -638,8 +638,8 @@
         "views": 128,
         "likes": 3,
         "comments": 0,
-        "avg_duration_s": 20,
-        "avg_pct": 52.04,
+        "avg_duration_s": 19,
+        "avg_pct": 50.13000000000001,
         "minutes": 16
       }
     },
@@ -654,12 +654,12 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 260,
+        "views": 301,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 25,
-        "avg_pct": 74.89,
-        "minutes": 28
+        "avg_duration_s": 26,
+        "avg_pct": 77.84,
+        "minutes": 40
       }
     },
     {
@@ -677,7 +677,7 @@
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 13,
-        "avg_pct": 29.909999999999997,
+        "avg_pct": 30.04,
         "minutes": 12
       }
     },
@@ -695,12 +695,12 @@
       "warnings": [],
       "created_at": "2026-10-30T12:23:32.688274+00:00",
       "stats": {
-        "views": 48,
+        "views": 51,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 89,
-        "avg_pct": 14.19,
-        "minutes": 14
+        "avg_duration_s": 149,
+        "avg_pct": 23.63,
+        "minutes": 33
       }
     },
     {
@@ -718,8 +718,8 @@
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 18,
-        "avg_pct": 50.13000000000001,
-        "minutes": 18
+        "avg_pct": 50.43,
+        "minutes": 19
       }
     },
     {
@@ -733,11 +733,11 @@
       "warnings": [],
       "created_at": "2026-10-30T13:00:19.902734+00:00",
       "stats": {
-        "views": 533,
+        "views": 539,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 31,
-        "avg_pct": 109.54000000000002,
+        "avg_pct": 109.42,
         "minutes": 129
       }
     },
@@ -752,12 +752,12 @@
       "warnings": [],
       "created_at": "2026-10-31T10:06:27.130994+00:00",
       "stats": {
-        "views": 223,
+        "views": 231,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 15,
-        "avg_pct": 40.95,
-        "minutes": 16
+        "avg_duration_s": 30,
+        "avg_pct": 78.63,
+        "minutes": 30
       }
     },
     {
@@ -794,12 +794,12 @@
       "warnings": [],
       "created_at": "2026-11-01T12:01:32.048352+00:00",
       "stats": {
-        "views": 15,
+        "views": 20,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 187,
-        "avg_pct": 34.52,
-        "minutes": 18
+        "avg_duration_s": 232,
+        "avg_pct": 42.74,
+        "minutes": 46
       },
       "commented": true
     },
@@ -818,12 +818,12 @@
       "queue": "shorts:Is the AI bubble about to pop",
       "created_at": "2026-11-01T12:04:09.847736+00:00",
       "stats": {
-        "views": 230,
+        "views": 231,
         "likes": 3,
         "comments": 2,
-        "avg_duration_s": 17,
-        "avg_pct": 83.55,
-        "minutes": 16
+        "avg_duration_s": 16,
+        "avg_pct": 80.81,
+        "minutes": 22
       },
       "commented": true
     },
@@ -842,12 +842,12 @@
       "queue": "shorts:Egg prices",
       "created_at": "2026-11-01T12:07:19.626318+00:00",
       "stats": {
-        "views": 93,
+        "views": 94,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 14,
-        "avg_pct": 59.79,
-        "minutes": 6
+        "avg_duration_s": 13,
+        "avg_pct": 55.81,
+        "minutes": 7
       },
       "commented": true
     },
@@ -867,9 +867,12 @@
       "created_at": "2026-11-02T15:59:18.703616+00:00",
       "commented": true,
       "stats": {
-        "views": 73,
+        "views": 93,
         "likes": 1,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 90,
+        "avg_pct": 266.26,
+        "minutes": 43
       }
     },
     {
@@ -887,9 +890,12 @@
       "queue": "shorts:Gas prices",
       "created_at": "2026-11-02T16:03:09.420207+00:00",
       "stats": {
-        "views": 58,
+        "views": 63,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 12,
+        "avg_pct": 43.66,
+        "minutes": 4
       },
       "commented": true
     },
@@ -913,9 +919,12 @@
       ],
       "created_at": "2026-11-03T12:05:52.640499+00:00",
       "stats": {
-        "views": 3,
+        "views": 7,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 7,
+        "avg_pct": 1.71,
+        "minutes": 0
       },
       "commented": true
     },
@@ -934,9 +943,12 @@
       "queue": "",
       "created_at": "2026-11-03T12:09:05.062483+00:00",
       "stats": {
-        "views": 31,
+        "views": 47,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 18,
+        "avg_pct": 67.05,
+        "minutes": 5
       },
       "commented": true
     },
@@ -955,9 +967,12 @@
       "queue": "shorts:How Madoff fooled everyone",
       "created_at": "2026-11-03T12:12:28.027839+00:00",
       "stats": {
-        "views": 30,
+        "views": 33,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 14,
+        "avg_pct": 45.47,
+        "minutes": 3
       },
       "commented": true
     },
@@ -977,9 +992,12 @@
       "created_at": "2026-11-04T06:02:41.107366+00:00",
       "commented": true,
       "stats": {
-        "views": 17,
+        "views": 66,
         "likes": 0,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 11,
+        "avg_pct": 46.86,
+        "minutes": 4
       }
     },
     {
@@ -1002,9 +1020,12 @@
       ],
       "created_at": "2026-11-04T06:45:27.312371+00:00",
       "stats": {
-        "views": 0,
+        "views": 4,
         "likes": 0,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1023,9 +1044,12 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 20,
+        "views": 352,
         "likes": 0,
-        "comments": 0
+        "comments": 2,
+        "avg_duration_s": 20,
+        "avg_pct": 90.53,
+        "minutes": 41
       },
       "commented": true
     },
@@ -1043,7 +1067,15 @@
       "title_style": "search",
       "queue": "shorts:Childcare costs",
       "created_at": "2026-11-04T11:34:33.172223+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 27,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 29,
+        "avg_pct": 105.79,
+        "minutes": 5
+      }
     },
     {
       "company": "Car insurance prices",
@@ -1059,7 +1091,15 @@
       "title_style": "search",
       "queue": "shorts:Car insurance prices",
       "created_at": "2026-11-04T11:38:26.045994+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 36,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 10,
+        "avg_pct": 35.52,
+        "minutes": 2
+      }
     },
     {
       "company": "Beef prices",
@@ -1075,7 +1115,15 @@
       "title_style": "search",
       "queue": "shorts:Beef prices",
       "created_at": "2026-11-05T11:33:11.257058+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 54,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 11,
+        "avg_pct": 39.98,
+        "minutes": 3
+      }
     },
     {
       "company": "Market Drop Wipes Out Trillion Dollars",
@@ -1091,7 +1139,15 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-05T11:40:13.748708+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 60,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 14,
+        "avg_pct": 49.64,
+        "minutes": 4
+      }
     },
     {
       "company": "Google value drops $500bn amid AI slowdown fears",
@@ -1110,7 +1166,15 @@
       "runtime": "5:45",
       "warnings": [],
       "created_at": "2026-11-06T12:02:03.059033+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 3,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 128,
+        "avg_pct": 37.14,
+        "minutes": 2
+      }
     },
     {
       "company": "Health insurance costs",
@@ -1126,7 +1190,15 @@
       "title_style": "search",
       "queue": "shorts:Health insurance costs",
       "created_at": "2026-11-06T12:05:39.005033+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 39,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 14,
+        "avg_pct": 63.27,
+        "minutes": 1
+      }
     },
     {
       "company": "World food prices dip in October but remain high",
@@ -1142,7 +1214,15 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-06T12:09:16.960099+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 39,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 12,
+        "avg_pct": 64.28,
+        "minutes": 1
+      }
     },
     {
       "company": "Coffee prices",
@@ -1158,7 +1238,12 @@
       "title_style": "search",
       "queue": "shorts:Coffee prices",
       "created_at": "2026-11-07T10:43:26.433160+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 47,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Global Stocks $2.5T Sell-Off and Market Volatility",
@@ -1174,7 +1259,12 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-07T10:47:19.470358+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 601,
+        "likes": 7,
+        "comments": 1
+      }
     },
     {
       "company": "Global Stock Sell-Off and Tech Market Volatility",
@@ -1189,7 +1279,12 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-08T10:46:17.239408+00:00"
+      "created_at": "2026-11-08T10:46:17.239408+00:00",
+      "stats": {
+        "views": 131,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "The Fed",
@@ -1204,9 +1299,14 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "evergreen-short:The Fed",
-      "created_at": "2026-11-08T10:48:55.917547+00:00"
+      "created_at": "2026-11-08T10:48:55.917547+00:00",
+      "stats": {
+        "views": 33,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 55.5
+  "channel_median_views": 54.0
 }

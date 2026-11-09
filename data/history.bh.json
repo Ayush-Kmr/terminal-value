@@ -15,7 +15,12 @@
       "source": {},
       "kind": "short",
       "runtime": 28.5,
-      "created_at": "2026-11-08T15:09:33.371269+00:00"
+      "created_at": "2026-11-08T15:09:33.371269+00:00",
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Lallan Chacha tries to film a high-tech Chhath Puja vlog for social media, compl",
@@ -36,9 +41,14 @@
       },
       "kind": "short",
       "runtime": 25.1,
-      "created_at": "2026-11-08T15:17:31.397556+00:00"
+      "created_at": "2026-11-08T15:17:31.397556+00:00",
+      "stats": {
+        "views": 28,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": null
+  "channel_median_views": 16.0
 }
