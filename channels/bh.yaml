@@ -19,9 +19,9 @@ channel:
   country: IN
   timezone: Asia/Kolkata
   about: |
-    ललन चाचा, फूलमती चाची आ उनकर भतीजा बबलू: एगो गाँव, एगो घर, आ रोज नया बवाल! 😂
+    ललन चाचा, फूलमती चाची, भतीजा बबलू आ रूसल फूफा जी: एगो गाँव, एगो घर, आ रोज नया बवाल! 😂
 
-    Four Bhojpuri comedy Shorts every day Monday to Saturday, and every Sunday the week's funniest skits in one long video: Lallan Chacha, Phoolmati Chachi and their nephew Bablu, in short funny skits from village life. Smartphones, power cuts, weddings, exams, WhatsApp forwards and more.
+    Four Bhojpuri comedy Shorts every day Monday to Saturday, and every Sunday the week's funniest skits in one long video: Lallan Chacha, Phoolmati Chachi, their nephew Bablu and the easily offended Fufa Ji, in short funny skits from village life. Smartphones, power cuts, weddings, exams, WhatsApp forwards and more.
 
     सोमवार से शनिचर रोज चार गो नया कॉमेडी Shorts, आ हर एतवार के साँझ हफ्ता भर के सबसे मजेदार कॉमेडी एगो लंबा वीडियो में।
 
@@ -58,6 +58,20 @@ skit:
     min_clips: 6
     max_clips: 24                # 24 x ~35 s = about 14 minutes
   lines: [6, 9]                  # dialogue lines per skit
+  # Numbered series (audience research 2026-11-10: the big Bhojpuri Shorts are
+  # numbered parts, "Part 2", "04"). The series is the lead character's (the
+  # first speaker); the part number counts that series' skits so far.
+  series:
+    lallan: "ललन चाचा के कांड"
+    phoolmati: "चाची के जलवा"
+    bablu: "बबलू के जुगाड़"
+    fufa: "फूफा जी"
+  # Spoken after the punchline by the series lead: follow for the next part
+  # (audit 2026-11-10: 2 subscribers from 2,387 views). {part} = next part.
+  follow_lines:
+    - "भाग {part} देखे खातिर अबहीं फॉलो करीं!"
+    - "अगिला भाग में अउरी बवाल होई, फॉलो कर लीं!"
+    - "भाग {part} में का भइल, जाने खातिर फॉलो करीं!"
   max_words: 85                  # ~35-45 s once voiced
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
@@ -121,6 +135,23 @@ skit:
       voice: >-
         Aman speaks in a cheerful, energetic and expressive voice at a fast pace.
         The recording is very clear and close up.
+    # Added 2026-11-10 (audience research: "Fufa Ji 3" was the top Bhojpuri
+    # comedy of the month, 18M views; the easily offended fufa is a classic).
+    fufa:
+      name: Fufa Ji
+      colour: "#2F9E44"
+      name_bho: फूफा जी
+      role: >-
+        Lallan's brother-in-law who visits and stays too long; pompous, gets
+        offended (रूस जाला) over the smallest thing, expects VIP treatment and
+        is always secretly the cause of the trouble
+      look: >-
+        Fufa Ji, a tall thin 58-year-old Indian man with a big black curled
+        moustache, slicked-back dyed black hair, a shiny cream silk kurta with a
+        maroon Nehru jacket, a gold watch, and a folded umbrella in his hand
+      voice: >-
+        Rohit speaks in a slow, nasal, pompous voice with long dramatic pauses
+        and an offended tone. The recording is very clear and close up.
 
 voice:
   # AI4Bharat Indic Parler-TTS (Apache-2.0), run on the build machine. Each
@@ -185,6 +216,7 @@ upload:
   title_series: {}
   # A playlist per character: a skit joins the playlist of everyone in it.
   topic_playlists:
+    "Fufa Ji Comedy": [fufa]
     "Lallan Chacha Comedy": [lallan]
     "Phoolmati Chachi Comedy": [phoolmati]
     "Bablu Comedy": [bablu]

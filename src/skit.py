@@ -3,7 +3,7 @@
     CHANNEL=bh python main.py --skit                 make today's skits, upload at the slots
     CHANNEL=bh python main.py --skit --no-upload     build only
 
-One skit = one vertical Short of 35-45 s: three recurring cartoon characters
+One skit = one vertical Short of 35-45 s: recurring cartoon characters
 (skit.characters in channels/bh.yaml) in a short dialogue that ends on a
 punchline. Per line: a cartoon picture of the speaker (Cloudflare FLUX, with
 the character's full look in every prompt so they stay recognisable), the line
@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 
 PROMPT = """You write short, very funny comedy skits in BHOJPURI for a YouTube
-Shorts channel. The same three cartoon characters appear in every video:
+Shorts channel. These recurring cartoon characters appear in the videos:
 
 {cast}
 
@@ -190,7 +190,9 @@ def write(cfg: Config, idea: dict) -> dict:
         sk = llm.json_call(PROMPT.format(
             cast="\n".join(f"- {k}: {c['name']} ({c['name_bho']}): {c['role'].strip()}"
                            for k, c in chars.items()),
-            premise=idea["premise"], in_skit=", ".join(chars[c]["name"] for c in cast),
+            premise=idea["premise"] + (f" {chars[idea['lead']]['name']} speaks the FIRST line."
+                                       if idea.get("lead") in chars else ""),
+            in_skit=", ".join(chars[c]["name"] for c in cast),
             trend=(f"This premise comes from what India is watching on YouTube right now "
                    f"({idea['keyword']}). Make that link obvious in the first two lines, "
                    "so people who know it get the joke, but never name or portray a real "
@@ -292,6 +294,18 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     yt_lang = cfg.get_path("channel.youtube_language", "hi")
 
     sk = write(cfg, idea)
+    # A numbered series per lead character, and the lead asking viewers to
+    # follow for the next part, after the punchline.
+    lead = sk["lines"][0]["speaker"]
+    series = str(cfg.get_path(f"skit.series.{lead}", "") or "")
+    part = 1 + sum(1 for e in state.load().get("episodes", []) if series and e.get("series") == series)
+    punch = len(sk["lines"]) - 1
+    follow = cfg.get_path("skit.follow_lines", []) or []
+    if follow:
+        sk["lines"].append({
+            "speaker": lead, "follow": True, "sfx": "none",
+            "text": random.Random(idea["id"]).choice(follow).format(part=part + 1),
+            "action": "smiling widely at the viewer and pointing straight at the camera"})
     (workdir / "script.json").write_text(
         json.dumps({"idea": idea, **sk}, indent=2, ensure_ascii=False, default=str),
         encoding="utf-8")
@@ -314,13 +328,15 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
     # Comic timing: a beat of silence before the punchline, and time after it
     # for the ba-dum-tss while the last picture holds.
-    if len(shots) > 1:
-        shots[-2]["duration"] = float(shots[-2]["duration"]) + 0.35
-    shots[-1]["duration"] = float(shots[-1]["duration"]) + 1.5
+    if punch > 0:
+        shots[punch - 1]["duration"] = float(shots[punch - 1]["duration"]) + 0.35
+    shots[punch]["duration"] = float(shots[punch]["duration"]) + 1.5
+    if punch < len(shots) - 1:
+        shots[-1]["duration"] = float(shots[-1]["duration"]) + 0.4
     clips = talking_clips(tall, shots, workdir, sk["lines"])
     seed = idea["id"]
     video = render.concat_with_audio(tall, clips, shots, workdir, render.pick_music(cfg, seed))
-    video = add_sfx(video, sound_events(shots, sk["lines"]), workdir)
+    video = add_sfx(video, sound_events(shots, sk["lines"], punch), workdir)
     out = shorts.finish(cfg, video, workdir / "short.mp4", str(sk.get("hook") or sk["title"]),
                         shots=shots)
 
@@ -328,10 +344,11 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     phrases = cfg.get_path("skit.search_phrases", ["Bhojpuri Comedy"])
     phrase = phrases[len(state.load().get("episodes", [])) % len(phrases)]
     head = str(sk["title"]).strip()
-    title = f"{head} 😂 | {idea['keyword']} | {phrase}" if idea.get("keyword") \
-        else f"{head} 😂 | {phrase}"
+    tag = f"{series} भाग {part}" if series else ""
+    bits = [f"{head} 😂", tag, str(idea.get("keyword") or ""), phrase]
+    title = " | ".join(b for b in bits if b)
     if len(title) > 95:
-        title = f"{head[:50]} 😂 | {phrase}"
+        title = " | ".join(b for b in [f"{head[:45]} 😂", tag, phrase] if b)
     names = ", ".join(f"{chars[c]['name_bho']} ({chars[c]['name']})" for c in in_skit)
     tags = list(dict.fromkeys([*([str(idea["keyword"]), f"{idea['keyword']} comedy"]
                                  if idea.get("keyword") else []),
@@ -354,6 +371,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
             "language": yt_lang, "path": str(out), "captions": str(srt),
             "idea": idea["id"], "premise": idea["premise"], "characters": in_skit,
             "keyword": idea.get("keyword", ""), "source": idea.get("source", {}),
+            "series": series, "part": part,
             "runtime": round(sum(float(s["duration"]) for s in shots), 1)}
     (workdir / "metadata.json").write_text(
         json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -384,7 +402,8 @@ def talking_clips(cfg: Config, shots: list[dict], workdir: Path, lines: list[dic
 SFX = {"boing", "pop", "ding", "gasp", "whoosh"}
 
 
-def sound_events(shots: list[dict], lines: list[dict]) -> list[tuple[str, float, float]]:
+def sound_events(shots: list[dict], lines: list[dict],
+                 punch: int = -1) -> list[tuple[str, float, float]]:
     """(effect, start second, volume): the script's picks at their lines (at
     most 3), and the rimshot just after the punchline's last word."""
     out, t = [], 0.0
@@ -393,8 +412,9 @@ def sound_events(shots: list[dict], lines: list[dict]) -> list[tuple[str, float,
         if fx in SFX and len(out) < 3:
             out.append((fx, max(t - 0.05, 0.0), 0.9))
         t += float(shot["duration"])
-    last = shots[-1]
-    end = sum(float(s["duration"]) for s in shots[:-1]) + float(
+    punch = punch % len(shots)
+    last = shots[punch]
+    end = sum(float(s["duration"]) for s in shots[:punch]) + float(
         last.get("spoken_duration") or last["duration"])
     out.append(("rimshot", end + 0.2, 1.4))
     return out
@@ -432,7 +452,7 @@ with a million views or more:
 
 {videos}
 
-Our channel makes 40-second Bhojpuri family comedy skits with three cartoon
+Our channel makes 40-second Bhojpuri family comedy skits with recurring cartoon
 characters in a Bihar village house:
 {cast}
 
@@ -562,7 +582,8 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
                 "company": idea["premise"][:80], "title": meta["title"], "idea": idea["id"],
                 "characters": meta["characters"], "language": "bho", "video_id": sid,
                 "keyword": meta["keyword"], "source": meta["source"],
-                "kind": "short", "day": day.isoformat(), "runtime": meta["runtime"]})
+                "kind": "short", "day": day.isoformat(), "runtime": meta["runtime"],
+                "series": meta["series"], "part": meta["part"]})
             state.save(st)
             gate.notify("\n".join([
                 f"😂 Bhojpuri skit: {meta['title']}", f"https://youtu.be/{sid}",

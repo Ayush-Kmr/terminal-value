@@ -4,6 +4,9 @@
 # A title is used only if every figure in it is in the research.
 # not_before holds a story back until that date, for anything timed to an event.
 long:
+  # 2026-11-10: the "why is X so expensive" long videos (cars, rent) were
+  # dropped: the price-explainer series did worst. The Sunday video now
+  # follows the week's best Short first (main.best_short_story).
   - topic: "Rising cost of living"
     title: "Why Are Groceries So Expensive in the US? The Real Reason"
     angle: "Why do groceries still cost so much in the US, and who is actually getting the money?"
@@ -16,11 +19,6 @@ long:
     search_query: "Bernie Madoff Ponzi scheme"
     wiki_title: "Madoff investment scandal"
     keywords: [madoff scheme, bernie madoff explained, madoff documentary]
-  - topic: "Car prices"
-    title: "Why Are Cars So Expensive Now?"
-    angle: "Why has a new car moved out of reach for so many Americans?"
-    search_query: "US new car prices affordability"
-    keywords: [why are cars so expensive now, why are cars so expensive, car market]
   - topic: "Enron"
     history: true
     title: "Enron Scandal Explained: The Biggest Fraud in American Business"
@@ -50,11 +48,6 @@ long:
     search_query: "FTX collapse Sam Bankman-Fried trial"
     wiki_title: "Bankruptcy of FTX"
     keywords: [ftx collapse, ftx explained, ftx documentary]
-  - topic: "Rent prices"
-    title: "Why Is Rent So High in America?"
-    angle: "Why has rent climbed so far, and what would actually bring it down?"
-    search_query: "US rent prices housing shortage"
-    keywords: [why is rent so high in america, why is rent so expensive, why is housing unaffordable]
   - topic: "Car loans"
     title: "Is the Car Loan Crisis Real?"
     angle: "Are more Americans falling behind on car payments, and what does that signal?"

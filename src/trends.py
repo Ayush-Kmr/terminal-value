@@ -112,15 +112,17 @@ def gather(cfg: Config) -> list[dict[str, Any]]:
 
 
 US_AUDIENCE = "the United States"
-US_RULES = """- Choose American business stories: US companies, markets, jobs, prices, the
-  Fed, tariffs, big tech and AI deals. A foreign story qualifies only if it
-  clearly moves American money, jobs or prices.
-- Prefer everyday American money over company results: prices, rent, housing, cars,
-  groceries, jobs, debt, the things a family feels. Frame a company story around
-  what it changes for ordinary people. A big open question beats a recap.
-- A VIRAL line is a video already doing big numbers on YouTube this week. If one
-  with 1,000,000 views or more is about an American business story and breaks none
-  of the rules below, its subject goes FIRST, then the next biggest."""
+US_RULES = """- Choose American and global business stories: markets, big tech and AI,
+  the Fed, tariffs, giant deals and IPOs, and the companies behind them. A
+  foreign story qualifies when it moves world markets or American money.
+- What this channel's viewers watch most (audit 2026-11-10): MARKET SHOCKS
+  with a big number (a $2.5T AI sell-off: 619 views, a 5.5% market fall),
+  the AI bubble and AI money, and giant deals or rulings that hit a famous
+  company (Reliance, SpaceX, IDBI: 170-540 views). Rank these first.
+- Everyday price explainers ("why is X so expensive") did worst (27-95
+  views): choose one only when that price is itself today's big news.
+- Frame the story around the size of the money and what happens next. A big
+  open question beats a recap."""
 
 PICK_PROMPT = """You are the commissioning editor of a YouTube explainer channel
 whose audience is in {audience}. Today is {today}. Choose the {n} best stories

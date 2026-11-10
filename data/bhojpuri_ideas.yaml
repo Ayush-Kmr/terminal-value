@@ -5,6 +5,42 @@
 #   this week's festival skits (docs/BHOJPURI-WEEK-PLAN.md).
 # cast: who is in it (keys of skit.characters in channels/bh.yaml).
 ideas:
+  # ---- Fufa Ji series (added 2026-11-10): the easily offended brother-in-law ----
+  # lead: who speaks first, so the skit joins that character's numbered series.
+  - id: fufa-wedding-sulk
+    premise: Fufa Ji arrives for a family wedding and sulks because nobody touched his feet first; the whole family tries one silly trick after another to un-offend him.
+    cast: [fufa, lallan, phoolmati]
+    lead: fufa
+    months: [11, 12]
+  - id: fufa-wifi-password
+    premise: Fufa Ji is offended that Bablu changed the WiFi password and did not tell him first, and demands it be named after him.
+    cast: [fufa, bablu]
+    lead: fufa
+  - id: fufa-vip-chair
+    premise: Fufa Ji refuses to eat until he gets "his" special chair, which Chacha secretly sold last year; Chachi disguises a bucket as the chair.
+    cast: [fufa, lallan, phoolmati]
+    lead: fufa
+  - id: fufa-photo-frame
+    premise: In the family wedding photo Fufa Ji is standing at the edge, so he declares the photo invalid and demands a reshoot with himself in the middle.
+    cast: [fufa, bablu, lallan]
+    lead: fufa
+  - id: fufa-extra-week
+    premise: Fufa Ji came for two days and is now in his third week; Chacha and Chachi plan increasingly silly ways to make him go home without offending him.
+    cast: [fufa, lallan, phoolmati]
+    lead: lallan
+  - id: fufa-laddoo-count
+    premise: Fufa Ji counts the laddoos on every guest's plate and is offended he got one less than the groom's uncle.
+    cast: [fufa, phoolmati]
+    lead: fufa
+  - id: fufa-reels-star
+    premise: Bablu makes a reel of Fufa Ji sulking and it goes viral; now Fufa Ji is offended he was not paid, and then offended it is not viral enough.
+    cast: [fufa, bablu]
+    lead: bablu
+  - id: fufa-baraat-dance
+    premise: At the baraat nobody pulled Fufa Ji onto the dance floor, so he sulks at the side; when they finally do, he refuses to stop dancing.
+    cast: [fufa, lallan, bablu]
+    lead: fufa
+    months: [11, 12]
   # ---- week of 2026-11-09: Diwali -> Bhai Dooj -> Chhath ----
   - id: diwali-leftover-mithai
     premise: The day after Diwali, Chacha hides the leftover sweets all over the house "for safety", forgets where, and Chachi finds them one by one in very silly places.

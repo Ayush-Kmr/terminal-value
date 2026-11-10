@@ -228,6 +228,25 @@ def loops(sc: dict) -> bool:
     return bool(key(lines[0]) & key(lines[-1]))
 
 
+def add_follow_line(cfg, sc: dict, seed: str) -> None:
+    """A spoken follow line just before the last sentence, so the loop into the
+    opening still works (audit 2026-11-10: 6 subscribers from 6,504 views;
+    the description's 'subscribe' was the only ask)."""
+    import copy
+    import random
+
+    lines = cfg.get_path("format.short.follow_lines", []) or []
+    shots = [s for b in sc.get("beats", []) for s in b.get("shots", [])]
+    if not lines or len(shots) < 3:
+        return
+    beat = next(b for b in reversed(sc["beats"]) if b.get("shots"))
+    extra = copy.deepcopy(shots[-2])
+    extra["narration"] = random.Random(seed).choice(lines)
+    extra["emphasis"] = "normal"
+    beat["shots"].insert(len(beat["shots"]) - 1, extra)
+    sc["word_count"] = sc.get("word_count", 0) + len(extra["narration"].split())
+
+
 def produce_short(cfg, story: dict, workdir: Path) -> dict:
     """One standalone Short on one story: research -> ~30s script -> render."""
     company, language = story["topic"], story.get("language", "en")
@@ -266,6 +285,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
     sc, checked = factcheck.check(sc, fb)
     warnings = [*warnings, *checked]
+    add_follow_line(cfg, sc, company)   # after the fact check: it is not a claim
     shot_list = voice.narrate_shots(
         tall, script_mod.all_shots(sc, int(cfg.get_path("format.short.max_shot_words", 12))),
         workdir, story.get("region"), language)
@@ -636,7 +656,8 @@ def run(args) -> int:
     n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.long.with_shorts", 0))
     candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
-    story = (first[0] if first else None) or best_short_story(cfg, args) \
+    # Sunday's one long video follows the week's best Short before anything queued.
+    story = best_short_story(cfg, args) or (first[0] if first else None) \
         or history_story(cfg, args) \
         or evergreen_story(cfg, args) or candidates[0]
     if story.get("evergreen") or story.get("history"):

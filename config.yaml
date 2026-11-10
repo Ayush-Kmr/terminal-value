@@ -24,7 +24,7 @@ channel:
 
     We follow the stories Americans are searching for, from earnings and layoffs to the Fed, tariffs and AI deals, read the coverage, and explain each one in plain English with the numbers, the dates and the people involved.
 
-    New explainers every Tuesday and Friday at 12 PM ET. New Shorts every day at 9 AM and 5 PM ET.
+    A new deep-dive explainer every Sunday at 11 AM ET. Four new Shorts every day, Monday to Saturday.
 
     Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. Nothing here is financial advice. If we get something wrong, tell us in the comments and we will correct it.
   # What Americans search for. Check against YouTube search suggestions.
@@ -52,7 +52,7 @@ channel:
     - "Subscribe for the story behind the headline: https://www.youtube.com/@terminalvaluedoc?sub_confirmation=1"
   # Closes every description, before the sources.
   cta: >-
-    New explainers every Tuesday and Friday at 12 PM ET, and two Shorts every day.
+    A new deep dive every Sunday at 11 AM ET, and four Shorts a day Monday to Saturday.
     Subscribe so you never miss the story behind the headline.
   disclosure: >-
     This video was produced with AI: the script was written and the narration
@@ -109,8 +109,11 @@ format:
     # shows a video less). Mid-roll ads need 8+ minutes but only pay after
     # monetisation. Go back towards 8 once the average watched is over 30% and
     # minutes watched per view have held.
-    target_minutes: 6
-    min_minutes: 5
+    # 2026-11-10 (Ayush): one long video a week now, so it is the week's big
+    # deep dive at 10 minutes (8+ allows mid-roll ads once monetised). It
+    # follows the week's most watched Short, a subject viewers already chose.
+    target_minutes: 10
+    min_minutes: 8
     words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["11:00"]    # ET, Sunday late morning: the weekend long-watch window
   short:
@@ -118,8 +121,17 @@ format:
                                 # Standalone Shorts outperformed cuts ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
-    second: question            # 2nd Short a day: question (searched-for question) | stock (biggest move)
+    # Extra Short a day: none = all four from today's trending stories (audit
+    # 2026-11-10: the evergreen "why is X so expensive" questions got 27-95
+    # views, today's market shocks 150-619) | question | stock.
+    second: none
     max_shot_words: 12
+    # Spoken just before the last sentence of every Short (main.add_follow_line).
+    follow_lines:
+      - "Follow, so you catch the next big market move."
+      - "Follow for the money story behind tomorrow's headline."
+      - "Follow, so you understand the next one before everyone else."
+      - "Follow for one money story like this every few hours."
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     # ET. Spread out: one Short every ~4 h. A slot that has already gone when
