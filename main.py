@@ -15,7 +15,7 @@ import copy
 import json
 import logging
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from src import (assets, captions, engage, factcheck, gate, hooks, reach, render,
@@ -357,6 +357,42 @@ def long_slot(n: int) -> str:
     return ("evergreen", "history", "evergreen", "news")[n % 4]
 
 
+def best_short_story(cfg, args) -> dict | None:
+    """The weekly long video goes deep on the week's most watched Short: a
+    subject viewers have already chosen (audit 2026-11-10: news longs got
+    0-51 views while the best Shorts of each week got 300-600)."""
+    if args.topic or not cfg.get_path("format.long.from_best_short", True):
+        return None
+    eps = state.load().get("episodes", [])
+    since = datetime.now(upload.ZoneInfo("UTC")) - timedelta(days=7)
+    week = [e for e in eps if e.get("kind") == "short" and e.get("video_id")
+            and e.get("created_at") and datetime.fromisoformat(e["created_at"]) > since]
+    done = {str(e.get("company", "")).lower() for e in eps if e.get("kind", "long") == "long"}
+    week = [e for e in week if str(e.get("company", "")).lower() not in done]
+    if not week:
+        return None
+    try:
+        ids = [e["video_id"] for e in week][:50]
+        views = {v["id"]: int(v["statistics"].get("viewCount", 0)) for v in
+                 upload.client().videos().list(part="statistics", id=",".join(ids))
+                 .execute().get("items", [])}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Could not rank this week's Shorts: %s", str(exc)[:120])
+        return None
+    best = max(week, key=lambda e: views.get(e["video_id"], 0))
+    if views.get(best["video_id"], 0) < int(cfg.get_path("format.long.best_short_min_views", 100)):
+        return None
+    log.info("Long video follows the week's best Short: %s (%d views)",
+             best["company"], views[best["video_id"]])
+    topic = best["company"]
+    return {"topic": topic, "company": topic,
+            "angle": f"The full story behind '{str(best.get('title', topic)).replace(' #shorts', '')}': what happened, "
+                     "why, who wins and loses, and what comes next",
+            "region": best.get("region", "US"), "language": best.get("language", "en"),
+            "search_query": topic, "wiki_title": "", "keywords": [topic],
+            "parent_url": f"https://youtu.be/{best['video_id']}"}
+
+
 def history_story(cfg, args) -> dict | None:
     """Every format.long.history_every-th long video: a past business story
     already proven at a million views on YouTube."""
@@ -600,7 +636,8 @@ def run(args) -> int:
     n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.long.with_shorts", 0))
     candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
-    story = (first[0] if first else None) or history_story(cfg, args) \
+    story = (first[0] if first else None) or best_short_story(cfg, args) \
+        or history_story(cfg, args) \
         or evergreen_story(cfg, args) or candidates[0]
     if story.get("evergreen") or story.get("history"):
         log.info("Not today's news: %s", story["angle"])

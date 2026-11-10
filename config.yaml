@@ -96,6 +96,10 @@ format:
     # alone carries Sunday, so it is not split with Shorts for the audience.
     days: [sunday]
     with_shorts: 0              # Shorts made on the long day: none
+    # The Sunday video goes deep on the week's most watched Short (needs 100+
+    # views); otherwise the usual rotation below.
+    from_best_short: true
+    best_short_min_views: 100
     # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
     # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
     # A video that ends up under min_minutes is reported in Telegram.
