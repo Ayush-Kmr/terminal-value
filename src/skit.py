@@ -83,6 +83,9 @@ Return a JSON object:
                           surprise), ding (a "smart" idea), gasp (shock or drama),
                           whoosh (someone rushes in). At most 3 lines get one.
   summary   - one funny sentence in Bhojpuri (Devanagari) for the description
+  question  - one short, funny question in Bhojpuri (Devanagari) for the comments
+              that viewers can answer about their own family (e.g. "रउआ घर में
+              केकर फूफा सबसे जल्दी रूसेलें? 😂")
   tags      - 6 short English or Hinglish search tags (e.g. "chacha bhatija comedy")
 {feedback}"""
 
@@ -357,8 +360,10 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
                                *(chars[c]["name"].lower() for c in in_skit),
                                "funny video", "comedy shorts", "bhojpuri"]))[:20]
     hashtags = "#bhojpuricomedy #comedy #funny #shorts"
+    weekly = state.latest_long_url(state.load())
     description = "\n\n".join(p for p in [
         str(sk.get("summary", "")).strip(),
+        f"पूरा हफ्ता के कॉमेडी एके वीडियो में 👉 {weekly}" if weekly else "",
         f"किरदार: {names}",
         "\n".join([cfg.get_path("channel.cta", "").strip(),
                    *[str(x) for x in cfg.get_path("channel.links", []) or []]]),
@@ -372,6 +377,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
             "idea": idea["id"], "premise": idea["premise"], "characters": in_skit,
             "keyword": idea.get("keyword", ""), "source": idea.get("source", {}),
             "series": series, "part": part,
+            "question": str(sk.get("question") or "").strip(), "deep_dive": weekly,
             "runtime": round(sum(float(s["duration"]) for s in shots), 1)}
     (workdir / "metadata.json").write_text(
         json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -545,6 +551,11 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
     way to a spare idea, so one bad draft does not lose a slot. Sunday
     (format.long.days) is the long video's day instead, and nothing else."""
     day = upload.publish_day(cfg)
+    if not no_upload:
+        # The question under each skit that has gone public since the last run:
+        # 0 comments on every skit so far (audit 2026-11-10).
+        from . import engage
+        engage.post_questions(cfg)
     if not (count or topic) and upload.is_long_day(cfg, day):
         return weekly(cfg, publish, no_upload)
     n = count or int(cfg.get_path("skit.per_day", 4))
@@ -583,7 +594,8 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
                 "characters": meta["characters"], "language": "bho", "video_id": sid,
                 "keyword": meta["keyword"], "source": meta["source"],
                 "kind": "short", "day": day.isoformat(), "runtime": meta["runtime"],
-                "series": meta["series"], "part": meta["part"]})
+                "series": meta["series"], "part": meta["part"],
+                "question": meta["question"], "deep_dive": meta["deep_dive"]})
             state.save(st)
             gate.notify("\n".join([
                 f"😂 Bhojpuri skit: {meta['title']}", f"https://youtu.be/{sid}",
@@ -775,7 +787,8 @@ def weekly(cfg: Config, publish: str = "slot", no_upload: bool = False) -> int:
     state.record_episode(st, {"company": f"Week to {day.isoformat()}", "title": title,
                               "language": "bho", "video_id": sid, "kind": "long",
                               "day": day.isoformat(), "runtime": round(t, 1),
-                              "clips": [vid for _, vid in order]})
+                              "clips": [vid for _, vid in order],
+                              "question": "एह हफ्ता के कवन कॉमेडी सबसे मजेदार लागल? नंबर कमेंट में लिखीं! 😂"})
     state.save(st)
     gate.notify("\n".join([f"🎬 Bhojpuri Sunday video: {title}", f"https://youtu.be/{sid}",
                            f"{len(parts)} skits, {minutes:.1f} min",

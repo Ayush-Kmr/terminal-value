@@ -220,3 +220,7 @@ upload:
     "Lallan Chacha Comedy": [lallan]
     "Phoolmati Chachi Comedy": [phoolmati]
     "Bablu Comedy": [bablu]
+
+# The link under each skit's question comment (src/engage.py).
+labels:
+  deep_dive: "पूरा हफ्ता के कॉमेडी एके वीडियो में"
