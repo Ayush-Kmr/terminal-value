@@ -1321,7 +1321,8 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-09T12:05:12.434161+00:00"
+      "created_at": "2026-11-09T12:05:12.434161+00:00",
+      "commented": true
     },
     {
       "company": "Inflation",
@@ -1336,7 +1337,56 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "evergreen-short:Inflation",
-      "created_at": "2026-11-09T12:07:24.216247+00:00"
+      "created_at": "2026-11-09T12:07:24.216247+00:00",
+      "commented": true
+    },
+    {
+      "company": "Gas Prices Fall Below Four Dollars",
+      "angle": "Why are US gas prices dropping below four dollars a gallon for the first time since July?",
+      "title": "Gas Prices Falling: What the Drop Below Four Dollars Means for Drivers",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "ckjUthYMbq8",
+      "short_ids": [],
+      "kind": "long",
+      "question": "How do fluctuating fuel costs affect your monthly household budget?",
+      "title_style": "search",
+      "queue": "",
+      "evergreen": "",
+      "history": "",
+      "runtime": "5:07",
+      "warnings": [],
+      "created_at": "2026-11-10T12:11:03.355175+00:00"
+    },
+    {
+      "company": "Supreme Court Invalidates Trump Tariffs",
+      "angle": "What does the Supreme Court ruling striking down presidential tariffs mean for import prices and businesses?",
+      "title": "Why Did the Supreme Court Just Strike Down Presidential Tariffs? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "8uiW8uLIiB8",
+      "kind": "short",
+      "warnings": [],
+      "question": "Should small businesses get help to claim complex government refunds?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-10T12:13:28.229684+00:00"
+    },
+    {
+      "company": "Recession",
+      "angle": "What is a recession, who decides when one starts, and what happens to jobs?",
+      "title": "Recession 2026: Will Tech Layoffs Spread? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "WKTeyQ_A8aA",
+      "kind": "short",
+      "warnings": [],
+      "question": "Would you consider changing careers if your sector faced cutbacks?",
+      "parent_url": "",
+      "title_style": "search",
+      "queue": "evergreen-short:Recession",
+      "created_at": "2026-11-10T12:16:34.080875+00:00"
     }
   ],
   "rejected_topics": [],
