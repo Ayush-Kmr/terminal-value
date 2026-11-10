@@ -114,6 +114,14 @@ format:
     # follows the week's most watched Short, a subject viewers already chose.
     target_minutes: 10
     min_minutes: 8
+    # Hook work (/youtube hook, 2026-11-10). Cold-open shots of at most this
+    # many words, so the picture changes inside 5 seconds.
+    opening_shot_words: 9
+    # Spoken follow asks at these minutes (by word count), not only at the end.
+    cta_minutes: [1, 4]
+    cta_lines:
+      - "Quick thing: if you want one story like this explained properly every Sunday, follow now, then keep watching."
+      - "If this is useful, follow for the next big market move. Now, here's the part most coverage missed."
     words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["11:00"]    # ET, Sunday late morning: the weekend long-watch window
   short:

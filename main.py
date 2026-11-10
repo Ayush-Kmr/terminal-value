@@ -51,6 +51,44 @@ def save_shots(shot_list: list[dict], workdir: Path) -> None:
         json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def quick_opening(cfg, sc: dict, shot_list: list[dict]) -> list[dict]:
+    """The cold open cut into shots of at most format.long.opening_shot_words,
+    so the picture changes inside the first 5 seconds (retention guide: a
+    pattern interrupt in the first 5 s = 23% higher retention; long videos
+    here lost 35-70% of viewers in their first tenth)."""
+    words = int(cfg.get_path("format.long.opening_shot_words", 9))
+    first = next((b for b in sc.get("beats", []) if b.get("shots")), None)
+    if not first or not words:
+        return shot_list
+    opening = script_mod.all_shots({"beats": [first]}, words)
+    rest = [s for s in shot_list if s.get("beat") != first.get("id")]
+    return [*opening, *rest]
+
+
+def add_long_ctas(cfg, shot_list: list[dict]) -> list[dict]:
+    """Spoken follow asks at about 1 and 4 minutes, never only at the end:
+    ~60% of viewers are still there at 1 min, ~35% at 4 min, 16% at the end
+    (retention guide)."""
+    import copy
+
+    lines = cfg.get_path("format.long.cta_lines", []) or []
+    marks = cfg.get_path("format.long.cta_minutes", [1, 4]) or []
+    if not lines or not marks:
+        return shot_list
+    wpm = float(cfg.get_path("format.long.words_per_minute", 140))
+    out, said, k = [], 0, 0
+    for shot in shot_list:
+        out.append(shot)
+        said += len((shot.get("narration") or "").split())
+        if k < min(len(marks), len(lines)) and said >= marks[k] * wpm \
+                and (shot.get("narration") or "").rstrip().endswith((".", "!", "?")):
+            ask = copy.deepcopy(shot)
+            ask.update({"narration": lines[k], "emphasis": "normal", "cta": True})
+            out.append(ask)
+            k += 1
+    return out
+
+
 def produce(cfg, story: dict, workdir: Path) -> dict:
     if story.get("history"):            # the story arc of the past, not of the news
         cfg = Config(copy.deepcopy(dict(cfg)))
@@ -72,7 +110,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
         json.dumps(fb.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
 
     # ---- hook -----------------------------------------------------------
-    hook = hooks.generate_and_score(company, angle, fb.facts, language, kind)
+    hook = hooks.generate_and_score(company, angle, fb.facts, language, kind,
+                                    story.get("proven_hook", ""), story.get("proven_views", 0))
     log.info("Hook (%d): %s", hook["winner"]["final_score"], hook["winner"]["text"][:110])
 
     # ---- script ---------------------------------------------------------
@@ -82,6 +121,8 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     (workdir / "script.json").write_text(
         json.dumps(sc, indent=2, ensure_ascii=False), encoding="utf-8")
     shot_list = script_mod.all_shots(sc, int(cfg.get_path("format.long.max_shot_words", 20)))
+    shot_list = quick_opening(cfg, sc, shot_list)
+    shot_list = add_long_ctas(cfg, shot_list)
 
     # ---- narration (sets real shot durations) ---------------------------
     shot_list = voice.narrate_shots(cfg, shot_list, workdir, region, language)
@@ -334,7 +375,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         facts=[str(f.get("claim", "")) for f in fb.facts][:4],
         music=render.music_credit(cfg, company)) + " #shorts"
     short["captions"] = str(captions.srt(shot_list, workdir / "captions.srt"))
-    short.update({"company": company,
+    short.update({"company": company, "hook": shot_list[0].get("narration", ""),
                   "tags": seo.tags(company, keywords, language, extra=best.get("searches")),
                   "language": language, "region": story.get("region"),
                   "warnings": warnings, "angle": story.get("angle", ""),
@@ -420,7 +461,9 @@ def best_short_story(cfg, args) -> dict | None:
                      "why, who wins and loses, and what comes next",
             "region": best.get("region", "US"), "language": best.get("language", "en"),
             "search_query": topic, "wiki_title": "", "keywords": [topic],
-            "parent_url": f"https://youtu.be/{best['video_id']}"}
+            "parent_url": f"https://youtu.be/{best['video_id']}",
+            "proven_hook": best.get("hook") or str(best.get("title", "")).replace(" #shorts", ""),
+            "proven_views": views[best["video_id"]]}
 
 
 def history_story(cfg, args) -> dict | None:
@@ -622,7 +665,7 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
                 "video_id": sid, "kind": "short", "day": day.isoformat(),
                 "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
-                "deep_dive": story.get("deep_dive", ""),
+                "deep_dive": story.get("deep_dive", ""), "hook": short.get("hook", ""),
                 "title_style": short["title_style"], "queue": short["queue"],
             })
             state.save(st)

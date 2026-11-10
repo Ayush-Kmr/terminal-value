@@ -55,10 +55,16 @@ Make the five genuinely different in STRATEGY, not just wording:
   4. Open on the thing the viewer thinks they know, then undercut it.
   5. Open on the ending, then rewind.
 
+{proven}
 Never compare a figure to anything unless the facts above make that comparison.
 Never begin with a rhetorical question. Never use: {banned}
 
 Return JSON array of objects: {{"strategy": "...", "text": "..."}}"""
+
+PROVEN = """  6. strategy "proven": open with the idea of this line, which already held
+     viewers in our own Short on the same story ({views} views): "{line}"
+     Keep its number and its punch, then add the payoff the Short had no time for.
+Write 6 cold opens in all."""
 
 SCORE_PROMPT = """Score each cold open 0-100 for a YouTube explainer audience.
 
@@ -114,7 +120,10 @@ def _penalty(text: str) -> tuple[int, list[str]]:
 
 
 def generate_and_score(company: str, angle: str, facts: list[dict],
-                       language: str = "en", kind: str = "documentary") -> dict[str, Any]:
+                       language: str = "en", kind: str = "documentary",
+                       proven: str = "", proven_views: int = 0) -> dict[str, Any]:
+    """`proven`: the opening line of our own Short on this story that already
+    held viewers; a cold open built on it gets a small head start."""
     import json as _json
 
     top = [f for f in facts if f.get("is_surprising")][:6] or facts[:6]
@@ -125,6 +134,7 @@ def generate_and_score(company: str, angle: str, facts: list[dict],
             facts="\n".join(f"- {f.get('claim','')} {f.get('value','')}" for f in top),
             voice=read_channel_doc("voice.md")[:1800],
             banned=", ".join(BANNED[:8]),
+            proven=PROVEN.format(line=proven.strip(), views=proven_views) if proven else "",
         ),
         temperature=0.95,
     )
@@ -143,6 +153,9 @@ def generate_and_score(company: str, angle: str, facts: list[dict],
     results = []
     for i, h in enumerate(hooks):
         pen, issues = _penalty(h["text"])
+        if proven and str(h.get("strategy", "")).lower().startswith("proven"):
+            pen += 8                    # already tested on this channel's viewers
+            issues.append("built on the Short that held viewers (+8)")
         model = score_by_idx.get(i, {})
         results.append({
             **h,
