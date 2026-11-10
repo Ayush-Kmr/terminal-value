@@ -242,8 +242,11 @@ def _proper_case(text: str, company: str) -> str:
                   lambda m: m[1].upper() if m[1] != "fed" else "Fed", text)
 
 
-def chapters(cfg: Config, shots: list[dict]) -> str:
-    """Chapter marks at beat boundaries. YouTube needs 00:00 as the first."""
+def chapters(cfg: Config, shots: list[dict], subject: str = "") -> str:
+    """Chapter marks at beat boundaries. YouTube needs 00:00 as the first.
+    Each label carries the subject: keyword-rich chapters are what search and
+    the key-moments panel match (SEO playbook)."""
+    subject = subject.strip()[:40]
     labels = {b["id"]: b.get("label", b["id"].replace("_", " ").capitalize())
               for b in cfg.get_path("structure.beats", [])}
     labels.update(cfg.get_path("labels.chapters", {}) or {})
@@ -252,7 +255,10 @@ def chapters(cfg: Config, shots: list[dict]) -> str:
         beat = shot.get("beat")
         if beat and beat not in seen:
             seen.add(beat)
-            lines.append(f"{int(t)//60:02d}:{int(t)%60:02d} {labels.get(beat, beat)}")
+            label = labels.get(beat, beat)
+            if subject and subject.lower() not in label.lower():
+                label = f"{label}: {subject}"
+            lines.append(f"{int(t)//60:02d}:{int(t)%60:02d} {label}")
         t += float(shot.get("duration", 5))
     # YouTube ignores chapters unless there are at least three, 10s+ apart.
     return "\n".join(lines) if len(lines) >= 3 else ""

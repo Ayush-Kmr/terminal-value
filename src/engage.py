@@ -38,6 +38,9 @@ def post_questions(cfg: Config, limit: int = 6) -> int:
             if e.get("parent_url"):
                 label = cfg.get_path("labels.full_story", "Full story")
                 text += f"\n\n{label}: {e['parent_url']}"
+            elif e.get("deep_dive"):
+                label = cfg.get_path("labels.deep_dive", "This week's deep dive")
+                text += f"\n\n{label}: {e['deep_dive']}"
             yt.commentThreads().insert(part="snippet", body={"snippet": {
                 "channelId": channel, "videoId": e["video_id"],
                 "topLevelComment": {"snippet": {"textOriginal": text}}}}).execute()

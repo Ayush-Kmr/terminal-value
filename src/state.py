@@ -75,3 +75,11 @@ def own_median_views(state: dict[str, Any]) -> float | None:
         return None
     mid = len(views) // 2
     return float(views[mid]) if len(views) % 2 else (views[mid - 1] + views[mid]) / 2.0
+
+
+def latest_long_url(state: dict[str, Any]) -> str:
+    """The newest long video, for Shorts to send viewers to."""
+    for e in reversed(state.get("episodes", [])):
+        if e.get("kind", "long") == "long" and e.get("video_id"):
+            return f"https://youtu.be/{e['video_id']}"
+    return ""

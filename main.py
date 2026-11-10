@@ -111,7 +111,7 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     if series and len(title) + len(series) + 3 <= 100:
         title = f"{title} | {series}"
     keywords = [str(k) for k in story.get("keywords", [])]
-    chapter_text = seo.chapters(cfg, shot_list)
+    chapter_text = seo.chapters(cfg, shot_list, company)
     # Each picture credited once, however many shots used it.
     attribution = "\n".join(dict.fromkeys(
         f"- {c['credit']} ({c['licence']}) {c.get('url','')}"
@@ -215,6 +215,14 @@ def names_loop(sc: dict) -> bool:
     return bool(re.search(r"\bloop(s|ing|ed)?\b|back to the (start|beginning)", text, re.I))
 
 
+def ends_clean(sc: dict) -> bool:
+    """The last sentence is finished (test 2026-11-10 ended on "...comes back
+    to a hotter than expected")."""
+    lines = [s.get("narration", "") for b in sc.get("beats", []) for s in b.get("shots", [])
+             if (s.get("narration") or "").strip()]
+    return bool(lines) and lines[-1].rstrip().endswith((".", "?", "!", "%", "\"", "'"))
+
+
 def loops(sc: dict) -> bool:
     """The last line picks up a word or number from the first, so the Short replays."""
     import re
@@ -271,7 +279,7 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
         # 30% (reach report 2026-11-04).
         limit = int(seconds / 60 * wpm)
         if hook_words(sc) <= 10 and sc["word_count"] <= limit and loops(sc) \
-                and not names_loop(sc):
+                and not names_loop(sc) and ends_clean(sc):
             break
         log.info("Short has a %d-word opening, %d words, loop %s; rewriting (%d)",
                  hook_words(sc), sc["word_count"], loops(sc), attempt + 1)
@@ -317,6 +325,8 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
     lead = best.get("summary") or fb.summary
     if story.get("parent_url"):
         lead += f"\n\nWatch the full story: {story['parent_url']}"
+    elif story.get("deep_dive"):
+        lead += f"\n\nThis week's deep dive: {story['deep_dive']}"
     short["description"] = seo.description(
         cfg, lead, "",
         [s if isinstance(s, dict) else s.__dict__ for s in fb.sources][:6],
@@ -578,9 +588,14 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
     st = state.load()
     done, failures = [], []
 
+    # Every Short points at the latest long video (audit 2026-11-10: long
+    # videos got 0-51 views; Shorts are where the viewers are).
+    deep_dive = state.latest_long_url(st)
     while queue and len(done) < n:
         story, i = queue.pop(0), len(done)
         company = story["topic"]
+        if deep_dive and not story.get("parent_url"):
+            story["deep_dive"] = deep_dive
         workdir = ROOT / "output" / f"{datetime.now():%Y-%m-%d}-short-{slug(company)}"
         workdir.mkdir(parents=True, exist_ok=True)
         log.info("Short %d/%d: %s [%s/%s]", i + 1, n, company,
@@ -607,6 +622,7 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
                 "video_id": sid, "kind": "short", "day": day.isoformat(),
                 "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
+                "deep_dive": story.get("deep_dive", ""),
                 "title_style": short["title_style"], "queue": short["queue"],
             })
             state.save(st)
