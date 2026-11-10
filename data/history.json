@@ -337,12 +337,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 300,
+        "views": 329,
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 111,
-        "avg_pct": 21.9,
-        "minutes": 256
+        "avg_pct": 21.99,
+        "minutes": 273
       }
     },
     {
@@ -356,7 +356,7 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 116,
+        "views": 117,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
@@ -438,9 +438,9 @@
         "views": 43,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 172,
-        "avg_pct": 32.51,
-        "minutes": 95
+        "avg_duration_s": 171,
+        "avg_pct": 32.31,
+        "minutes": 103
       }
     },
     {
@@ -454,7 +454,7 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 115,
+        "views": 116,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
@@ -842,7 +842,7 @@
       "queue": "shorts:Egg prices",
       "created_at": "2026-11-01T12:07:19.626318+00:00",
       "stats": {
-        "views": 94,
+        "views": 95,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 13,
@@ -867,7 +867,7 @@
       "created_at": "2026-11-02T15:59:18.703616+00:00",
       "commented": true,
       "stats": {
-        "views": 93,
+        "views": 98,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 90,
@@ -919,11 +919,11 @@
       ],
       "created_at": "2026-11-03T12:05:52.640499+00:00",
       "stats": {
-        "views": 7,
+        "views": 9,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 7,
-        "avg_pct": 1.71,
+        "avg_duration_s": 8,
+        "avg_pct": 1.82,
         "minutes": 0
       },
       "commented": true
@@ -967,7 +967,7 @@
       "queue": "shorts:How Madoff fooled everyone",
       "created_at": "2026-11-03T12:12:28.027839+00:00",
       "stats": {
-        "views": 33,
+        "views": 34,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 14,
@@ -995,8 +995,8 @@
         "views": 66,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 11,
-        "avg_pct": 46.86,
+        "avg_duration_s": 12,
+        "avg_pct": 48.38,
         "minutes": 4
       }
     },
@@ -1044,7 +1044,7 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 352,
+        "views": 355,
         "likes": 0,
         "comments": 2,
         "avg_duration_s": 20,
@@ -1096,9 +1096,9 @@
         "views": 36,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 10,
-        "avg_pct": 35.52,
-        "minutes": 2
+        "avg_duration_s": 12,
+        "avg_pct": 40.64,
+        "minutes": 3
       }
     },
     {
@@ -1117,7 +1117,7 @@
       "created_at": "2026-11-05T11:33:11.257058+00:00",
       "commented": true,
       "stats": {
-        "views": 54,
+        "views": 55,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 11,
@@ -1145,7 +1145,7 @@
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 14,
-        "avg_pct": 49.64,
+        "avg_pct": 48.25,
         "minutes": 4
       }
     },
@@ -1171,8 +1171,8 @@
         "views": 3,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 128,
-        "avg_pct": 37.14,
+        "avg_duration_s": 83,
+        "avg_pct": 24.27,
         "minutes": 2
       }
     },
@@ -1192,12 +1192,12 @@
       "created_at": "2026-11-06T12:05:39.005033+00:00",
       "commented": true,
       "stats": {
-        "views": 39,
+        "views": 40,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 14,
-        "avg_pct": 63.27,
-        "minutes": 1
+        "avg_duration_s": 37,
+        "avg_pct": 163.18,
+        "minutes": 3
       }
     },
     {
@@ -1220,8 +1220,8 @@
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 12,
-        "avg_pct": 64.28,
-        "minutes": 1
+        "avg_pct": 67.44,
+        "minutes": 2
       }
     },
     {
@@ -1240,9 +1240,12 @@
       "created_at": "2026-11-07T10:43:26.433160+00:00",
       "commented": true,
       "stats": {
-        "views": 47,
+        "views": 46,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 12,
+        "avg_pct": 64.63,
+        "minutes": 2
       }
     },
     {
@@ -1261,9 +1264,12 @@
       "created_at": "2026-11-07T10:47:19.470358+00:00",
       "commented": true,
       "stats": {
-        "views": 601,
+        "views": 619,
         "likes": 7,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 16,
+        "avg_pct": 67.73,
+        "minutes": 56
       }
     },
     {
@@ -1281,9 +1287,9 @@
       "queue": "",
       "created_at": "2026-11-08T10:46:17.239408+00:00",
       "stats": {
-        "views": 131,
+        "views": 164,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -1302,9 +1308,9 @@
       "queue": "evergreen-short:The Fed",
       "created_at": "2026-11-08T10:48:55.917547+00:00",
       "stats": {
-        "views": 33,
+        "views": 39,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -1322,7 +1328,12 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-09T12:05:12.434161+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 77,
+        "likes": 1,
+        "comments": 1
+      }
     },
     {
       "company": "Inflation",
@@ -1338,7 +1349,12 @@
       "title_style": "search",
       "queue": "evergreen-short:Inflation",
       "created_at": "2026-11-09T12:07:24.216247+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 10,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Gas Prices Fall Below Four Dollars",
@@ -1356,7 +1372,12 @@
       "history": "",
       "runtime": "5:07",
       "warnings": [],
-      "created_at": "2026-11-10T12:11:03.355175+00:00"
+      "created_at": "2026-11-10T12:11:03.355175+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Supreme Court Invalidates Trump Tariffs",
@@ -1371,7 +1392,12 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-10T12:13:28.229684+00:00"
+      "created_at": "2026-11-10T12:13:28.229684+00:00",
+      "stats": {
+        "views": 3,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Recession",
@@ -1386,9 +1412,14 @@
       "parent_url": "",
       "title_style": "search",
       "queue": "evergreen-short:Recession",
-      "created_at": "2026-11-10T12:16:34.080875+00:00"
+      "created_at": "2026-11-10T12:16:34.080875+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 54.0
+  "channel_median_views": 52.0
 }

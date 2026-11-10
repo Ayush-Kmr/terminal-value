@@ -1,15 +1,15 @@
-Welcome back to another edition of business news made simple.
+Welcome back to another edition of business news made simple. 
 
-**Global AI Sell-off Hits Markets**
-Global stocks suffered a severe blow as the S&P 500 dropped 4.4% in a single day and the Nasdaq 100 fell over 5.5%. Investors panicked and scrambled amid mounting worries over artificial intelligence infrastructure, data center power demands, and spiking AI volatility. 
-Watch: https://youtu.be/aUPucp6nUpQ
+**Why Childcare Costs Are So High**
+Federal guidelines state that a two-child household needs to earn $400,000 a year to afford childcare. Most average salaries fall far short of that benchmark, putting immense strain on family budgets. 
+Watch: https://youtu.be/TAfxRaCl24M
 
-**Why Grocery and Everyday Items Cost More**
-Rising everyday costs are hitting families hard as childcare expenses rose 7.6% and consumer sentiment sank near record lows. At the same time, beef prices surged because the U.S. cattle herd fell to its smallest size in 75 years, while coffee prices face pressure after producers like India cut their outlooks due to below-normal monsoon rains.
-Watch: https://youtu.be/X_RJbVpSeZ4
+**Why Car Insurance Prices Surged**
+Car insurance prices jumped because of persistent inflation in parts and labor, alongside a rise in severe pandemic-era accidents. Additionally, General Motors settled a case over driver data used for pricing. 
+Watch: https://youtu.be/FAIglZB5eV0
 
-**Google Stock Tumbles on Massive Spending**
-Google stock faced a major sell-off as capital investments climbed higher than analysts anticipated. Although search revenue grew, expenses and future obligations surpassed one trillion dollars, worrying Wall Street.
-Watch: https://youtu.be/cN9hgPGDp3w
+**Why Beef Prices Are Climbing**
+Beef prices have surged because the U.S. cattle herd fell to its smallest size in 75 years. This limited supply is directly driving higher costs for consumers at the grocery store. 
+Watch: https://youtu.be/7VXXBNtDO-s
 
-Which of these rising everyday costs has impacted your household budget the most lately?
+Which of these everyday household expenses has impacted your personal budget the most lately?
