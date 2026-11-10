@@ -1,5 +1,7 @@
 # Terminal Value
 
+> **Start with [PROJECT.md](PROJECT.md)**: the current plan, how everything works, and the open items. The schedule below is out of date: it is now Sunday one long video, and Monday to Saturday four Shorts, on both channels.
+
 Automated YouTube channel for a US audience: it finds the American business
 stories people are searching for and explains them in English: a 9-minute video
 every other day and two standalone Shorts a day. A second channel, **Bhojpuri AI Comedy**, makes two cartoon comedy skit Shorts a day in Bhojpuri with three recurring characters (`channels/bh.yaml`, `src/skit.py`; see SETUP.md §11). It shares nothing with the news pipeline.
