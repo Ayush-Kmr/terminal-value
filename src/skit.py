@@ -25,8 +25,9 @@ import json
 import logging
 import random
 import re
+import shutil
 import subprocess
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -521,13 +522,22 @@ def slug(text: str) -> str:
 def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int = 0,
         topic: str = "") -> int:
     """Today's skits, each at its own publish slot. A skit that fails gives
-    way to a spare idea, so one bad draft does not lose a slot."""
-    n = count or int(cfg.get_path("skit.per_day", 2))
-    # The trending skit takes the evening slot (the second), when India watches most.
+    way to a spare idea, so one bad draft does not lose a slot. Sunday
+    (format.long.days) is the long video's day instead, and nothing else."""
+    day = upload.publish_day(cfg)
+    if not (count or topic) and upload.is_long_day(cfg, day):
+        return weekly(cfg, publish, no_upload)
+    n = count or int(cfg.get_path("skit.per_day", 4))
+    if not count:
+        n -= upload.made_on(state.load().get("episodes", []), day, "short")
+        if n <= 0:
+            log.info("Today's skits are already up")
+            return 0
+    # Trending skits take the later slots, when India watches most.
     trend = [] if topic else trending(cfg, min(n, int(cfg.get_path("skit.trending.per_day", 1))))
     bank = pick_ideas(cfg, n - len(trend) + 2, topic)
     queue = [*bank[: n - len(trend)], *trend, *bank[n - len(trend):]]
-    times = upload.slots(cfg, "short", n)
+    taken: list = []
     st = state.load()
     done, failures = [], []
     while queue and len(done) < n:
@@ -540,17 +550,19 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
             if no_upload:
                 done.append(f"{meta['title']} (built, not uploaded)")
                 continue
-            now = publish == "now"
-            when = None if now else times[i] if i < len(times) else None
+            when = None if publish == "now" else upload.day_slot(cfg, "short", day, taken)
+            now = when is None          # every slot today has gone: public at once
+            taken.append(when)
             sid = upload.upload(cfg, Path(meta["path"]), meta,
                                 privacy="public" if now else "private", publish_at=when)
             upload.upload_captions(sid, Path(meta["captions"]), meta["language"])
             upload.add_to_playlists(cfg, sid, meta["language"], " ".join(meta["characters"]))
+            archive(Path(meta["path"]), day, sid)
             state.record_episode(st, {
                 "company": idea["premise"][:80], "title": meta["title"], "idea": idea["id"],
                 "characters": meta["characters"], "language": "bho", "video_id": sid,
                 "keyword": meta["keyword"], "source": meta["source"],
-                "kind": "short", "runtime": meta["runtime"]})
+                "kind": "short", "day": day.isoformat(), "runtime": meta["runtime"]})
             state.save(st)
             gate.notify("\n".join([
                 f"😂 Bhojpuri skit: {meta['title']}", f"https://youtu.be/{sid}",
@@ -568,4 +580,184 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
         gate.notify("⚠️ Bhojpuri: replaced a failed skit with a spare idea: "
                     + " | ".join(failures), markdown=False)
     log.info("Skits done: %s", "; ".join(done))
+    return 0
+
+
+# ---------- Sunday: the week's skits as one long video ----------
+# The runner forgets everything, so each skit's finished file is kept as an
+# asset of one GitHub release (named <publish day>_<video id>.mp4) until the
+# Sunday long video has used it.
+ARCHIVE = "skit-archive"
+
+
+def _gh(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["gh", *args], capture_output=True, text=True)
+
+
+def archive(path: Path, day: date, video_id: str) -> None:
+    """Keep a published skit for Sunday. Never fails the skit."""
+    if not shutil.which("gh"):
+        return
+    copy = path.with_name(f"{day.isoformat()}_{video_id}.mp4")
+    shutil.copy(path, copy)
+    _gh("release", "create", ARCHIVE, "--prerelease", "--title", "Skit archive",
+        "--notes", "Each day's Bhojpuri skits, kept for the Sunday long video.")
+    r = _gh("release", "upload", ARCHIVE, str(copy), "--clobber")
+    if r.returncode:
+        log.warning("Could not archive %s for Sunday: %s", copy.name, r.stderr[:200])
+
+
+def _duration(path: Path) -> float:
+    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                          "-of", "csv=p=0", str(path)], capture_output=True, text=True)
+    return float(out.stdout.strip() or 0)
+
+
+def _stamp(sec: float) -> str:
+    sec = int(sec)
+    return f"{sec // 60}:{sec % 60:02d}" if sec < 3600 else \
+        f"{sec // 3600}:{sec % 3600 // 60:02d}:{sec % 60:02d}"
+
+
+def _thumbnail(cfg: Config, clip: Path, text: str, dest: Path) -> Path:
+    """The funniest-looking moment of the top skit, wide, with a big headline."""
+    from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+    frame = dest.with_name("thumb_frame.jpg")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{_duration(clip) * 0.3:.2f}",
+                    "-i", str(clip), "-frames:v", "1", str(frame)], check=True)
+    img = Image.open(frame).convert("RGB")
+    back = img.resize((1280, int(1280 * img.height / img.width))).crop((0, 0, 1280, 720))
+    back = back.filter(ImageFilter.GaussianBlur(18))
+    front = img.resize((int(720 * img.width / img.height), 720))
+    back.paste(front, (1280 - front.width - 30, 0))
+    draw = ImageDraw.Draw(back)
+    font_path = str(ROOT / cfg.get_path("visuals.fonts.display", "assets/fonts/Baloo2-Variable.ttf"))
+    try:
+        font = ImageFont.truetype(font_path, 92, layout_engine=ImageFont.Layout.RAQM)
+        font.set_variation_by_name("ExtraBold")
+    except Exception:  # noqa: BLE001 - plain layout still works for most text
+        font = ImageFont.truetype(font_path, 92)
+    y = 60
+    for line in text.split("\n"):
+        draw.text((48, y), line, font=font, fill="#FFD23F", stroke_width=8, stroke_fill="#1B1030")
+        y += 130
+    back.save(dest, quality=92)
+    return dest
+
+
+def weekly(cfg: Config, publish: str = "slot", no_upload: bool = False) -> int:
+    """Sunday's long video: the week's skits back to back in 16:9, the most
+    watched first, with a chapter per skit."""
+    import json as _json
+
+    day = upload.publish_day(cfg)
+    st = state.load()
+    if upload.made_on(st.get("episodes", []), day, "long"):
+        log.info("This Sunday's long video is already up")
+        return 0
+    r = _gh("release", "view", ARCHIVE, "--json", "assets")
+    if r.returncode:
+        raise RuntimeError(f"No skit archive to build Sunday's video from: {r.stderr[:200]}")
+    names = [a["name"] for a in _json.loads(r.stdout).get("assets", [])]
+    since = day - timedelta(days=int(cfg.get_path("skit.weekly.days_back", 7)))
+    week, old = [], []
+    for name in names:
+        try:
+            made = date.fromisoformat(name[:10])
+        except ValueError:
+            continue
+        (week if since <= made < day else old if made < since - timedelta(days=14) else []
+         ).append(name)
+    for name in old:                     # tidy: three weeks is plenty
+        _gh("release", "delete-asset", ARCHIVE, name, "-y")
+    if len(week) < int(cfg.get_path("skit.weekly.min_clips", 6)):
+        raise RuntimeError(f"Only {len(week)} skits archived this week; need "
+                           f"{cfg.get_path('skit.weekly.min_clips', 6)} for the long video")
+
+    titles = {e.get("video_id"): str(e.get("title", "")) for e in st.get("episodes", [])}
+    ids = [n.split("_", 1)[1].rsplit(".", 1)[0] for n in week]
+    views: dict[str, int] = {}
+    try:
+        for i in range(0, len(ids), 50):
+            for v in upload.client().videos().list(part="statistics", id=",".join(ids[i:i + 50])
+                                                   ).execute().get("items", []):
+                views[v["id"]] = int(v["statistics"].get("viewCount", 0))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("View counts unavailable, keeping the week's order: %s", str(exc)[:120])
+    order = sorted(zip(week, ids), key=lambda x: -views.get(x[1], 0))
+    order = order[: int(cfg.get_path("skit.weekly.max_clips", 24))]
+
+    workdir = ROOT / "output" / f"{day.isoformat()}-weekly"
+    clips_dir = workdir / "clips"
+    clips_dir.mkdir(parents=True, exist_ok=True)
+    pats = [x for name, _ in order for x in ("-p", name)]
+    r = _gh("release", "download", ARCHIVE, *pats, "-D", str(clips_dir), "--clobber")
+    if r.returncode:
+        raise RuntimeError(f"Could not download the week's skits: {r.stderr[:200]}")
+
+    wide = ("[0:v]split[a][b];[a]scale=1920:1080:force_original_aspect_ratio=increase,"
+            "crop=1920:1080,boxblur=30:4,eq=brightness=-0.10[bg];[b]scale=-2:1080[fg];"
+            "[bg][fg]overlay=(W-w)/2:0,fps=30,format=yuv420p[v]")
+    parts, chapters, t = [], [], 0.0
+    for k, (name, vid) in enumerate(order):
+        out = workdir / f"wide_{k:02d}.mp4"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(clips_dir / name),
+                        "-filter_complex", wide, "-map", "[v]", "-map", "0:a",
+                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
+                        "-af", "aresample=48000,aformat=channel_layouts=stereo",
+                        "-c:a", "aac", "-b:a", "160k", str(out)], check=True)
+        head = re.split(r"\s*😂|\s*\|", titles.get(vid, ""))[0].strip() or f"कॉमेडी {k + 1}"
+        chapters.append(f"{_stamp(t)} {head}")
+        parts.append(out)
+        t += _duration(out)
+    listing = workdir / "list.txt"
+    listing.write_text("".join(f"file '{p.name}'\n" for p in parts), encoding="utf-8")
+    video = workdir / "long.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
+                    "-i", str(listing), "-c", "copy", "-movflags", "+faststart", str(video)],
+                   check=True)
+    minutes = t / 60
+    log.info("Sunday long video: %d skits, %.1f min", len(parts), minutes)
+
+    chars = cfg.get_path("skit.characters", {})
+    cast = " ".join(c["name"] for c in chars.values())
+    title = (f"ललन चाचा, फूलमती चाची आ बबलू के हफ्ता भर के बवाल 😂 | "
+             f"Bhojpuri Comedy Video {int(minutes)} Minute")[:100]
+    description = "\n\n".join(p for p in [
+        "पूरा हफ्ता के सबसे मजेदार भोजपुरी कॉमेडी एके वीडियो में! ललन चाचा, फूलमती चाची "
+        "आ बबलू के गाँव के बवाल, एक के बाद एक।",
+        "This week's funniest Bhojpuri comedy skits in one video: Lallan Chacha, "
+        "Phoolmati Chachi and Bablu.",
+        "\n".join(chapters),
+        "\n".join([cfg.get_path("channel.cta", "").strip(),
+                   *[str(x) for x in cfg.get_path("channel.links", []) or []]]),
+        cfg.get_path("channel.disclosure", "").strip(),
+        "#bhojpuricomedy #bhojpurifunnyvideo #comedy",
+    ] if p)
+    phrases = cfg.get_path("skit.search_phrases", ["Bhojpuri Comedy"])
+    tags = list(dict.fromkeys([*[p.lower() for p in phrases], "bhojpuri comedy video",
+                               "bhojpuri comedy compilation", "bhojpuri funny video full",
+                               "lallan chacha comedy", *cast.lower().split(),
+                               "भोजपुरी कॉमेडी", "भोजपुरी कॉमेडी वीडियो", "comedy video"]))[:25]
+    thumb = _thumbnail(cfg, clips_dir / order[0][0], "हफ्ता भर के\nबवाल!", workdir / "thumb.jpg")
+    yt_lang = cfg.get_path("channel.youtube_language", "hi")
+    if no_upload:
+        log.info("Built %s (upload skipped)", video)
+        return 0
+    when = None if publish == "now" else upload.day_slot(cfg, "long", day)
+    sid = upload.upload(cfg, video, {"title": title, "description": description, "tags": tags,
+                                     "language": yt_lang},
+                        privacy="public" if when is None else "private", publish_at=when)
+    upload.set_thumbnail(sid, thumb)
+    upload.add_to_playlists(cfg, sid, yt_lang, " ".join(chars))
+    state.record_episode(st, {"company": f"Week to {day.isoformat()}", "title": title,
+                              "language": "bho", "video_id": sid, "kind": "long",
+                              "day": day.isoformat(), "runtime": round(t, 1),
+                              "clips": [vid for _, vid in order]})
+    state.save(st)
+    gate.notify("\n".join([f"🎬 Bhojpuri Sunday video: {title}", f"https://youtu.be/{sid}",
+                           f"{len(parts)} skits, {minutes:.1f} min",
+                           "Published now" if when is None else f"Goes public {when:%a %d %b %H:%M}"]),
+                markdown=False)
     return 0

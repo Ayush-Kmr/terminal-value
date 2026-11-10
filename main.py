@@ -15,7 +15,7 @@ import copy
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from src import (assets, captions, engage, factcheck, gate, hooks, reach, render,
@@ -419,27 +419,15 @@ def evergreen_story(cfg, args) -> dict | None:
 
 
 def todays_kind(cfg, args) -> str:
-    """'long' on a long-video day, otherwise 'shorts' (standalone Shorts)."""
+    """'long' on the weekly long-video day (Sunday), 'shorts' on the others,
+    'done' when today's long video is already up (a restarted run)."""
     if args.kind != "auto":
         return args.kind
-    tz = upload.ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
-    # The day the video would go public, not the day the job runs: the job
-    # starts 03:30 UTC, still the evening before in New York.
-    today = upload.next_slot(cfg, "long").astimezone(tz).strftime("%A").lower()
-    days = [d.lower() for d in cfg.get_path("format.long.days", [])]
-    if days and today not in days:
+    day = upload.publish_day(cfg)
+    if not upload.is_long_day(cfg, day):
         return "shorts"
-    # Counted from the last long video actually uploaded, so a long day that
-    # fails is retried the next day instead of being skipped.
-    every = int(cfg.get_path("format.long.every_days", 1))
-    # Measured in hours, not calendar dates: GitHub starts the run anywhere from
-    # late evening to morning Eastern, which would otherwise shift the date.
-    last = max((datetime.fromisoformat(e["created_at"]).astimezone(tz)
-                for e in state.load().get("episodes", [])
-                if e.get("kind", "long") == "long" and e.get("created_at")),
-               default=None)
-    if every > 1 and last and datetime.now(tz) - last < timedelta(days=every, hours=-12):
-        return "shorts"
+    if upload.made_on(state.load().get("episodes", []), day, "long"):
+        return "done"
     return "long"
 
 
@@ -513,7 +501,12 @@ def fresh_or_queue(cfg, args, n: int, kinds: tuple[str, ...]) -> list[dict]:
 
 def run_shorts_day(cfg, args) -> int:
     """No long video today: one standalone Short on each of the top stories."""
-    n = args.count or int(cfg.get_path("format.short.per_day", 2))
+    n = args.count or int(cfg.get_path("format.short.per_day", 4))
+    if not args.count:
+        n -= upload.made_on(state.load().get("episodes", []), upload.publish_day(cfg), "short")
+        if n <= 0:
+            log.info("Today's Shorts are already up")
+            return 0
     stories = with_stock(cfg, args, queued(args, "shorts", n)
                          + fresh_or_queue(cfg, args, n, ("shorts",)))
     return make_shorts(cfg, args, stories[:n], stories[n:])
@@ -523,7 +516,8 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
     """One standalone Short per story, each at its own daily slot. A story that
     fails is replaced by the next spare, so one bad story does not lose a Short."""
     n = len(stories)
-    times = upload.slots(cfg, "short", n)
+    day = upload.publish_day(cfg)
+    taken: list = []
     queue = [*stories, *(spares or [])]
     st = state.load()
     done, failures = [], []
@@ -540,8 +534,9 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
             if args.no_upload:
                 done.append(f"{company} (built, not uploaded)")
                 continue
-            now = args.publish == "now"
-            when = None if now else times[i] if i < len(times) else None
+            when = None if args.publish == "now" else upload.day_slot(cfg, "short", day, taken)
+            now = when is None          # every slot today has gone: public at once
+            taken.append(when)
             sid = upload.upload(cfg, Path(short["path"]),
                                 {"title": short["title"][:100], "language": short["language"],
                                  "description": short["description"], "tags": short["tags"]},
@@ -553,7 +548,8 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
             state.record_episode(st, {
                 "company": company, "angle": short["angle"], "title": short["title"],
                 "region": short["region"], "language": short["language"],
-                "video_id": sid, "kind": "short", "warnings": short["warnings"],
+                "video_id": sid, "kind": "short", "day": day.isoformat(),
+                "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
                 "title_style": short["title_style"], "queue": short["queue"],
             })
@@ -593,10 +589,15 @@ def run(args) -> int:
     if not args.no_upload:
         engage.post_questions(cfg)
 
-    if todays_kind(cfg, args) == "shorts":
+    kind = todays_kind(cfg, args)
+    if kind == "shorts":
         return run_shorts_day(cfg, args)
+    if kind == "done":
+        log.info("Today's long video is already up, and a long day has no Shorts")
+        return 0
 
-    n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.short.per_day", 2))
+    # Long day: the long video alone (format.long.with_shorts, 0 = no Shorts).
+    n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.long.with_shorts", 0))
     candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
     story = (first[0] if first else None) or history_story(cfg, args) \
@@ -653,7 +654,10 @@ def run(args) -> int:
         log.info("Held at review. File is at %s", video)
         return 0
 
-    publish_at = upload.next_slot(cfg, "long") if decision == "schedule" else None
+    day = upload.publish_day(cfg)
+    publish_at = upload.day_slot(cfg, "long", day) if decision == "schedule" else None
+    if publish_at is None:
+        decision = "publish"        # the slot has gone (a late run): public now
     video_id = upload.upload(cfg, video, meta,
                              privacy="public" if decision == "publish" else "private",
                              publish_at=publish_at)
@@ -696,7 +700,7 @@ def run(args) -> int:
     state.record_episode(st, {
         "company": company, "angle": meta["angle"], "title": meta["title"],
         "region": meta["region"], "language": meta["language"],
-        "video_id": video_id, "short_ids": short_ids, "kind": "long",
+        "video_id": video_id, "short_ids": short_ids, "kind": "long", "day": day.isoformat(),
         "question": meta["question"], "title_style": meta["title_style"],
         "queue": story.get("queue", ""),
         "evergreen": story.get("evergreen", ""), "history": story.get("history", ""),

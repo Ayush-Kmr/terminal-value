@@ -21,9 +21,9 @@ channel:
   about: |
     ललन चाचा, फूलमती चाची आ उनकर भतीजा बबलू: एगो गाँव, एगो घर, आ रोज नया बवाल! 😂
 
-    Bhojpuri comedy Shorts every day: Lallan Chacha, Phoolmati Chachi and their nephew Bablu, in short funny skits from village life. Smartphones, power cuts, weddings, exams, WhatsApp forwards and more.
+    Four Bhojpuri comedy Shorts every day Monday to Saturday, and every Sunday the week's funniest skits in one long video: Lallan Chacha, Phoolmati Chachi and their nephew Bablu, in short funny skits from village life. Smartphones, power cuts, weddings, exams, WhatsApp forwards and more.
 
-    रोज दू गो नया कॉमेडी वीडियो: दुपहरिया साढ़े बारह बजे आ साँझ साढ़े सात बजे।
+    सोमवार से शनिचर रोज चार गो नया कॉमेडी Shorts, आ हर एतवार के साँझ हफ्ता भर के सबसे मजेदार कॉमेडी एगो लंबा वीडियो में।
 
     Every video is made with AI: the story, the voices and the pictures. The characters are made up; any likeness to real people is a coincidence. Clean family comedy, no vulgarity.
   keywords:
@@ -50,7 +50,13 @@ channel:
 
 # The whole skit format. src/skit.py reads everything under here.
 skit:
-  per_day: 2
+  per_day: 4                     # Mon-Sat (Ayush, 2026-11-10); Sunday = the long video only
+  # Sunday's long video: the week's skits back to back in 16:9, most watched
+  # first, a chapter each (skit.weekly in src/skit.py).
+  weekly:
+    days_back: 7
+    min_clips: 6
+    max_clips: 24                # 24 x ~35 s = about 14 minutes
   lines: [6, 9]                  # dialogue lines per skit
   max_words: 85                  # ~35-45 s once voiced
   max_line_words: 14
@@ -59,7 +65,7 @@ skit:
   # One skit a day on what India is watching: YouTube's India trending chart,
   # videos with 1M+ views; the subject only, never the video or real people.
   trending:
-    per_day: 1
+    per_day: 2                   # two of the four skits on what India is watching today
     min_views: 1000000
     categories: ["", "24", "23", "17", "10"]   # all, entertainment, comedy, sports, music
   # Pictures: Cloudflare Workers AI (FLUX schnell), one per line. Every prompt
@@ -134,8 +140,12 @@ localize:
   languages: {}
 
 format:
+  long:
+    publish_times: ["18:00"]           # Sunday evening, India time
   short:
-    publish_times: ["12:30", "19:30"]   # India time: lunch and evening
+    # India time: lunch, tea time, evening, night. A slot already gone when the
+    # (often late) run gets there goes public at once, never the next day.
+    publish_times: ["12:30", "16:30", "19:30", "21:30"]
     shot_seconds: [1.5, 7]             # one picture per line, however short
 
 visuals:

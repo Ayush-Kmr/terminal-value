@@ -342,10 +342,10 @@ def cmd_next(_: list[dict]) -> str:
     return ("⏭ <b>NEXT</b>\n\n"
             f"🛠 Next daily run starts: {run:%a %d %b, %I:%M %p} IST "
             "(GitHub sometimes starts it late)\n"
-            f"🎬 Long video: every {cfg['format']['long']['every_days']} days, "
-            f"public at {long_times} ET\n"
-            f"📱 Shorts: {cfg['format']['short']['per_day']} a day, public at {short_times} ET\n"
-            "😂 The Bhojpuri channel: two comedy skits a day, public at 12:30 and 19:30 IST.")
+            f"🎬 Long video: every Sunday only (no Shorts that day), public at {long_times} ET\n"
+            f"📱 Shorts: Mon-Sat, {cfg['format']['short']['per_day']} a day, public at {short_times} ET\n"
+            "😂 Bhojpuri: Sunday one long comedy video (the week's best skits); "
+            "Mon-Sat four skits a day, public at 12:30, 16:30, 19:30 and 21:30 IST.")
 
 
 def cmd_review(chs: list[dict]) -> str:

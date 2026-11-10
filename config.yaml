@@ -91,10 +91,11 @@ trending:
 format:
   kind: "news explainer video"     # how prompts describe the video
   long:
-    # Two long videos a week (Ayush, 2026-11-04): they go public on these
-    # weekdays (the day of the publish slot, channel time). Empty = any day.
-    days: [tuesday, friday]
-    every_days: 1               # with days set: every listed day; 2 = alternate days
+    # Weekly plan (Ayush, 2026-11-10): ONE long video every Sunday and no
+    # Shorts that day; Monday-Saturday four Shorts a day. The long video
+    # alone carries Sunday, so it is not split with Shorts for the audience.
+    days: [sunday]
+    with_shorts: 0              # Shorts made on the long day: none
     # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
     # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
     # A video that ends up under min_minutes is reported in Telegram.
@@ -107,18 +108,19 @@ format:
     target_minutes: 6
     min_minutes: 5
     words_per_minute: 140       # measured for the Kokoro voice
-    publish_times: ["12:00"]    # ET, channel timezone. A starting point to test
+    publish_times: ["11:00"]    # ET, Sunday late morning: the weekend long-watch window
   short:
-    per_day: 2                  # two standalone Shorts every day, on the next
-                                # stories after the long video's. Standalone
-                                # Shorts outperformed cuts from the long ~5x.
+    per_day: 4                  # four standalone Shorts Mon-Sat (none on Sunday).
+                                # Standalone Shorts outperformed cuts ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
     second: question            # 2nd Short a day: question (searched-for question) | stock (biggest move)
     max_shot_words: 12
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
-    publish_times: ["09:00", "17:00"]   # ET
+    # ET. Spread out: one Short every ~4 h. A slot that has already gone when
+    # the (often late) run gets there goes public at once, never the next day.
+    publish_times: ["08:00", "12:00", "16:00", "20:00"]
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.

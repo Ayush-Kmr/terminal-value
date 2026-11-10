@@ -78,6 +78,44 @@ def next_slot(cfg: Config, kind: str = "long") -> datetime:
     return slots(cfg, kind, 1)[0]
 
 
+def publish_day(cfg: Config, lead_hours: int = 4):
+    """The channel-time date today's run publishes on. The daily job fires
+    03:30 UTC (the evening before in New York, morning in India) but GitHub
+    often starts it hours late, so 'today' is judged a few hours ahead."""
+    tz = ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
+    return (datetime.now(tz) + timedelta(hours=lead_hours)).date()
+
+
+def is_long_day(cfg: Config, day=None) -> bool:
+    """Weekly plan (Ayush, 2026-11-10): the long video on format.long.days
+    (Sunday), and on that day nothing else; Shorts on every other day."""
+    day = day or publish_day(cfg)
+    days = [d.lower() for d in cfg.get_path("format.long.days", []) or []]
+    return bool(days) and day.strftime("%A").lower() in days
+
+
+def day_slot(cfg: Config, kind: str, day, taken: list | tuple = (),
+             min_lead_minutes: int = 20) -> datetime | None:
+    """The earliest free publish slot of this format on `day`, never another
+    day, so a late run cannot push Saturday's Shorts into Sunday. None when
+    every slot that day has gone: the caller then publishes at once."""
+    tz = ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
+    soon = datetime.now(tz) + timedelta(minutes=min_lead_minutes)
+    for hhmm in sorted(cfg.get_path(f"format.{kind}.publish_times") or ["19:00"]):
+        hh, mm = hhmm.split(":")[:2]
+        cand = datetime(day.year, day.month, day.day, int(hh), int(mm), tzinfo=tz)
+        if cand > soon and cand not in taken:
+            return cand
+    return None
+
+
+def made_on(episodes: list[dict], day, kind: str) -> int:
+    """How many videos of this kind were already uploaded for `day`, so a
+    restarted run tops the day up instead of doubling it."""
+    return sum(1 for e in episodes
+               if e.get("day") == day.isoformat() and e.get("kind", "long") == kind)
+
+
 def _safe(text: str, max_bytes: int) -> str:
     """YouTube rejects < and > in titles, descriptions and tags, and measures
     the description limit in bytes — Devanagari is three bytes a character."""

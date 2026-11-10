@@ -16,7 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WINDOW = timedelta(hours=26)
+WINDOW = timedelta(hours=20)    # daily uploads; Sunday's long must not count for Monday
 
 
 def fresh(path: str, now: datetime) -> bool:
