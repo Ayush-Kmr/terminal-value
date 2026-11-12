@@ -382,7 +382,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Phoolmati Chachi demands Fufa Ji buy expensive festival sweets, but he insists o",
@@ -412,7 +413,103 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "Fufa Ji arrives for a family wedding and sulks because nobody touched his feet f",
+      "title": "फूफा जी के नाक पर मक्खी 😂 | फूफा जी भाग 3 | Bhojpuri Comedy Video",
+      "idea": "fufa-wedding-sulk",
+      "characters": [
+        "fufa",
+        "lallan",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "35HYrY0X4AY",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "day": "2026-11-13",
+      "runtime": 32.2,
+      "series": "फूफा जी",
+      "part": 3,
+      "question": "रउआ घर में केकर फूफा सबसे जल्दी रूसेलें? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-12T20:55:33.058315+00:00"
+    },
+    {
+      "company": "Chacha wants to speak English to impress a city guest and translates Bhojpuri sa",
+      "title": "ललन चाचा के अंग्रेजी झाड़ 😂 | ललन चाचा के कांड भाग 3 | Bhojpuri Comedy",
+      "idea": "chacha-english",
+      "characters": [
+        "lallan",
+        "bablu"
+      ],
+      "language": "bho",
+      "video_id": "EvmBwMyuBQA",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "day": "2026-11-13",
+      "runtime": 29.4,
+      "series": "ललन चाचा के कांड",
+      "part": 3,
+      "question": "रउआ घर में अंग्रेजी के ज्ञान सबसे बेसी केकरा पास बा? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-12T21:04:07.063871+00:00"
+    },
+    {
+      "company": "Lallan pretends to be a film director after watching the trailer of a big new mo",
+      "title": "ललन चाचा भईल डायरेक्टर 😂 | ललन चाचा के कांड भाग 4 | new film trailer | Bhojpuri Funny Video",
+      "idea": "trend-fA8-gXDoAk8",
+      "characters": [
+        "lallan",
+        "phoolmati",
+        "bablu"
+      ],
+      "language": "bho",
+      "video_id": "TmEYNZ5OajQ",
+      "keyword": "new film trailer",
+      "source": {
+        "video_id": "fA8-gXDoAk8",
+        "title": "Maatrubhumi - Trailer | Salman Khan, Chitrangda Singh | Apoorva Lakhia | 4th December 2026",
+        "views": 40620250
+      },
+      "kind": "short",
+      "day": "2026-11-13",
+      "runtime": 31.4,
+      "series": "ललन चाचा के कांड",
+      "part": 4,
+      "question": "रउआ घर में केकर एक्टिंग सबसे ज्यादा खतरनाक बा? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-12T21:11:53.635644+00:00"
+    },
+    {
+      "company": "Fufa Ji gets deeply offended when he receives the cheapest box of sweets for Diw",
+      "title": "सस्ता मिठाई प फूफा के भौकाल 😂 | फूफा जी भाग 4 | Diwali festival comedy | Bhojpuri AI Comedy",
+      "idea": "trend-mHbu5mBAjxY",
+      "characters": [
+        "fufa",
+        "lallan",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "SK_ABS6yhjI",
+      "keyword": "Diwali festival comedy",
+      "source": {
+        "video_id": "mHbu5mBAjxY",
+        "title": "Diwali 🪔 ki bachpan wali yaade 🥹♥️ #diwali #trendingshorts #relatable #anmolthakurz #shorts",
+        "views": 25149849
+      },
+      "kind": "short",
+      "day": "2026-11-13",
+      "runtime": 24.8,
+      "series": "फूफा जी",
+      "part": 4,
+      "question": "रउआ घर में दिवाली प सबसेज्यादा केकर मुँह फूले ला? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-12T21:18:29.986220+00:00"
     }
   ],
   "rejected_topics": [],
