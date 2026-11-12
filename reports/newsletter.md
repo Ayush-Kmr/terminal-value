@@ -1,15 +1,16 @@
-Welcome back to another edition of business news made simple. 
+Welcome back to another edition of business news made simple.
 
-**Why Childcare Costs Are So High**
-Federal guidelines state that a two-child household needs to earn $400,000 a year to afford childcare. Most average salaries fall far short of that benchmark, putting immense strain on family budgets. 
-Watch: https://youtu.be/TAfxRaCl24M
+**Global Markets Hit by Massive AI Sell-Off**
+Global stocks suffered a severe blow as the S&P 500 dropped 4.4% in a single day and the Nasdaq 100 fell over 5.5%. Investors panicked amid mounting worries over artificial intelligence infrastructure, data center power demands, and a staggering $2.5 trillion AI sell-off. 
+Watch: https://youtu.be/aUPucp6nUpQ and https://youtu
+.be/umbey2EjMU8
 
-**Why Car Insurance Prices Surged**
-Car insurance prices jumped because of persistent inflation in parts and labor, alongside a rise in severe pandemic-era accidents. Additionally, General Motors settled a case over driver data used for pricing. 
-Watch: https://youtu.be/FAIglZB5eV0
+**Why Health Insurance Costs Keep Accelerating**
+Health insurance premium increases are accelerating as consulting firms project record costs for the year. This ongoing rise means household expenses continue to outpace broader inflation rates. 
+Watch: https://youtu.be/NmRqk13nDGY
 
-**Why Beef Prices Are Climbing**
-Beef prices have surged because the U.S. cattle herd fell to its smallest size in 75 years. This limited supply is directly driving higher costs for consumers at the grocery store. 
-Watch: https://youtu.be/7VXXBNtDO-s
+**Gas Prices Fall Below Four Dollars**
+Average gas prices have dropped below four dollars, directly impacting the daily commute for millions of motorists. This relief at the pump is being shaped by local taxation and recent dips in crude oil. 
+Watch: https://youtu.be/ckjUthYMbq8
 
-Which of these everyday household expenses has impacted your personal budget the most lately?
+Have falling gas prices made a noticeable difference in your household budget lately?

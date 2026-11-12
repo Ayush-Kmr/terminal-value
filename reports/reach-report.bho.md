@@ -1,7 +1,7 @@
-# Reach report — 2026-11-10
+# Reach report — 2026-11-12
 
-**Videos:** 24   
-**Median views:** 6   
+**Videos:** 32   
+**Median views:** 9   
 **Watch hours (28d):** 4 / 4,000
 
 ## Videos
@@ -12,39 +12,47 @@
 | Idbi Bank Share News Tamil | IDBI வங்கியின் 60% பங்குகள் விற | 446 | 22% | 🔒 unlisted |
 | Epfo Minimum Pension | ஓய்வூதியம் உயருமா? #shorts | 327 | 36% | 🔒 unlisted |
 | அமெரிக்காவில் ரிலையன்ஸ் முதலீடு #shorts | 149 | 26% | 🔒 unlisted |
-| ललन चाचा के वायरल छठ व्लॉग 😂 | Chhath Puja | Bhojpuri Funny  | 57 | — | 🔥 outlier |
+| ललन चाचा के वायरल छठ व्लॉग 😂 | Chhath Puja | Bhojpuri Funny  | 63 | 34% | 🔥 outlier |
+| ललन चाचा के मिठाई कांड 😂 | Bhojpuri Comedy | 40 | 18% | 🔥 outlier |
+| ललन चाचा के ब्याह वाला मास्टरप्लान 😂 | Bhojpuri Comedy Video | 25 | 23% | 🔥 outlier |
 | Rising Cost of Living USA | அமெரிக்காவில் விலைவாசி உயர்வது ஏ | 24 | 8% | 🔒 unlisted |
-| ललन चाचा के मिठाई कांड 😂 | Bhojpuri Comedy | 13 | — |  |
+| फूफा जी के दिवाली गिफ्ट 😂 | फूफा जी भाग 2 | Diwali Gift | Bh | 20 | — |  |
+| चाचा के बोलता रेडियो 😂 | चाची के जलवा भाग 1 | Bhojpuri Comed | 19 | — |  |
 | TN Govt News in Tamil | தீபாவளிக்கு ரூ.100க்கு காய்கறி | 12 | 51% | 🔒 unlisted |
-| ललन चाचा के ब्याह वाला मास्टरप्लान 😂 | Bhojpuri Comedy Video | 10 | — |  |
-| घाट पर गमछा राज 😂 | Bhojpuri Comedy | 6 | — |  |
-| दिवाली के सफाई वाला जुगाड़ 😂 | Diwali ki safai | Bhojpuri AI | 5 | — |  |
+| फ्री के भाई दूज गिफ्ट 😂 | Bhojpuri Funny Video | 10 | — |  |
+| चाचा के थीकुआ ट्रिक फसाद 😂 | ललन चाचा के कांड भाग 1 | Bhojpu | 9 | — |  |
+| दिवाली के सफाई वाला जुगाड़ 😂 | Diwali ki safai | Bhojpuri AI | 9 | 49% |  |
+| फूफा जी के नागिन डांस 😂 | फूफा जी भाग 1 | Bhojpuri Comedy | 8 | — |  |
+| घाट पर गमछा राज 😂 | Bhojpuri Comedy | 7 | 0% |  |
+| चाचा के चहटा सीट टिप 😂 | बबलू के जुगाड़ भाग 2 | Bhojpuri Com | 5 | — |  |
 | Crude Oil Price Tamil | கச்சா எண்ணெய் விலை மற்றும் ஆர்பிஐ வட | 5 | 116% | 🔒 unlisted |
-| Livewire Stock | லைவ்யூர் பங்கு விலை 40% சரிவு ஏன்? | 4 | 26% | 🔒 unlisted |
+| Livewire Stock | லைவ்யூர் பங்கு விலை 40% சரிவு ஏன்? | 4 | 20% | 🔒 unlisted |
 | India News Tamil | நெட்வொர்க் செலவைக் குறைக்க 6ஜி கூட்டணியில | 4 | 11% | 🔒 unlisted |
+| ललन चाचा चलाएहें ट्रैक्टर गेम 😂 | बबलू के जुगाड़ भाग 1 | GTA | 3 | — | ⚠️ retitle candidate |
+| ललन चाचा के झालर कांड 😂 | Diwali celebration comedy | Bhojpu | 3 | — | ⚠️ retitle candidate |
 | Madoff Fooled Tamil | பெர்னி மடோப்பின் மிகப்பெரிய மோசடி | 3 | 103% | 🔒 unlisted |
 | Big Tech AI Regret | செயற்கை நுண்ணறிவுத் துறையில் பிக்டெக் ந | 3 | 22% | 🔒 unlisted |
 | Is AI Bubble | ஏஐ குமிழி உடையும் தருவாயில் உள்ளதா? | 2 | 22% | 🔒 unlisted |
 | Kalshi | கல்ஷி எப்படி பணம் சம்பாதிக்கிறது? | 1 | 24% | 🔒 unlisted |
 | Indian News Tamil News | டிடிபிபி சட்டம் #shorts | 1 | 0% | 🔒 unlisted |
 | Gold Silver Price Tamil | விலை கடும் சரிவு #shorts | 1 | 30% | 🔒 unlisted |
-| फ्री के भाई दूज गिफ्ट 😂 | Bhojpuri Funny Video | 0 | — | ⚠️ retitle candidate |
-| ललन चाचा के झालर कांड 😂 | Diwali celebration comedy | Bhojpu | 0 | — | 🔒 private |
+| फूफा के मीठा गड़बड़ी 😂 | चाची के जलवा भाग 2 | diwali festiva | 0 | — | ⚠️ retitle candidate |
+| चाचा के काका बनल खलनायक 😂 | ललन चाचा के कांड भाग 2 | new mov | 0 | — | ⚠️ retitle candidate |
 | Inovio Stock | இனோவியோ நிறுவன பங்குகள் 224% உயர்வு | 0 | — | 🔒 unlisted |
 | Gas Price Hike Tamil | அமெரிக்காவில் பெட்ரோல் விலை உயர்வு | 0 | — | 🔒 unlisted |
 
 ## Where views came from (28 days)
 
-**Subscribers (28d):** +2 / -0 (0.08% of 2,387 views)
+**Subscribers (28d):** +2 / -0 (0.08% of 2,474 views)
 
 | Source | Views | Share | Watch min |
 |---|---|---|---|
-| Shorts feed | 2,266 | 95% | 220 |
-| YouTube search | 88 | 4% | 10 |
+| Shorts feed | 2,263 | 91% | 220 |
+| YouTube search | 168 | 7% | 16 |
 | Suggested videos | 23 | 1% | 21 |
-| Channel page | 5 | 0% | 0 |
-| Direct / unknown | 2 | 0% | 0 |
-| Subscribers | 2 | 0% | 0 |
+| Channel page | 9 | 0% | 1 |
+| Subscribers | 5 | 0% | 0 |
+| Direct / unknown | 3 | 0% | 0 |
 | Outside YouTube | 2 | 0% | 0 |
 | Other YouTube pages | 1 | 0% | 0 |
 
@@ -54,12 +62,12 @@
 |---|---|---|---|
 | Subscribers | 2 | 500 | 1,000 |
 | Watch hours (12 months) | 0 | 3,000 | 4,000 |
-| Shorts views (90 days) | 2,362 | 3,000,000 | 10,000,000 |
+| Shorts views (90 days) | 2,447 | 3,000,000 | 10,000,000 |
 
 Each tier needs its subscribers plus either the hours or the Shorts views. Watch hours here exclude Shorts.
 
 ## What to do next
 
-- 1 video(s) under 40% of median. Packaging is the usual cause — try a new thumbnail first, then a new title. Change one at a time.
-- 9 video(s) under 30% average view percentage. That is a cold-open problem, not a topic problem.
+- 4 video(s) under 40% of median. Packaging is the usual cause — try a new thumbnail first, then a new title. Change one at a time.
+- 12 video(s) under 30% average view percentage. That is a cold-open problem, not a topic problem.
 - 3,996 watch hours still needed for the Partner Programme.

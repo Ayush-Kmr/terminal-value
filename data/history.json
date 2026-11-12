@@ -37,10 +37,7 @@
       "stats": {
         "views": 4,
         "likes": 0,
-        "comments": 0,
-        "avg_duration_s": 33,
-        "avg_pct": 13.04,
-        "minutes": 2
+        "comments": 0
       }
     },
     {
@@ -56,10 +53,7 @@
       "stats": {
         "views": 5,
         "likes": 0,
-        "comments": 0,
-        "avg_duration_s": 7,
-        "avg_pct": 31.129999999999995,
-        "minutes": 0
+        "comments": 0
       }
     },
     {
@@ -76,9 +70,9 @@
         "views": 170,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 16,
-        "avg_pct": 75.78,
-        "minutes": 14
+        "avg_duration_s": 13,
+        "avg_pct": 60.45,
+        "minutes": 0
       }
     },
     {
@@ -95,9 +89,9 @@
         "views": 100,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 12,
-        "avg_pct": 49.11,
-        "minutes": 9
+        "avg_duration_s": 11,
+        "avg_pct": 45.22,
+        "minutes": 4
       }
     },
     {
@@ -111,12 +105,12 @@
       "warnings": [],
       "created_at": "2026-10-14T15:32:54.507639+00:00",
       "stats": {
-        "views": 376,
+        "views": 377,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 21,
-        "avg_pct": 78.46,
-        "minutes": 54
+        "avg_duration_s": 19,
+        "avg_pct": 73.84,
+        "minutes": 16
       }
     },
     {
@@ -337,12 +331,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 329,
+        "views": 337,
         "likes": 2,
         "comments": 0,
-        "avg_duration_s": 111,
-        "avg_pct": 21.99,
-        "minutes": 273
+        "avg_duration_s": 106,
+        "avg_pct": 21.03,
+        "minutes": 314
       }
     },
     {
@@ -359,9 +353,9 @@
         "views": 117,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 21,
-        "avg_pct": 61.86000000000001,
-        "minutes": 19
+        "avg_duration_s": 22,
+        "avg_pct": 63.51,
+        "minutes": 20
       }
     },
     {
@@ -438,9 +432,9 @@
         "views": 43,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 171,
-        "avg_pct": 32.31,
-        "minutes": 103
+        "avg_duration_s": 170,
+        "avg_pct": 32.14,
+        "minutes": 108
       }
     },
     {
@@ -514,8 +508,8 @@
         "views": 9,
         "likes": 1,
         "comments": 0,
-        "avg_duration_s": 4,
-        "avg_pct": 10.24,
+        "avg_duration_s": 22,
+        "avg_pct": 54.05,
         "minutes": 0
       }
     },
@@ -554,7 +548,7 @@
       "warnings": [],
       "created_at": "2026-10-26T11:44:47.545945+00:00",
       "stats": {
-        "views": 413,
+        "views": 415,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 29,
@@ -597,7 +591,7 @@
       ],
       "created_at": "2026-10-28T11:41:57.269368+00:00",
       "stats": {
-        "views": 6,
+        "views": 8,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 32,
@@ -695,7 +689,7 @@
       "warnings": [],
       "created_at": "2026-10-30T12:23:32.688274+00:00",
       "stats": {
-        "views": 51,
+        "views": 52,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 149,
@@ -752,7 +746,7 @@
       "warnings": [],
       "created_at": "2026-10-31T10:06:27.130994+00:00",
       "stats": {
-        "views": 231,
+        "views": 232,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 30,
@@ -797,9 +791,9 @@
         "views": 20,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 232,
-        "avg_pct": 42.74,
-        "minutes": 46
+        "avg_duration_s": 202,
+        "avg_pct": 37.34,
+        "minutes": 47
       },
       "commented": true
     },
@@ -845,8 +839,8 @@
         "views": 95,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 13,
-        "avg_pct": 55.81,
+        "avg_duration_s": 14,
+        "avg_pct": 57.37,
         "minutes": 7
       },
       "commented": true
@@ -867,12 +861,12 @@
       "created_at": "2026-11-02T15:59:18.703616+00:00",
       "commented": true,
       "stats": {
-        "views": 98,
+        "views": 101,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 90,
-        "avg_pct": 266.26,
-        "minutes": 43
+        "avg_duration_s": 86,
+        "avg_pct": 253.77,
+        "minutes": 44
       }
     },
     {
@@ -919,7 +913,7 @@
       ],
       "created_at": "2026-11-03T12:05:52.640499+00:00",
       "stats": {
-        "views": 9,
+        "views": 15,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 8,
@@ -1044,12 +1038,12 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 355,
+        "views": 381,
         "likes": 0,
         "comments": 2,
         "avg_duration_s": 20,
-        "avg_pct": 90.53,
-        "minutes": 41
+        "avg_pct": 90.51,
+        "minutes": 42
       },
       "commented": true
     },
@@ -1117,12 +1111,12 @@
       "created_at": "2026-11-05T11:33:11.257058+00:00",
       "commented": true,
       "stats": {
-        "views": 55,
+        "views": 56,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 11,
-        "avg_pct": 39.98,
-        "minutes": 3
+        "avg_duration_s": 12,
+        "avg_pct": 41.95,
+        "minutes": 4
       }
     },
     {
@@ -1192,12 +1186,12 @@
       "created_at": "2026-11-06T12:05:39.005033+00:00",
       "commented": true,
       "stats": {
-        "views": 40,
+        "views": 41,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 37,
-        "avg_pct": 163.18,
-        "minutes": 3
+        "avg_duration_s": 35,
+        "avg_pct": 155.88,
+        "minutes": 4
       }
     },
     {
@@ -1216,7 +1210,7 @@
       "created_at": "2026-11-06T12:09:16.960099+00:00",
       "commented": true,
       "stats": {
-        "views": 39,
+        "views": 38,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 12,
@@ -1240,12 +1234,12 @@
       "created_at": "2026-11-07T10:43:26.433160+00:00",
       "commented": true,
       "stats": {
-        "views": 46,
+        "views": 48,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 12,
-        "avg_pct": 64.63,
-        "minutes": 2
+        "avg_duration_s": 13,
+        "avg_pct": 65.72,
+        "minutes": 3
       }
     },
     {
@@ -1264,12 +1258,12 @@
       "created_at": "2026-11-07T10:47:19.470358+00:00",
       "commented": true,
       "stats": {
-        "views": 619,
+        "views": 621,
         "likes": 7,
         "comments": 1,
         "avg_duration_s": 16,
-        "avg_pct": 67.73,
-        "minutes": 56
+        "avg_pct": 70.56,
+        "minutes": 79
       }
     },
     {
@@ -1287,9 +1281,12 @@
       "queue": "",
       "created_at": "2026-11-08T10:46:17.239408+00:00",
       "stats": {
-        "views": 164,
+        "views": 168,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 20,
+        "avg_pct": 88,
+        "minutes": 20
       },
       "commented": true
     },
@@ -1308,9 +1305,12 @@
       "queue": "evergreen-short:The Fed",
       "created_at": "2026-11-08T10:48:55.917547+00:00",
       "stats": {
-        "views": 39,
+        "views": 40,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 18,
+        "avg_pct": 79,
+        "minutes": 2
       },
       "commented": true
     },
@@ -1330,9 +1330,12 @@
       "created_at": "2026-11-09T12:05:12.434161+00:00",
       "commented": true,
       "stats": {
-        "views": 77,
+        "views": 88,
         "likes": 1,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 13,
+        "avg_pct": 58.68,
+        "minutes": 6
       }
     },
     {
@@ -1351,9 +1354,12 @@
       "created_at": "2026-11-09T12:07:24.216247+00:00",
       "commented": true,
       "stats": {
-        "views": 10,
+        "views": 24,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 6,
+        "avg_pct": 30.020000000000003,
+        "minutes": 0
       }
     },
     {
@@ -1374,9 +1380,9 @@
       "warnings": [],
       "created_at": "2026-11-10T12:11:03.355175+00:00",
       "stats": {
-        "views": 0,
+        "views": 5,
         "likes": 0,
-        "comments": 0
+        "comments": 3
       },
       "commented": true
     },
@@ -1395,9 +1401,9 @@
       "queue": "",
       "created_at": "2026-11-10T12:13:28.229684+00:00",
       "stats": {
-        "views": 3,
-        "likes": 0,
-        "comments": 0
+        "views": 283,
+        "likes": 3,
+        "comments": 3
       },
       "commented": true
     },
@@ -1416,9 +1422,9 @@
       "queue": "evergreen-short:Recession",
       "created_at": "2026-11-10T12:16:34.080875+00:00",
       "stats": {
-        "views": 0,
+        "views": 122,
         "likes": 0,
-        "comments": 0
+        "comments": 3
       },
       "commented": true
     },
@@ -1438,7 +1444,12 @@
       "hook": "Nvidia rebounded 2.87% on Wednesday, November 11.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-12T01:58:21.724514+00:00"
+      "created_at": "2026-11-12T01:58:21.724514+00:00",
+      "stats": {
+        "views": 3,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Nvidia CEO Jensen Huang Relationship Disclosure",
@@ -1456,7 +1467,12 @@
       "hook": "Two affairs sparked a crisis at Nvidia.",
       "title_style": "curious",
       "queue": "",
-      "created_at": "2026-11-12T02:01:40.576915+00:00"
+      "created_at": "2026-11-12T02:01:40.576915+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Oil Prices Rebound on Middle East Supply Risks",
@@ -1474,7 +1490,12 @@
       "hook": "Brent crude climbed to $103.60 per barrel today.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-12T02:05:17.529587+00:00"
+      "created_at": "2026-11-12T02:05:17.529587+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Super El Niño Weather Impact on Wallets",
@@ -1492,9 +1513,14 @@
       "hook": "Trillions of dollars can vanish when Pacific trade winds weaken.",
       "title_style": "curious",
       "queue": "",
-      "created_at": "2026-11-12T02:08:24.879070+00:00"
+      "created_at": "2026-11-12T02:08:24.879070+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 52.0
+  "channel_median_views": 52.5
 }
