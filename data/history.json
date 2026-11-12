@@ -1377,7 +1377,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Supreme Court Invalidates Trump Tariffs",
@@ -1397,7 +1398,8 @@
         "views": 3,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Recession",
@@ -1417,7 +1419,80 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "AI Stocks Rebound After Market Sell-Off",
+      "angle": "Are tech stocks recovering their multi-trillion dollar losses or is this just a temporary dead cat bounce?",
+      "title": "AI Stocks Rebound After a Massive Sell-off #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "XPPpJ7pdC18",
+      "kind": "short",
+      "day": "2026-11-12",
+      "warnings": [],
+      "question": "How closely do you follow quarterly earnings reports before buying company shares?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/ckjUthYMbq8",
+      "hook": "Nvidia rebounded 2.87% on Wednesday, November 11.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-12T01:58:21.724514+00:00"
+    },
+    {
+      "company": "Nvidia CEO Jensen Huang Relationship Disclosure",
+      "angle": "How will Nvidia's corporate governance and investor confidence handle the disclosure of Jensen Huang's workplace relationship?",
+      "title": "Why Did Nvidia Shares Fall After Hours? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "p5RMp5rHbOQ",
+      "kind": "short",
+      "day": "2026-11-12",
+      "warnings": [],
+      "question": "How important is a founder to a multi-trillion dollar company?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/ckjUthYMbq8",
+      "hook": "Two affairs sparked a crisis at Nvidia.",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-12T02:01:40.576915+00:00"
+    },
+    {
+      "company": "Oil Prices Rebound on Middle East Supply Risks",
+      "angle": "What do renewed Middle East supply risks and attacks on shipping navigation mean for global energy prices and inflation?",
+      "title": "Latest News on Oil Prices After $20 Risk Premium Added #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "Y5AQvBZ63Xs",
+      "kind": "short",
+      "day": "2026-11-12",
+      "warnings": [],
+      "question": "Does news of emergency fuel supplies make you feel better about heating costs?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/ckjUthYMbq8",
+      "hook": "Brent crude climbed to $103.60 per barrel today.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-12T02:05:17.529587+00:00"
+    },
+    {
+      "company": "Super El Niño Weather Impact on Wallets",
+      "angle": "How much will the incoming monstrous El Niño weather event cost American households in food, energy, and insurance bills?",
+      "title": "How Much Will El Niño Cost Your Wallet? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "A5uuHfk4rhI",
+      "kind": "short",
+      "day": "2026-11-12",
+      "warnings": [],
+      "question": "Which household bill worries you the most right now?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/ckjUthYMbq8",
+      "hook": "Trillions of dollars can vanish when Pacific trade winds weaken.",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-12T02:08:24.879070+00:00"
     }
   ],
   "rejected_topics": [],
