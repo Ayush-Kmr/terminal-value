@@ -719,8 +719,14 @@ def run(args) -> int:
     n_shorts = 0 if args.no_shorts else int(args.count or cfg.get_path("format.long.with_shorts", 0))
     candidates = fresh_or_queue(cfg, args, 4 + n_shorts, ("long",))
     first = queued(args, "long", 1)
-    # Sunday's one long video follows the week's best Short before anything queued.
-    story = best_short_story(cfg, args) or (first[0] if first else None) \
+    # Sunday's one long video follows the week's best Short before anything
+    # queued, unless the next queued story carries ahead_of_best_short: <date>
+    # and that date has not passed (a one-off override, e.g. a story the best
+    # Short got wrong; it lapses on its own if that day's run fails).
+    today = datetime.now().date().isoformat()
+    urgent = first[0] if first and str(first[0].get("ahead_of_best_short") or "") >= today \
+        else None
+    story = urgent or best_short_story(cfg, args) or (first[0] if first else None) \
         or history_story(cfg, args) \
         or evergreen_story(cfg, args) or candidates[0]
     if story.get("evergreen") or story.get("history"):

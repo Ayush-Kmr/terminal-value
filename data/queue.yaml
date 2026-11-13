@@ -4,6 +4,27 @@
 # A title is used only if every figure in it is in the research.
 # not_before holds a story back until that date, for anything timed to an event.
 long:
+  # One-off for Sunday 15 Nov (/youtube hook, 2026-11-14): the week's best Short
+  # said the Supreme Court "just" struck down the tariffs, but the ruling was on
+  # 20 Feb 2026; this week's news is the fight over the refunds. Goes ahead of
+  # the best-Short pick until 15 Nov only.
+  - topic: "IEEPA tariff refunds"
+    ahead_of_best_short: "2026-11-15"
+    title: "Who Gets the $166 Billion Tariff Refund?"
+    angle: >-
+      The Supreme Court ruled 6-3 on 20 February 2026 that the emergency-powers
+      law (IEEPA) never let the president set tariffs. Nine months later, who
+      gets the roughly $166 billion back: the 330,000+ importers who paid, only
+      the ones who sued, or nobody yet; and why shop prices may not fall while
+      the Section 232 and 301 tariffs stay in force?
+    search_query: "IEEPA tariff refunds Court of International Trade importers"
+    keywords: [tariff refund, ieepa tariff refund, supreme court tariff ruling, who gets tariff refunds]
+    proven_hook: >-
+      The Supreme Court ruled Trump's emergency tariffs illegal back in February,
+      six votes to three. Nine months later, the money collected still hasn't
+      been fully handed back, and the administration wants to pay only the
+      importers who sued.
+    proven_views: 283
   # 2026-11-10: the "why is X so expensive" long videos (cars, rent) were
   # dropped: the price-explainer series did worst. The Sunday video now
   # follows the week's best Short first (main.best_short_story).
