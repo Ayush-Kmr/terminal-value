@@ -69,9 +69,11 @@ Write ONE skit of {lo}-{hi} dialogue lines, {max_words} words in all at most.
   celebrities, brands or anything sad.
 
 Return a JSON object:
-  title     - a catchy, funny Bhojpuri title in Devanagari, at most 40 characters,
-              that makes people curious and starts with the name of whoever
-              speaks line 1 (e.g. "ललन चाचा के पहिला स्मार्टफोन")
+  title     - a funny Bhojpuri title in Devanagari, at most 50 characters, that
+              names a situation every family knows, starting with "जब" and the
+              name of whoever speaks line 1 (e.g. "जब ललन चाचा के घर बिना
+              बतवले मेहमान आ जाला", "जब ललन चाचा पहिला बेर स्मार्टफोन चलवलें").
+              The biggest family-comedy Shorts are titled this way.
   hook      - on-screen headline in Devanagari, 2-5 words
   setting   - in ENGLISH: where it happens, as a picture (e.g. "the courtyard
               of a village house in Bihar with a buffalo tied to a post, sunny afternoon")

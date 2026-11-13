@@ -1,5 +1,9 @@
 name: Episode
 
+# The English channel (Terminal Value). The Bhojpuri channel has its own
+# workflow, bhojpuri.yml (split 2026-11-14), so a slow or failed skit run never
+# holds up or fails the English one.
+
 on:
   schedule:
     # Every day 03:30 UTC. Sunday: one long video per channel and no Shorts;
@@ -34,13 +38,6 @@ on:
         description: "Build only, do not upload"
         type: boolean
         default: false
-      bhojpuri_only:
-        description: "Only the Bhojpuri channel's run (skip the English channel)"
-        type: boolean
-        default: false
-      premise:
-        description: "Bhojpuri channel: a skit premise to use (blank = next idea)"
-        required: false
 
 concurrency:
   group: episode
@@ -51,7 +48,6 @@ permissions:
 
 jobs:
   produce:
-    if: ${{ !inputs.bhojpuri_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -150,113 +146,5 @@ jobs:
           git config user.email "noreply@users.noreply.github.com"
           git add data/history.json || true
           git diff --staged --quiet || git commit -m "chore: episode history [skip ci]"
-          git pull --rebase -q || true
-          git push || true
-
-  # The Bhojpuri comedy channel (channels/bh.yaml, src/skit.py): two cartoon
-  # skit Shorts a day with Lallan Chacha, Phoolmati Chachi and Bablu, each
-  # character in their own Indic Parler-TTS voice. Runs beside the English job
-  # and shares nothing with it. Skipped until the channel's token secret exists
-  # (YT_REFRESH_TOKEN_BH; the same channel's earlier secret is used until then).
-  bhojpuri:
-    runs-on: ubuntu-latest
-    timeout-minutes: 150
-    steps:
-      - name: Is the Bhojpuri channel set up?
-        id: on
-        env:
-          TOKEN: ${{ secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA }}
-        run: |
-          if [ -n "$TOKEN" ] || [ "${{ inputs.no_upload }}" = "true" ]; then
-            echo "go=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::No Bhojpuri channel token yet, so no skits. See SETUP.md, 'Bhojpuri channel'."
-          fi
-
-      - uses: actions/checkout@v4
-        if: steps.on.outputs.go
-
-      - uses: actions/setup-python@v5
-        id: py
-        if: steps.on.outputs.go
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      # libraqm + libfribidi let Pillow shape Devanagari for the captions.
-      - name: Install ffmpeg
-        if: steps.on.outputs.go
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu libraqm0 libfribidi0
-
-      - run: pip install -r requirements.txt
-        if: steps.on.outputs.go
-
-      - name: Cache voice environment and model
-        if: steps.on.outputs.go
-        uses: actions/cache@v4
-        with:
-          path: |
-            .venv-indic
-            ~/.cache/huggingface
-          key: indic-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements-indic.txt') }}
-
-      - name: Install voice model
-        if: steps.on.outputs.go
-        run: |
-          if ! .venv-indic/bin/python -c 'import sys' 2>/dev/null; then
-            rm -rf .venv-indic
-            python -m venv .venv-indic
-            .venv-indic/bin/pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
-            .venv-indic/bin/pip install -q -r requirements-indic.txt
-          fi
-
-      - name: Make today's skits
-        if: steps.on.outputs.go
-        env:
-          CHANNEL:            bh
-          GH_TOKEN:           ${{ github.token }}   # the skit archive for Sunday's long video
-          HF_TOKEN:           ${{ secrets.HF_TOKEN }}
-          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
-          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
-          XAI_API_KEY:        ${{ secrets.XAI_API_KEY }}
-          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
-          CF_ACCOUNT_ID:      ${{ secrets.CF_ACCOUNT_ID }}
-          CF_API_TOKEN:       ${{ secrets.CF_API_TOKEN }}
-          YT_CLIENT_ID:       ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET:   ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN:   ${{ secrets.YT_REFRESH_TOKEN_BH || secrets.YT_REFRESH_TOKEN_TA }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-          PREMISE:            ${{ inputs.premise }}
-          PUBLISH:            ${{ inputs.publish }}
-          COUNT:              ${{ inputs.count }}
-          NO_UPLOAD:          ${{ inputs.no_upload }}
-        run: |
-          args=(--skit)
-          [ -n "$PREMISE" ] && args+=(--topic "$PREMISE")
-          [ -n "$PUBLISH" ] && args+=(--publish "$PUBLISH")
-          [ -n "$COUNT" ] && args+=(--count "$COUNT")
-          [ "$NO_UPLOAD" = "true" ] && args+=(--no-upload)
-          python main.py "${args[@]}"
-
-      - name: Upload artifacts
-        if: always() && steps.on.outputs.go
-        uses: actions/upload-artifact@v4
-        with:
-          name: bhojpuri-${{ github.run_number }}
-          path: |
-            output/**/short.mp4
-            output/**/metadata.json
-            output/**/script.json
-            output/**/assets/scene_*.jpg
-          retention-days: 7
-
-      - name: Commit history
-        if: success() && steps.on.outputs.go
-        run: |
-          git config user.name "terminal-value-bot"
-          git config user.email "noreply@users.noreply.github.com"
-          git add data/history.bh.json || true
-          git diff --staged --quiet || git commit -m "chore: bhojpuri episode history [skip ci]"
           git pull --rebase -q || true
           git push || true

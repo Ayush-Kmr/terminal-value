@@ -43,7 +43,8 @@ How the timing works (`src/upload.py`):
 
 | Workflow | When | What |
 |---|---|---|
-| `episode.yml` | Daily, cron 03:30 UTC (actually starts about 11:30 UTC), or run by hand | The main job: an English long video or Shorts. The `bhojpuri` job makes skits, or the weekly long video. Inputs include topic, region, `bhojpuri_only`, `premise` and no-upload. |
+| `episode.yml` | Daily, cron 03:30 UTC (actually starts about 11:30 UTC), or run by hand | The English channel: a long video or Shorts. Inputs include topic, region and no-upload. |
+| `bhojpuri.yml` | Daily, cron 03:30 UTC, or run by hand | The Bhojpuri channel (split out 2026-11-14): skits, or the weekly long video. Own concurrency group; `GEMINI_API_KEY_BH` if set. Inputs: premise, publish, count, no-upload. |
 | `watchdog.yml` | Daily 13:00 UTC | Did both channels get their videos today? If not, it restarts what is missing (20 h window). |
 | `reach.yml` | Mondays 03:15 UTC | Reach report into `reports/` and the history files. |
 | `telegram.yml` | Hourly at :17 | Telegram bot: numbers and pipeline state for both channels. |

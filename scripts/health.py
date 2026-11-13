@@ -58,20 +58,24 @@ def failed_runs(now: datetime) -> list[str]:
 
 
 def todays_run(now: datetime) -> str:
-    rows = json.loads(gh("run", "list", "--workflow", "episode.yml", "--event", "schedule",
-                         "--limit", "1", "--json", "databaseId,status,conclusion,createdAt"))
-    if not rows:
-        return "⚠️ No scheduled daily run found"
-    r = rows[0]
-    when = datetime.fromisoformat(r["createdAt"].replace("Z", "+00:00"))
-    if now - when > DAY:
-        return "⚠️ The daily run did not start today"
-    jobs = json.loads(gh("run", "view", str(r["databaseId"]), "--json", "jobs"))["jobs"]
-    names = {"produce": "English", "bhojpuri": "Bhojpuri"}
+    """Each channel's latest scheduled run; the channels have their own
+    workflows since 2026-11-14 (episode.yml, bhojpuri.yml)."""
     icon = {"success": "✅", "failure": "❌", "skipped": "⏭", "cancelled": "⛔"}
-    parts = [f"{names.get(j['name'], j['name'])} {icon.get(j.get('conclusion'), '⏳')}"
-             for j in jobs]
-    return f"Daily run ({when.astimezone(IST):%H:%M} IST): " + " · ".join(parts)
+    parts = []
+    for name, wf in (("English", "episode.yml"), ("Bhojpuri", "bhojpuri.yml")):
+        rows = json.loads(gh("run", "list", "--workflow", wf, "--event", "schedule",
+                             "--limit", "1", "--json", "status,conclusion,createdAt"))
+        if not rows:
+            parts.append(f"{name} ⚠️ no scheduled run yet")
+            continue
+        r = rows[0]
+        when = datetime.fromisoformat(r["createdAt"].replace("Z", "+00:00"))
+        if now - when > DAY:
+            parts.append(f"{name} ⚠️ did not start today")
+        else:
+            parts.append(f"{name} {icon.get(r.get('conclusion'), '⏳')} "
+                         f"({when.astimezone(IST):%H:%M} IST)")
+    return "Daily runs: " + " · ".join(parts)
 
 
 def report(now: datetime) -> str:

@@ -58,9 +58,11 @@ skit:
     days_back: 7
     min_clips: 6
     max_clips: 24                # 24 x ~25 s = about 10 minutes
-  # Analysis 2026-11-13: skits of 20-25 s (5-7 lines) held 2-5x the views of
-  # the 29-34 s ones, and every Shorts watch-through sat at 18-34%. Shorter.
-  lines: [5, 7]                  # dialogue lines per skit
+  # 2026-11-13 cut to 5-7 lines; the first skits came out at 16-21 s, too short
+  # for a setup and a punchline. Competitors (2026-11-14: Laughingggodha 42-60 s,
+  # Keshav Shashi 77-134 s) run far longer. The 8-word line 1 stays: the hook,
+  # not the length, was what lost viewers. Aim: about 30-40 s.
+  lines: [7, 9]                  # dialogue lines per skit
   # Lallan Chacha leads every skit he is cast in (all three outliers starred
   # him), and is added to any cast that lacks him. "" = whoever speaks first.
   lead: lallan
@@ -74,7 +76,7 @@ skit:
     - "रोज नया बवाल देखे खातिर अबहीं फॉलो करीं!"
     - "काल्हु अउरी बवाल होई, फॉलो कर लीं!"
     - "चाचा के अगिला कांड खातिर फॉलो करीं!"
-  max_words: 60                  # ~20-25 s once voiced
+  max_words: 75                  # ~30-40 s once voiced
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
   search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]

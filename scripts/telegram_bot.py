@@ -258,8 +258,11 @@ def run_line(run: dict, jobs: bool = True) -> str:
 def last_episode_run() -> str:
     """Never the reason a command fails: YouTube numbers still go out without it."""
     try:
-        runs = gh("actions/workflows/episode.yml/runs?per_page=1").get("workflow_runs", [])
-        return run_line(runs[0]) if runs else "no runs yet"
+        lines = []
+        for name, wf in (("English", "episode.yml"), ("Bhojpuri", "bhojpuri.yml")):
+            runs = gh(f"actions/workflows/{wf}/runs?per_page=1").get("workflow_runs", [])
+            lines.append(f"{name}: " + (run_line(runs[0]) if runs else "no runs yet"))
+        return "\n".join(lines)
     except requests.RequestException as exc:
         return f"(GitHub unavailable right now: {esc(type(exc).__name__)})"
 

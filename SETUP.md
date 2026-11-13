@@ -141,9 +141,10 @@ Devanagari. Settings, characters and voices live in `channels/bh.yaml`; its
 history in `data/history.bh.json`. It is the channel that used to be Terminal
 Value Tamil (`UC5QnQWBbS5AVKvgxsZl4V3w`), rebranded on 2026-11-08.
 
-- **Test a skit without uploading:** Actions → Episode → Run workflow, tick
-  `bhojpuri_only` and `no_upload`, optionally type a `premise`. The video is in
-  the run's `bhojpuri-N` artifact.
+- **Test a skit without uploading:** Actions → Bhojpuri → Run workflow, tick
+  `no_upload`, optionally type a `premise`. The video is in the run's
+  `bhojpuri-N` artifact. (The channel has its own workflow, `bhojpuri.yml`,
+  since 2026-11-14; set `GEMINI_API_KEY_BH` to give it its own Gemini quota.)
 - **Add premises:** append to `data/bhojpuri_ideas.yaml` (`months:` makes one
   seasonal).
 - **Token:** the job signs in with the secret `YT_REFRESH_TOKEN_BH`, falling

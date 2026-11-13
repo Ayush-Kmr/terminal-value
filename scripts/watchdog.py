@@ -37,8 +37,8 @@ def gh(*args: str) -> str:
     return subprocess.run(["gh", *args], capture_output=True, text=True, check=True).stdout
 
 
-def latest_run() -> dict:
-    rows = json.loads(gh("run", "list", "--workflow", "episode.yml", "--limit", "1", "--json",
+def latest_run(workflow: str) -> dict:
+    rows = json.loads(gh("run", "list", "--workflow", workflow, "--limit", "1", "--json",
                          "databaseId,status,conclusion,createdAt"))
     return rows[0] if rows else {}
 
@@ -51,28 +51,30 @@ def tell(text: str) -> None:
         urllib.request.urlopen(f"https://api.telegram.org/bot{token}/sendMessage", data, timeout=30)
 
 
+# Each channel has its own workflow (split 2026-11-14), so each is checked and
+# restarted on its own.
+CHANNELS = (("English", "data/history.json", "episode.yml"),
+            ("Bhojpuri", "data/history.bh.json", "bhojpuri.yml"))
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
-    english, bhojpuri = fresh("data/history.json", now), fresh("data/history.bh.json", now)
-    run = latest_run()
-    if english and bhojpuri:
-        print("Both channels uploaded today")
-        return 0
-    if run.get("status") and run["status"] != "completed":
-        print(f"Run {run.get('databaseId')} is still {run['status']}; leaving it to finish")
-        return 0
-    if not english:
-        gh("workflow", "run", "episode.yml", "--ref", "main")
-        tell("🛠 Watchdog: no English upload in the last day, so I started the daily run.")
-    else:
-        started = datetime.fromisoformat(run["createdAt"].replace("Z", "+00:00"))
-        if run.get("conclusion") == "failure" and now - started < WINDOW:
+    for name, history, workflow in CHANNELS:
+        if fresh(history, now):
+            print(f"{name}: uploaded today")
+            continue
+        run = latest_run(workflow)
+        if run.get("status") and run["status"] != "completed":
+            print(f"{name}: run {run.get('databaseId')} is still {run['status']}; leaving it")
+            continue
+        started = datetime.fromisoformat(run["createdAt"].replace("Z", "+00:00")) \
+            if run.get("createdAt") else None
+        if run.get("conclusion") == "failure" and started and now - started < WINDOW:
             gh("run", "rerun", str(run["databaseId"]), "--failed")
-            tell("🛠 Watchdog: the Bhojpuri upload failed, so I restarted it.")
+            tell(f"🛠 Watchdog: the {name} run failed, so I restarted it.")
         else:
-            # The Bhojpuri job makes its own skits, so it can run on its own.
-            gh("workflow", "run", "episode.yml", "--ref", "main", "-f", "bhojpuri_only=true")
-            tell("🛠 Watchdog: no Bhojpuri upload in the last day, so I started a Bhojpuri-only run.")
+            gh("workflow", "run", workflow, "--ref", "main")
+            tell(f"🛠 Watchdog: no {name} upload in the last day, so I started its run.")
     return 0
 
 
