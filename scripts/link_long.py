@@ -8,8 +8,9 @@ Shorts already carry the link, the older winners did not).
     python scripts/link_long.py --top 15
 
 For each of the channel's top Shorts by views, the public long video whose
-title shares the most words with it is chosen (the most-viewed long video
-when none share a word), and one line is put at the top of the description.
+title shares the most words with it is chosen (when none share a word, the
+long video viewers watch furthest through, from history.json, with at least
+10 views), and one line is put at the top of the description.
 Shorts that already link a long video are left alone. Each change costs 50
 units of the 10,000-a-day YouTube quota.
 
@@ -25,12 +26,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src import upload  # noqa: E402
+from src import state, upload  # noqa: E402
 from src.config import load  # noqa: E402
 
 SHORT_MAX = 180     # seconds
 STOP = {"the", "a", "an", "of", "to", "in", "on", "for", "and", "is", "why", "how", "what",
-        "does", "did", "its", "as", "at", "by", "with", "shorts", "news", "latest", "new"}
+        "does", "did", "its", "as", "at", "by", "with", "shorts", "news", "latest", "new",
+        "price", "prices", "stock", "stocks", "market", "markets", "today", "will", "about"}
 
 
 def seconds(iso: str) -> int:
@@ -40,7 +42,8 @@ def seconds(iso: str) -> int:
 
 
 def words(title: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z0-9$]+|[ऀ-ॿ]+", title.lower())
+    title = title.lower().replace("artificial intelligence", "ai")
+    return {w for w in re.findall(r"[a-z0-9$]+|[ऀ-ॿ]+", title)
             if w not in STOP and len(w) > 1}
 
 
@@ -75,6 +78,12 @@ def main() -> int:
         print("No public long video on this channel yet; nothing to link.")
         return 0
     long_ids = {v["id"] for v in longs}
+    held = {e["video_id"]: (e.get("stats") or {}).get("avg_pct") or 0
+            for e in state.load().get("episodes", [])
+            if e.get("kind") == "long" and (e.get("stats") or {}).get("views", 0) >= 10}
+    fallback = max(longs, key=lambda v: (held.get(v["id"], 0), views(v)))
+    print(f"Fallback: {fallback['snippet']['title'][:60]} "
+          f"({held.get(fallback['id'], 0):.0f}% watched)\n")
     changed = 0
     for s in shorts:
         sn = s["snippet"]
@@ -84,6 +93,8 @@ def main() -> int:
             continue
         mine = words(sn["title"])
         best = max(longs, key=lambda v: (len(mine & words(v["snippet"]["title"])), views(v)))
+        if not mine & words(best["snippet"]["title"]):
+            best = fallback
         url = f"https://youtu.be/{best['id']}"
         print(f"{'would link' if dry else 'linked'}: {sn['title'][:55]} ({views(s)} views)"
               f"\n    -> {best['snippet']['title'][:60]} {url}")
