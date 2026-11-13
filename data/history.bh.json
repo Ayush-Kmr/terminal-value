@@ -485,7 +485,8 @@
       "part": 4,
       "question": "रउआ घर में केकर एक्टिंग सबसे ज्यादा खतरनाक बा? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-12T21:11:53.635644+00:00"
+      "created_at": "2026-11-12T21:11:53.635644+00:00",
+      "commented": true
     },
     {
       "company": "Fufa Ji gets deeply offended when he receives the cheapest box of sweets for Diw",
@@ -511,7 +512,98 @@
       "part": 4,
       "question": "रउआ घर में दिवाली प सबसेज्यादा केकर मुँह फूले ला? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-12T21:18:29.986220+00:00"
+      "created_at": "2026-11-12T21:18:29.986220+00:00",
+      "commented": true
+    },
+    {
+      "company": "At the Chhath ghat, Bablu wants the perfect selfie with the sunset while Chachi ",
+      "title": "ललन चाचा के सेल्फी बम 😂 | Bhojpuri Comedy Video",
+      "idea": "chhath-ghat-selfie",
+      "characters": [
+        "lallan",
+        "bablu",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "-qU_roxCcJ8",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "day": "2026-11-14",
+      "runtime": 18.0,
+      "series": "",
+      "part": 1,
+      "question": "रउआ घर में सेल्फी केहू के बा पागल? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-13T20:07:03.821745+00:00"
+    },
+    {
+      "company": "Fufa Ji counts the laddoos on every guest's plate and is offended he got one les",
+      "title": "फूफा जी के लड्डू पुराण 😂 | Bhojpuri Comedy",
+      "idea": "fufa-laddoo-count",
+      "characters": [
+        "fufa",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "S-wGTqHk0PQ",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "day": "2026-11-14",
+      "runtime": 16.5,
+      "series": "",
+      "part": 1,
+      "question": "रउआ घर में केकर फूफा सबसे जल्दी रूसेलें? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-13T20:12:45.212329+00:00"
+    },
+    {
+      "company": "Chacha and Chachi travel by train for the first time in years; Chacha argues wit",
+      "title": "ललन चाचा के ट्रेन यात्रा 😂 | Bhojpuri Funny Video",
+      "idea": "train-ticket",
+      "characters": [
+        "lallan",
+        "phoolmati"
+      ],
+      "language": "bho",
+      "video_id": "D9wsOPmOfsE",
+      "keyword": "",
+      "source": {},
+      "kind": "short",
+      "day": "2026-11-14",
+      "runtime": 20.7,
+      "series": "",
+      "part": 1,
+      "question": "रउआ घर में केकर दिमाग ललन चाचा लेखा चलेला? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-13T20:19:48.574180+00:00"
+    },
+    {
+      "company": "Bablu blasts a new viral song on maximum volume to record an influencer dance re",
+      "title": "ललन चाचा आ नया हरियाणवी गाना 😂 | new Haryanvi song | Bhojpuri AI Comedy",
+      "idea": "trend-XjW4-lowFXU",
+      "characters": [
+        "lallan",
+        "bablu",
+        "fufa"
+      ],
+      "language": "bho",
+      "video_id": "1-M3VbMhsis",
+      "keyword": "new Haryanvi song",
+      "source": {
+        "video_id": "XjW4-lowFXU",
+        "title": "KOOD KOOD NACHIYE (Official Videos) Masoom Sharma | Pranjal Dahiya | Aman J | New Haryanvi Song 2026",
+        "views": 1747841
+      },
+      "kind": "short",
+      "day": "2026-11-14",
+      "runtime": 21.5,
+      "series": "",
+      "part": 1,
+      "question": "रउआ घर में कौनो रील बना के सबका माथा पिआइत बा का? 😂",
+      "deep_dive": "",
+      "created_at": "2026-11-13T20:26:36.282260+00:00"
     }
   ],
   "rejected_topics": [],
