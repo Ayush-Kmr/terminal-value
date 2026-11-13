@@ -5,83 +5,112 @@
 # are tracked in data/history.json (queue "money-short:<topic>"); add new
 # topics at the bottom. Never investing advice: how the money flows, not
 # whether to buy.
+# title (SEO 2026-11-14): fixed, keyword first, at most 40 characters (the
+# Shorts feed shows about 40), in the 'How ... make money' form that puts every
+# one in the "How It Makes Money" series playlist (upload.title_series). The
+# pipeline drops a title only if its research does not support a figure in it.
 # Order (calendar 2026-11-14): one a day Mon-Sat from 16 Nov, so the list
 # lines up with the season: AI week, Thanksgiving and Black Friday (26-27
 # Nov), Cyber Monday (30 Nov), the Fed meeting (8-9 Dec). Keep new topics
 # at the bottom unless they are timed to a date.
 topics:
   - topic: "Polymarket"
+    title: "How Does Polymarket Actually Make Money?"
     angle: "How does Polymarket actually make money when it charges almost no trading fees?"
     search: [how does polymarket make money, polymarket business model]
   - topic: "Robinhood"
+    title: "How Robinhood Makes Money on Free Trades"
     angle: "How does Robinhood make money from free trades?"
     search: [how does robinhood make money, payment for order flow]
   - topic: "Visa"
+    title: "How Visa Makes Money on Every Swipe"
     angle: "How does Visa make money on every card swipe without lending a single rupee or dollar?"
     search: [how does visa make money, visa business model]
   - topic: "OpenAI"
+    title: "How Does OpenAI Make Money?"
     angle: "How does OpenAI make money, and why is it still losing billions?"
     search: [how does openai make money, openai revenue]
   - topic: "Spotify"
+    title: "How Does Spotify Actually Make Money?"
     angle: "How does Spotify make money when it pays most of its revenue to music labels?"
     search: [how does spotify make money, spotify profit]
   - topic: "Zerodha"
+    title: "How Does Zerodha Make Money?"
     angle: "How does Zerodha make money with zero brokerage on delivery trades?"
     search: [how does zerodha make money, zerodha business model]
   - topic: "Costco"
+    title: "How Costco Makes Money Selling at Cost"
     angle: "How does Costco make money if it sells almost everything near cost?"
     search: [how does costco make money, costco membership fees]
   - topic: "Black Friday doorbusters"
+    title: "How Stores Make Money on Black Friday"
     angle: "How do stores make money on Black Friday when the headline deals lose money?"
     search: [how do stores make money on black friday, black friday loss leaders]
   - topic: "Shein and Temu"
+    title: "How Do Temu and Shein Make Money?"
     angle: "How do Shein and Temu make money selling clothes and gadgets this cheap?"
     search: [how does temu make money, how is shein so cheap]
   - topic: "Airlines"
+    title: "How Do Airlines Actually Make Money?"
     angle: "How do airlines actually make money when flying planes barely pays?"
     search: [how do airlines make money, airline loyalty programs profit]
   - topic: "Credit card rewards"
+    title: "How Cashback Cards Make Money Off You"
     angle: "How do banks make money on credit cards that give you cashback?"
     search: [how do credit card companies make money, credit card rewards explained]
   - topic: "Netflix"
+    title: "How Does Netflix Make Money Now?"
     angle: "How does Netflix make money, and why did it start showing ads?"
     search: [how does netflix make money, netflix ad tier]
   - topic: "Google Search"
+    title: "How Does Google Make Money From Search?"
     angle: "How does Google make money from a free search box?"
     search: [how does google make money, google ads revenue]
   - topic: "Paytm UPI"
+    title: "How Do UPI Apps Make Money?"
     angle: "How do UPI apps make money when UPI payments are free?"
     search: [how do upi apps make money, how does phonepe make money]
   - topic: "Zomato"
+    title: "How Does Zomato Make Money Per Order?"
     angle: "How does Zomato make money on a food order, and who pays for what?"
     search: [how does zomato make money, zomato business model]
   - topic: "Uber"
+    title: "How Uber Makes Money on Every Ride"
     angle: "How does Uber make money from a ride, and how much does the driver keep?"
     search: [how does uber make money, uber take rate]
   - topic: "Stock exchanges"
+    title: "How Does the NSE Make Money?"
     angle: "How does a stock exchange like the NSE make money on every trade?"
     search: [how does nse make money, how do stock exchanges make money]
   - topic: "Reliance Jio"
+    title: "How Does Jio Make Money on Cheap Data?"
     angle: "How does Jio make money after making mobile data so cheap?"
     search: [how does jio make money, jio arpu]
   - topic: "BlackRock"
+    title: "How Does BlackRock Make Money?"
     angle: "How does BlackRock make money managing trillions it does not own?"
     search: [how does blackrock make money, blackrock fees]
   - topic: "Duolingo"
+    title: "How Does Duolingo Make Money?"
     angle: "How does Duolingo make money from a free language app?"
     search: [how does duolingo make money, duolingo subscribers]
   - topic: "McDonald's"
+    title: "How McDonald's Really Makes Money"
     angle: "How does McDonald's really make money: burgers or real estate?"
     search: [how does mcdonalds make money, mcdonalds real estate]
   - topic: "Apple App Store"
+    title: "How Apple Makes Money From the App Store"
     angle: "How does Apple make money from the App Store, and why are regulators fighting the 30% cut?"
     search: [how does the app store make money, apple 30 percent cut]
   - topic: "IPL"
+    title: "How Does the IPL Make Money?"
     angle: "How does the IPL make money, from media rights to team franchises?"
     search: [how does ipl make money, ipl media rights]
   - topic: "Tesla"
+    title: "How Does Tesla Actually Make Money?"
     angle: "How does Tesla make money, and how much of it comes from selling carbon credits?"
     search: [how does tesla make money, tesla regulatory credits]
   - topic: "Quick commerce"
+    title: "How Do Blinkit and Zepto Make Money?"
     angle: "How do Blinkit and Zepto make money delivering groceries in 10 minutes?"
     search: [how does blinkit make money, quick commerce business model]

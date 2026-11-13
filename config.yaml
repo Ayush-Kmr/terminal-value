@@ -429,6 +429,9 @@ upload:
   # and its Short carries the series name on screen (src/upload.title_series).
   title_series:
     "Why Is It So Expensive?": '^\s*why (is|are) .{2,60}? so expensive'
+    # The money Shorts (data/money.yaml): one playlist, so a viewer can watch
+    # one after another (/youtube seo 2026-11-14).
+    "How It Makes Money": '^\s*how (does |do )?.{2,40}? makes? money'
   made_for_kids: false
   synthetic_media_disclosure: true
   playlists:                   # one playlist per narration language

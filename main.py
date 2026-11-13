@@ -570,6 +570,7 @@ def evergreen_short(cfg, file: str = "evergreen.yaml",
             return {"topic": t["topic"], "company": t["topic"], "angle": t["angle"],
                     "region": "US", "language": "en", "search_query": t["topic"],
                     "wiki_title": "", "keywords": list(t.get("search", []))[:4] or [t["topic"]],
+                    **({"title": t["title"]} if t.get("title") else {}),
                     "queue": key}
     return None
 
