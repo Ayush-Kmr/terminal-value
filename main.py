@@ -550,16 +550,17 @@ def report(lines: list[str], video_id: str, wanted_public: bool) -> None:
     log.info("YouTube status for %s: %s", video_id, yt_status)
 
 
-def evergreen_short(cfg) -> dict | None:
-    """The next question from data/evergreen.yaml not yet made as a Short."""
+def evergreen_short(cfg, file: str = "evergreen.yaml",
+                    prefix: str = "evergreen-short") -> dict | None:
+    """The next topic from data/<file> not yet made as a Short."""
     import yaml
 
-    path = ROOT / "data" / "evergreen.yaml"
+    path = ROOT / "data" / file
     if not path.exists():
         return None
     used = {e.get("queue") for e in state.load().get("episodes", [])}
     for t in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("topics", []):
-        key = f"evergreen-short:{t['topic']}"
+        key = f"{prefix}:{t['topic']}"
         if key not in used:
             return {"topic": t["topic"], "company": t["topic"], "angle": t["angle"],
                     "region": "US", "language": "en", "search_query": t["topic"],
@@ -573,7 +574,9 @@ def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
     question (default) - a question people search for: a queued Short, else the
       next evergreen question. Audit 2026-11-04: the question Shorts (AI bubble,
       eggs, gas: 230/93/57 views) beat the single-stock ones (72/31/23).
-    stock - the day's biggest stock move, as before."""
+    stock - the day's biggest stock move, as before.
+    money - the next "How X makes money" topic from data/money.yaml (strategy
+      2026-11-13: Kalshi held 91% and kept drawing search views)."""
     from src import trends
 
     second = cfg.get_path("format.short.second", "question")
@@ -584,10 +587,11 @@ def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
         if move:
             stories.insert(min(1, len(stories)), move)
         return stories
-    if any(str(s.get("queue", "")).startswith(("shorts:", "evergreen-short:"))
+    if any(str(s.get("queue", "")).startswith(("shorts:", "evergreen-short:", "money-short:"))
            for s in stories[:2]):
         return stories                  # a queued question is already in today's two
-    question = evergreen_short(cfg)
+    question = evergreen_short(cfg, "money.yaml", "money-short") if second == "money" \
+        else evergreen_short(cfg)
     if question:
         stories.insert(min(1, len(stories)), question)
     return stories

@@ -1,0 +1,68 @@
+# "How X makes money" Shorts: the second Short of the day when
+# format.short.second is "money" (strategy 2026-11-13: "How Does Kalshi
+# Actually Make Money?" held 91% of viewers and kept drawing search views).
+# One business model per Short, told from the company's own filings. Used ones
+# are tracked in data/history.json (queue "money-short:<topic>"); add new
+# topics at the bottom. Never investing advice: how the money flows, not
+# whether to buy.
+topics:
+  - topic: "Polymarket"
+    angle: "How does Polymarket actually make money when it charges almost no trading fees?"
+    search: [how does polymarket make money, polymarket business model]
+  - topic: "Costco"
+    angle: "How does Costco make money if it sells almost everything near cost?"
+    search: [how does costco make money, costco membership fees]
+  - topic: "Robinhood"
+    angle: "How does Robinhood make money from free trades?"
+    search: [how does robinhood make money, payment for order flow]
+  - topic: "Zerodha"
+    angle: "How does Zerodha make money with zero brokerage on delivery trades?"
+    search: [how does zerodha make money, zerodha business model]
+  - topic: "Visa"
+    angle: "How does Visa make money on every card swipe without lending a single rupee or dollar?"
+    search: [how does visa make money, visa business model]
+  - topic: "Spotify"
+    angle: "How does Spotify make money when it pays most of its revenue to music labels?"
+    search: [how does spotify make money, spotify profit]
+  - topic: "Google Search"
+    angle: "How does Google make money from a free search box?"
+    search: [how does google make money, google ads revenue]
+  - topic: "Zomato"
+    angle: "How does Zomato make money on a food order, and who pays for what?"
+    search: [how does zomato make money, zomato business model]
+  - topic: "Netflix"
+    angle: "How does Netflix make money, and why did it start showing ads?"
+    search: [how does netflix make money, netflix ad tier]
+  - topic: "Paytm UPI"
+    angle: "How do UPI apps make money when UPI payments are free?"
+    search: [how do upi apps make money, how does phonepe make money]
+  - topic: "Uber"
+    angle: "How does Uber make money from a ride, and how much does the driver keep?"
+    search: [how does uber make money, uber take rate]
+  - topic: "Apple App Store"
+    angle: "How does Apple make money from the App Store, and why are regulators fighting the 30% cut?"
+    search: [how does the app store make money, apple 30 percent cut]
+  - topic: "Credit card rewards"
+    angle: "How do banks make money on credit cards that give you cashback?"
+    search: [how do credit card companies make money, credit card rewards explained]
+  - topic: "Reliance Jio"
+    angle: "How does Jio make money after making mobile data so cheap?"
+    search: [how does jio make money, jio arpu]
+  - topic: "Airlines"
+    angle: "How do airlines actually make money when flying planes barely pays?"
+    search: [how do airlines make money, airline loyalty programs profit]
+  - topic: "BlackRock"
+    angle: "How does BlackRock make money managing trillions it does not own?"
+    search: [how does blackrock make money, blackrock fees]
+  - topic: "Duolingo"
+    angle: "How does Duolingo make money from a free language app?"
+    search: [how does duolingo make money, duolingo subscribers]
+  - topic: "Stock exchanges"
+    angle: "How does a stock exchange like the NSE make money on every trade?"
+    search: [how does nse make money, how do stock exchanges make money]
+  - topic: "OpenAI"
+    angle: "How does OpenAI make money, and why is it still losing billions?"
+    search: [how does openai make money, openai revenue]
+  - topic: "IPL"
+    angle: "How does the IPL make money, from media rights to team franchises?"
+    search: [how does ipl make money, ipl media rights]

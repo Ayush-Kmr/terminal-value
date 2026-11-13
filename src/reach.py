@@ -159,6 +159,36 @@ def sources(cfg: Config, days: int = 28) -> list[str]:
     return out
 
 
+def countries(cfg: Config, days: int = 28, top: int = 8) -> list[str]:
+    """Where viewers are (strategy 2026-11-13): ad pay per 1,000 views in
+    finance runs $15-25 for US viewers and $0.50-1.50 for Indian ones, so this
+    decides whom the channel writes for."""
+    from googleapiclient.discovery import build
+
+    try:
+        ya = build("youtubeAnalytics", "v2", credentials=upload.credentials(),
+                   cache_discovery=False)
+        rows = ya.reports().query(
+            ids="channel==MINE", startDate=str(date.today() - timedelta(days=days)),
+            endDate=str(date.today()), metrics="views,estimatedMinutesWatched",
+            dimensions="country", sort="-views", maxResults=top).execute().get("rows", [])
+        total = ya.reports().query(
+            ids="channel==MINE", startDate=str(date.today() - timedelta(days=days)),
+            endDate=str(date.today()), metrics="views").execute().get("rows", [[0]])[0][0]
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Countries unavailable: %s", str(exc)[:200])
+        return []
+    if not rows:
+        return []
+    total = max(int(total or 0), sum(r[1] for r in rows), 1)
+    out = ["| Country | Views | Share | Watch min |", "|---|---|---|---|"]
+    out += [f"| {r[0]} | {r[1]:,} | {r[1] / total * 100:.0f}% | {r[2]:,.0f} |" for r in rows]
+    rest = total - sum(r[1] for r in rows)
+    if rest > 0:
+        out.append(f"| Other | {rest:,} | {rest / total * 100:.0f}% | |")
+    return out
+
+
 def progress(cfg: Config) -> list[str]:
     """Distance from each Partner Program tier, from the channel's own numbers."""
     from googleapiclient.discovery import build
@@ -248,6 +278,10 @@ def report(cfg: Config) -> Path:
     came_from = sources(cfg)
     if came_from:
         lines += ["", "## Where views came from (28 days)", "", *came_from]
+
+    where = countries(cfg)
+    if where:
+        lines += ["", "## Where viewers are (28 days)", "", *where]
 
     road = progress(cfg)
     if road:

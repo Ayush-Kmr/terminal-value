@@ -125,14 +125,18 @@ format:
     words_per_minute: 140       # measured for the Kokoro voice
     publish_times: ["11:00"]    # ET, Sunday late morning: the weekend long-watch window
   short:
-    per_day: 4                  # four standalone Shorts Mon-Sat (none on Sunday).
+    # Strategy 2026-11-13: two a day, down from four. YouTube notifies
+    # subscribers of at most 3 uploads a day, and half the volume at higher
+    # quality is the defence against the "inauthentic content" policy.
+    per_day: 2                  # standalone Shorts Mon-Sat (none on Sunday).
                                 # Standalone Shorts outperformed cuts ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
-    # Extra Short a day: none = all four from today's trending stories (audit
-    # 2026-11-10: the evergreen "why is X so expensive" questions got 27-95
-    # views, today's market shocks 150-619) | question | stock.
-    second: none
+    # Second Short of the day: money = "How X makes money" from data/money.yaml
+    # (strategy 2026-11-13: Kalshi held 91%) | none = both from today's
+    # trending stories | question (data/evergreen.yaml; the "why is X so
+    # expensive" ones got 27-95 views, 2026-11-10) | stock.
+    second: money
     max_shot_words: 12
     # Spoken just before the last sentence of every Short (main.add_follow_line).
     follow_lines:
@@ -142,9 +146,9 @@ format:
       - "Follow for one money story like this every few hours."
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
-    # ET. Spread out: one Short every ~4 h. A slot that has already gone when
-    # the (often late) run gets there goes public at once, never the next day.
-    publish_times: ["08:00", "12:00", "16:00", "20:00"]
+    # ET. Midday and evening. A slot that has already gone when the (often
+    # late) run gets there goes public at once, never the next day.
+    publish_times: ["12:00", "20:00"]
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.

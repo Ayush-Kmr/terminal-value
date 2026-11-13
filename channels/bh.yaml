@@ -50,7 +50,8 @@ channel:
 
 # The whole skit format. src/skit.py reads everything under here.
 skit:
-  per_day: 4                     # Mon-Sat (Ayush, 2026-11-10); Sunday = the long video only
+  per_day: 2                     # Mon-Sat; Sunday = the long video only. Was 4 (2026-11-10);
+                                 # 2 from 2026-11-13: notification cap of 3 a day, more effort per skit
   # Sunday's long video: the week's skits back to back in 16:9, most watched
   # first, a chapter each (skit.weekly in src/skit.py).
   weekly:
@@ -80,7 +81,7 @@ skit:
   # One skit a day on what India is watching: YouTube's India trending chart,
   # videos with 1M+ views; the subject only, never the video or real people.
   trending:
-    per_day: 2                   # two of the four skits on what India is watching today
+    per_day: 1                   # one of the two skits on what India is watching today
     min_views: 1000000
     categories: ["", "24", "23", "17", "10"]   # all, entertainment, comedy, sports, music
   # Pictures: Cloudflare Workers AI (FLUX schnell), one per line. Every prompt
@@ -177,7 +178,7 @@ format:
   short:
     # India time: lunch, tea time, evening, night. A slot already gone when the
     # (often late) run gets there goes public at once, never the next day.
-    publish_times: ["12:30", "16:30", "19:30", "21:30"]
+    publish_times: ["12:30", "19:30"]
     shot_seconds: [1.5, 7]             # one picture per line, however short
 
 visuals:
