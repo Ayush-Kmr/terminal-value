@@ -56,23 +56,24 @@ skit:
   weekly:
     days_back: 7
     min_clips: 6
-    max_clips: 24                # 24 x ~35 s = about 14 minutes
-  lines: [6, 9]                  # dialogue lines per skit
-  # Numbered series (audience research 2026-11-10: the big Bhojpuri Shorts are
-  # numbered parts, "Part 2", "04"). The series is the lead character's (the
-  # first speaker); the part number counts that series' skits so far.
-  series:
-    lallan: "ललन चाचा के कांड"
-    phoolmati: "चाची के जलवा"
-    bablu: "बबलू के जुगाड़"
-    fufa: "फूफा जी"
-  # Spoken after the punchline by the series lead: follow for the next part
-  # (audit 2026-11-10: 2 subscribers from 2,387 views). {part} = next part.
+    max_clips: 24                # 24 x ~25 s = about 10 minutes
+  # Analysis 2026-11-13: skits of 20-25 s (5-7 lines) held 2-5x the views of
+  # the 29-34 s ones, and every Shorts watch-through sat at 18-34%. Shorter.
+  lines: [5, 7]                  # dialogue lines per skit
+  # Lallan Chacha leads every skit he is cast in (all three outliers starred
+  # him), and is added to any cast that lacks him. "" = whoever speaks first.
+  lead: lallan
+  # Numbered series switched off 2026-11-13: every "भाग 1/2" skit got 0-20
+  # views; the parts were standalone, so "Part 2" only told viewers they had
+  # missed something. {lead key: series name} turns it back on.
+  series: {}
+  # Spoken after the punchline by the lead (audit 2026-11-10: 2 subscribers
+  # from 2,387 views). {part} = next part, only meaningful with a series.
   follow_lines:
-    - "भाग {part} देखे खातिर अबहीं फॉलो करीं!"
-    - "अगिला भाग में अउरी बवाल होई, फॉलो कर लीं!"
-    - "भाग {part} में का भइल, जाने खातिर फॉलो करीं!"
-  max_words: 85                  # ~35-45 s once voiced
+    - "रोज नया बवाल देखे खातिर अबहीं फॉलो करीं!"
+    - "काल्हु अउरी बवाल होई, फॉलो कर लीं!"
+    - "चाचा के अगिला कांड खातिर फॉलो करीं!"
+  max_words: 60                  # ~20-25 s once voiced
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
   search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]

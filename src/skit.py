@@ -56,8 +56,11 @@ Write ONE skit of {lo}-{hi} dialogue lines, {max_words} words in all at most.
   (मोबाइल, फोन, सेल्फी, वाईफाई, ऑनलाइन) are written in Devanagari. Write numbers in words.
 - Each line: one character speaks, at most {max_line_words} words, one or two short
   sentences, so the picture changes every few seconds.
-- LINE 1 starts the conflict at once (a viewer decides in 2 seconds whether to
-  keep watching). No greeting, no introduction, no narrator.
+- LINE 1 IS THE HOOK: drop the viewer into the middle of the trouble, already
+  happening (Chacha already stuck on the roof, the phone already ringing in
+  the cooking pot). At most {first_words} words, ending on a shout, a shock or a
+  question. A viewer decides in 2 seconds whether to keep watching. No
+  greeting, no introduction, no narrator, no explaining the situation.
 - The comedy comes from the characters: Chacha is confidently wrong, Chachi
   always wins, Bablu has a shortcut. Exaggeration, misunderstanding, timing.
 - The LAST LINE is a surprise punchline twist that makes people laugh out loud.
@@ -67,7 +70,8 @@ Write ONE skit of {lo}-{hi} dialogue lines, {max_words} words in all at most.
 
 Return a JSON object:
   title     - a catchy, funny Bhojpuri title in Devanagari, at most 40 characters,
-              that makes people curious (e.g. "चाचा के पहिला स्मार्टफोन")
+              that makes people curious and starts with the name of whoever
+              speaks line 1 (e.g. "ललन चाचा के पहिला स्मार्टफोन")
   hook      - on-screen headline in Devanagari, 2-5 words
   setting   - in ENGLISH: where it happens, as a picture (e.g. "the courtyard
               of a village house in Bihar with a buffalo tied to a post, sunny afternoon")
@@ -158,7 +162,7 @@ def tidy(sk: dict) -> dict:
     return sk
 
 
-def problems(cfg: Config, sk: dict, cast: list[str]) -> list[str]:
+def problems(cfg: Config, sk: dict, cast: list[str], lead: str = "") -> list[str]:
     """What is wrong with a draft, in words the model can act on."""
     lo, hi = cfg.get_path("skit.lines", [6, 9])
     lines = sk.get("lines") or []
@@ -168,6 +172,12 @@ def problems(cfg: Config, sk: dict, cast: list[str]) -> list[str]:
     words = sum(len(str(x.get("text", "")).split()) for x in lines)
     if words > int(cfg.get_path("skit.max_words", 85)):
         out.append(f"it has {words} words, the limit is {cfg.get_path('skit.max_words', 85)}")
+    first = len(str(lines[0].get("text", "")).split()) if lines else 0
+    if first > int(cfg.get_path("skit.first_line_words", 8)):
+        out.append(f"line 1 has {first} words: the hook must be at most "
+                   f"{cfg.get_path('skit.first_line_words', 8)} words, straight into the trouble")
+    if lead and lines and lines[0].get("speaker") != lead:
+        out.append(f"line 1 must be spoken by {lead}")
     long_ = [i + 1 for i, x in enumerate(lines)
              if len(str(x.get("text", "")).split()) > int(cfg.get_path("skit.max_line_words", 14))]
     if long_:
@@ -183,9 +193,23 @@ def problems(cfg: Config, sk: dict, cast: list[str]) -> list[str]:
     return out
 
 
+def idea_lead(cfg: Config, cast: list[str], idea: dict | None = None) -> str:
+    """Who speaks line 1: the idea's own lead, else the channel lead
+    (skit.lead), else nobody in particular."""
+    chars = cfg.get_path("skit.characters", {})
+    for who in ((idea or {}).get("lead"), cfg.get_path("skit.lead", "")):
+        if who in chars and who in cast:
+            return str(who)
+    return ""
+
+
 def write(cfg: Config, idea: dict) -> dict:
     chars = cfg.get_path("skit.characters", {})
     cast = [c for c in idea.get("cast") or list(chars) if c in chars] or list(chars)
+    main = cfg.get_path("skit.lead", "")
+    if main in chars and main not in cast and not idea.get("lead"):
+        cast.append(main)
+    lead = idea_lead(cfg, cast, idea)
     lo, hi = cfg.get_path("skit.lines", [6, 9])
     feedback = ""
     sk: dict = {}
@@ -193,8 +217,8 @@ def write(cfg: Config, idea: dict) -> dict:
         sk = llm.json_call(PROMPT.format(
             cast="\n".join(f"- {k}: {c['name']} ({c['name_bho']}): {c['role'].strip()}"
                            for k, c in chars.items()),
-            premise=idea["premise"] + (f" {chars[idea['lead']]['name']} speaks the FIRST line."
-                                       if idea.get("lead") in chars else ""),
+            premise=idea["premise"] + (f" {chars[lead]['name']} speaks the FIRST line."
+                                       if lead else ""),
             in_skit=", ".join(chars[c]["name"] for c in cast),
             trend=(f"This premise comes from what India is watching on YouTube right now "
                    f"({idea['keyword']}). Make that link obvious in the first two lines, "
@@ -203,9 +227,10 @@ def write(cfg: Config, idea: dict) -> dict:
                    if idea.get("keyword") else ""),
             lo=lo, hi=hi, max_words=cfg.get_path("skit.max_words", 85),
             max_line_words=cfg.get_path("skit.max_line_words", 14),
+            first_words=cfg.get_path("skit.first_line_words", 8),
             keys=", ".join(cast), feedback=feedback), temperature=0.9)
         sk = tidy(sk) if isinstance(sk, dict) else {}
-        wrong = problems(cfg, sk, cast)
+        wrong = problems(cfg, sk, cast, lead)
         if not wrong:
             return sk
         log.info("Skit draft %d rejected: %s", attempt + 1, "; ".join(wrong))
@@ -217,7 +242,7 @@ def write(cfg: Config, idea: dict) -> dict:
             x["speaker"] = cast[0]
     if not sk.get("lines"):
         raise RuntimeError(f"No usable skit for {idea['id']}")
-    log.warning("Using an imperfect skit draft: %s", "; ".join(problems(cfg, sk, cast)))
+    log.warning("Using an imperfect skit draft: %s", "; ".join(problems(cfg, sk, cast, lead)))
     return sk
 
 
