@@ -25,6 +25,11 @@ long:
       been fully handed back, and the administration wants to pay only the
       importers who sued.
     proven_views: 283
+    # Thumbnail (/youtube thumbnail, 2026-11-14): the title carries "who" and
+    # "$166 billion"; the thumbnail carries the twist, so the two never repeat.
+    thumb_text: "NOT YOU?"
+    thumb_figure: ""                 # no "$166B" on the thumbnail: it is in the title
+    thumb_entity: "IMPORTERS FIRST"
   # 2026-11-10: the "why is X so expensive" long videos (cars, rent) were
   # dropped: the price-explainer series did worst. The Sunday video now
   # follows the week's best Short first (main.best_short_story).

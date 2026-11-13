@@ -178,9 +178,14 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     backdrop = Path(stills[0]["asset"]) if stills else None
     thumb = thumbnail.generate(
         cfg,
-        {"company": company, "thumb_figure": best.get("thumb_figure", ""),
-         "thumb_words": best.get("thumb_text") or company, "title": title,
-         "thumb_entity": series.upper() or best.get("thumb_entity", "")},
+        # A queued story may fix its own thumbnail words (/youtube thumbnail).
+        {"company": company,
+         "thumb_figure": story["thumb_figure"] if "thumb_figure" in story
+         else best.get("thumb_figure", ""),     # "" = words only, no number
+         "thumb_words": story.get("thumb_text") or best.get("thumb_text") or company,
+         "title": title,
+         "thumb_entity": series.upper() or story.get("thumb_entity")
+         or best.get("thumb_entity", "")},
         backdrop, workdir / "thumbnail.jpg")
     # Two more to try in YouTube Studio's Test & Compare (it has no API).
     for n, option in enumerate(title_opts[1:3], 2):
