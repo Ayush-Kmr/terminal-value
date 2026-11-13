@@ -1,0 +1,28 @@
+name: Competitors
+
+# One-off public-data pull for /youtube competitor (scripts/competitors.py).
+# About 650 units of the daily YouTube quota: run by hand, not on a schedule.
+on:
+  workflow_dispatch:
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Pull competitor data
+        env:
+          YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python scripts/competitors.py output/competitors.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: competitors
+          path: output/competitors.json
