@@ -32,7 +32,8 @@ from src.config import load  # noqa: E402
 SHORT_MAX = 180     # seconds
 STOP = {"the", "a", "an", "of", "to", "in", "on", "for", "and", "is", "why", "how", "what",
         "does", "did", "its", "as", "at", "by", "with", "shorts", "news", "latest", "new",
-        "price", "prices", "stock", "stocks", "market", "markets", "today", "will", "about"}
+        "price", "prices", "stock", "stocks", "market", "markets", "today", "will", "about",
+        "drop", "drops", "falls", "falling", "crash", "hits", "surges", "slide", "jump"}
 
 
 def seconds(iso: str) -> int:
@@ -44,7 +45,7 @@ def seconds(iso: str) -> int:
 def words(title: str) -> set[str]:
     title = title.lower().replace("artificial intelligence", "ai")
     return {w for w in re.findall(r"[a-z0-9$]+|[ऀ-ॿ]+", title)
-            if w not in STOP and len(w) > 1}
+            if w not in STOP and len(w) > 1 and not w.strip("$").isdigit()}
 
 
 def main() -> int:
