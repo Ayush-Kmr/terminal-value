@@ -1449,7 +1449,8 @@
         "views": 3,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Nvidia CEO Jensen Huang Relationship Disclosure",
@@ -1472,7 +1473,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Oil Prices Rebound on Middle East Supply Risks",
@@ -1495,7 +1497,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Super El Niño Weather Impact on Wallets",
