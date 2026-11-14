@@ -77,6 +77,9 @@ skit:
     - "काल्हु अउरी बवाल होई, फॉलो कर लीं!"
     - "चाचा के अगिला कांड खातिर फॉलो करीं!"
   max_words: 75                  # ~30-40 s once voiced
+  # A line the speech check still scores under this after its retake is
+  # rewritten in plainer words once; still under, the skit is dropped.
+  voice_floor: 0.4
   max_line_words: 14
   ideas: data/bhojpuri_ideas.yaml
   search_phrases: ["Bhojpuri Comedy", "Bhojpuri Funny Video", "Bhojpuri AI Comedy", "Bhojpuri Comedy Video"]

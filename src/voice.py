@@ -282,6 +282,8 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
                 shutil.move(prev, p)        # the old take was better
     if score:
         log.info("Voice check: %d takes, lowest match %.2f", len(score), min(score.values()))
+    for p, sc in score.items():
+        heard[p]["match"] = sc          # skit.fix_garbled reads it per shot
     low = [f"{p.stem}={sc:.2f}" for p, sc in score.items() if sc < match_ok]
     if low:
         log.warning("Voice check: %d takes still below %.2f: %s", len(low), match_ok,
@@ -342,6 +344,8 @@ def narrate_shots(cfg: Config, shots: list[dict], outdir: Path,
                  if cfg.get_path("voice.check", True) else {})
         for shot in shots:
             t = heard.get(audio_dir / f"shot_{shot['index']:03d}.mp3")
+            if t and "match" in t:
+                shot["match"] = float(t["match"])
             if t and t.get("words"):
                 shot["words"] = [{"word": w["word"], "start": float(w["start"]),
                                   "end": float(w["end"])} for w in t["words"]]

@@ -36,14 +36,16 @@ Strongest surprising facts available:
 Narrator voice:
 {voice}
 
-Each cold open: 65-85 words, spoken aloud in about 30 seconds, in three parts:
-  0-5 seconds: ONE short sentence (under 18 words) that names the subject and
+Each cold open: 30-40 words, spoken aloud in about 15 seconds, in two parts:
+  0-5 seconds: ONE short sentence (under 15 words) that names the subject and
   contains the single most surprising number from the facts. No scene-setting.
   5-15 seconds: the payoff, said plainly: the exact question this video answers,
   what the viewer will know by the end, and why it touches their own money,
-  job or prices. This promise is required, and must be finished by word 35.
-  15-30 seconds: one reason it matters right now, ending on the first thing
-  the video shows next, so there is no pause where a viewer could leave.
+  job or prices. This promise is required, and must be finished by word 30.
+  End on the first thing the video shows next, so there is no pause where a
+  viewer could leave.
+The video's long videos lose most viewers in their first tenth (audit
+2026-11-14), so every word past 40 costs viewers.
 No background, history, definitions or "to understand this" before 15 seconds:
 viewers of this channel leave in the first minute when the opening explains
 before it pays off.
@@ -69,7 +71,7 @@ Write 6 cold opens in all."""
 SCORE_PROMPT = """Score each cold open 0-100 for a YouTube explainer audience.
 
 Rubric:
-  25  Payoff by 15 seconds — within the first ~35 words, do they know exactly
+  25  Payoff by 15 seconds — within the first ~30 words, do they know exactly
       what question is answered and what they will get?
   20  Curiosity gap — does the viewer now need the rest of the video?
   20  Viewer stake — does it say what this means for the viewer's own money or life?
@@ -106,14 +108,14 @@ def _penalty(text: str) -> tuple[int, list[str]]:
     elif not re.search(r"\d", first):
         score -= 10
         issues.append("no number in the first sentence")
-    if len(first.split()) > 18:
+    if len(first.split()) > 15:
         score -= 10
         issues.append(f"first sentence too long ({len(first.split())} words)")
     words = len(text.split())
-    if words > 90:
+    if words > 45:
         score -= 10
         issues.append(f"too long ({words} words)")
-    if words < 55:
+    if words < 25:
         score -= 10
         issues.append(f"too short ({words} words)")
     return score, issues

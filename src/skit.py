@@ -238,14 +238,36 @@ def write(cfg: Config, idea: dict) -> dict:
         log.info("Skit draft %d rejected: %s", attempt + 1, "; ".join(wrong))
         feedback = ("\nYOUR LAST DRAFT WAS REJECTED BECAUSE " + "; ".join(wrong).upper()
                     + ". FIX THAT.")
-    # The last draft, cleaned: unknown speakers fall back to the lead.
-    for x in sk.get("lines") or []:
-        if x.get("speaker") not in cast:
-            x["speaker"] = cast[0]
-    if not sk.get("lines"):
-        raise RuntimeError(f"No usable skit for {idea['id']}")
-    log.warning("Using an imperfect skit draft: %s", "; ".join(problems(cfg, sk, cast, lead)))
-    return sk
+    # One last try: fix the last draft rather than write a new one (the usual
+    # fault is a hook a word or two too long). Still wrong, the skit is dropped
+    # and run() moves on to the next idea: audit 2026-11-14 found the imperfect
+    # drafts that used to ship here among the most-skipped skits.
+    if sk.get("lines"):
+        fixed = llm.json_call(REPAIR.format(
+            draft=json.dumps(sk, ensure_ascii=False), problems="; ".join(wrong),
+            lo=lo, hi=hi, first_words=cfg.get_path("skit.first_line_words", 8),
+            max_line_words=cfg.get_path("skit.max_line_words", 14),
+            max_words=cfg.get_path("skit.max_words", 85),
+            lead=chars[lead]["name"] if lead else "anyone",
+            keys=", ".join(cast)), temperature=0.3)
+        fixed = tidy(fixed) if isinstance(fixed, dict) else {}
+        wrong = problems(cfg, fixed, cast, lead)
+        if not wrong:
+            log.info("Skit draft repaired")
+            return {**sk, **fixed}
+    raise RuntimeError(f"No skit draft for {idea['id']} passed the checks: " + "; ".join(wrong))
+
+
+REPAIR = """This Bhojpuri comedy skit (JSON) was rejected because: {problems}.
+Return the SAME JSON with the fewest changes that fix exactly that, keeping the
+joke, the punchline and every other field:
+- {lo}-{hi} lines, at most {max_words} words in total, at most {max_line_words} words a line
+- line 1 at most {first_words} words, spoken by {lead}, straight into the trouble
+- speakers only from: {keys}
+- Devanagari only (no English letters) in the lines and the title
+
+{draft}
+"""
 
 
 # --------------------------------------------------------------- pictures
@@ -356,6 +378,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
                       "visual_type": "ai_still", "asset": str(pic),
                       "speaker": line["speaker"]})
     shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
+    shots = fix_garbled(cfg, tall, sk, shots, workdir, yt_lang)
     # Comic timing: a beat of silence before the punchline, and time after it
     # for the ba-dum-tss while the last picture holds.
     if punch > 0:
@@ -410,6 +433,46 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
         json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     log.info("Skit built: %s (%.1f s)", out, meta["runtime"])
     return meta
+
+
+def fix_garbled(cfg: Config, tall: Config, sk: dict, shots: list[dict], workdir: Path,
+                lang: str) -> list[dict]:
+    """A line the voice still garbles after its retake (speech check under
+    skit.voice_floor) is rewritten once in plainer words and spoken again; still
+    garbled, the skit is dropped rather than uploaded with a line nobody can
+    follow (audit 2026-11-14: takes scoring 0.00-0.24 were shipping)."""
+    floor = float(cfg.get_path("skit.voice_floor", 0.4))
+    bad = [s for s in shots if s.get("match") is not None and s["match"] < floor]
+    if not bad:
+        return shots
+    log.info("Rewriting %d garbled line(s): %s", len(bad),
+             ", ".join(f"{s['index']}={s['match']:.2f}" for s in bad))
+    got = llm.json_call(PLAIN.format(lines="\n".join(
+        f"{s['index']}: {s['narration']}" for s in bad)), temperature=0.3)
+    plain = {str(k): str(v).strip() for k, v in (got or {}).items()} if isinstance(got, dict) else {}
+    audio = workdir / "audio"
+    for s in bad:
+        text = AVAGRAHA.sub("ऽ", plain.get(str(s["index"]), "")).strip()
+        if not text or LATIN.search(text):
+            raise RuntimeError(f"Line {s['index']} stays garbled and no plain rewrite came back")
+        s["narration"] = text
+        sk["lines"][s["index"]]["text"] = text
+        (audio / f"shot_{s['index']:03d}.mp3").unlink(missing_ok=True)
+    shots = voice.narrate_shots(tall, shots, workdir, None, lang)
+    still = [f"{s['index']}={s['match']:.2f}" for s in shots
+             if s.get("match") is not None and s["match"] < floor]
+    if still:
+        raise RuntimeError(f"Voice still garbles line(s) {', '.join(still)} after a rewrite")
+    return shots
+
+
+PLAIN = """These Bhojpuri comedy lines come out garbled from the text-to-speech
+voice. Rewrite each one with the same meaning and joke in plainer, common
+Bhojpuri words (Devanagari only, no English letters, no rare spellings, no
+more words than before). Return JSON: {{"<number>": "<new line>", ...}}
+
+{lines}
+"""
 
 
 # --------------------------------------------------------------- motion + sound

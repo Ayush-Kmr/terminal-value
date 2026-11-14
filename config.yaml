@@ -115,8 +115,9 @@ format:
     target_minutes: 10
     min_minutes: 8
     # Hook work (/youtube hook, 2026-11-10). Cold-open shots of at most this
-    # many words, so the picture changes inside 5 seconds.
-    opening_shot_words: 9
+    # many words: 6 words (~2.6 s) puts the first picture change inside 3 s
+    # (audit 2026-11-14; was 9).
+    opening_shot_words: 6
     # Spoken follow asks at these minutes (by word count), not only at the end.
     cta_minutes: [1, 4]
     cta_lines:
