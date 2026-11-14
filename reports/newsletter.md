@@ -1,16 +1,16 @@
-Welcome back to another edition of business news made simple.
+Welcome back to another week of making sense of the business news that hits your wallet.
 
-**Global Markets Hit by Massive AI Sell-Off**
-Global stocks suffered a severe blow as the S&P 500 dropped 4.4% in a single day and the Nasdaq 100 fell over 5.5%. Investors panicked amid mounting worries over artificial intelligence infrastructure, data center power demands, and a staggering $2.5 trillion AI sell-off. 
-Watch: https://youtu.be/aUPucp6nUpQ and https://youtu
-.be/umbey2EjMU8
-
-**Why Health Insurance Costs Keep Accelerating**
-Health insurance premium increases are accelerating as consulting firms project record costs for the year. This ongoing rise means household expenses continue to outpace broader inflation rates. 
-Watch: https://youtu.be/NmRqk13nDGY
-
-**Gas Prices Fall Below Four Dollars**
-Average gas prices have dropped below four dollars, directly impacting the daily commute for millions of motorists. This relief at the pump is being shaped by local taxation and recent dips in crude oil. 
+**Gas prices fall below four dollars**
+Gas prices dropping below four dollars directly impacts the daily commute for millions of motorists. Local taxation and crude oil dips are the main factors shaping the prices you see at checkout
+. 
 Watch: https://youtu.be/ckjUthYMbq8
 
-Have falling gas prices made a noticeable difference in your household budget lately?
+**Inflation eats into savings**
+The Consumer Prices Index rose by 2.8 percent in the 12 months to May 2026. This metric tracks how consumer costs change, while the Office for National Statistics adjusts its basket of goods annually to reflect trends.
+Watch: https://youtu.be/VCWbeD4yB_0
+
+**Recession warnings raise job concerns**
+Recent warnings highlight that job losses could extend beyond tech and hit another 1.6 million workers across retail and finance. This shift raises questions about job security across multiple major industries.
+Watch: https://youtu.be/WKTeyQ_A8aA
+
+Have you noticed these changes at the gas pump or in your grocery budget yet?

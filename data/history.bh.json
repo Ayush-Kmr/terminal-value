@@ -17,11 +17,11 @@
       "runtime": 28.5,
       "created_at": "2026-11-08T15:09:33.371269+00:00",
       "stats": {
-        "views": 7,
+        "views": 8,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 0,
-        "avg_pct": 0,
+        "avg_duration_s": 5,
+        "avg_pct": 17.59,
         "minutes": 0
       }
     },
@@ -46,11 +46,11 @@
       "runtime": 25.1,
       "created_at": "2026-11-08T15:17:31.397556+00:00",
       "stats": {
-        "views": 63,
+        "views": 66,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 8,
-        "avg_pct": 33.52,
+        "avg_pct": 33.76,
         "minutes": 5
       }
     },
@@ -78,8 +78,8 @@
         "views": 9,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 11,
-        "avg_pct": 49.33,
+        "avg_duration_s": 9,
+        "avg_pct": 39.71,
         "minutes": 0
       }
     },
@@ -99,12 +99,12 @@
       "runtime": 22.1,
       "created_at": "2026-11-09T12:23:45.398213+00:00",
       "stats": {
-        "views": 25,
+        "views": 26,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 5,
-        "avg_pct": 23.04,
-        "minutes": 0
+        "avg_duration_s": 7,
+        "avg_pct": 33.91,
+        "minutes": 1
       }
     },
     {
@@ -124,12 +124,12 @@
       "runtime": 20.3,
       "created_at": "2026-11-09T14:23:05.355612+00:00",
       "stats": {
-        "views": 40,
+        "views": 47,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 3,
-        "avg_pct": 17.5,
-        "minutes": 0
+        "avg_duration_s": 17,
+        "avg_pct": 82,
+        "minutes": 3
       }
     },
     {
@@ -151,7 +151,10 @@
       "stats": {
         "views": 10,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 4,
+        "avg_pct": 17.01,
+        "minutes": 0
       }
     },
     {
@@ -175,9 +178,12 @@
       "runtime": 27.4,
       "created_at": "2026-11-10T11:52:12.759290+00:00",
       "stats": {
-        "views": 3,
+        "views": 4,
         "likes": 0,
-        "comments": 0
+        "comments": 0,
+        "avg_duration_s": 7,
+        "avg_pct": 28.21,
+        "minutes": 0
       }
     },
     {
@@ -202,9 +208,12 @@
       "created_at": "2026-11-11T11:37:59.944412+00:00",
       "commented": true,
       "stats": {
-        "views": 19,
+        "views": 38,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 8,
+        "avg_pct": 27.779999999999998,
+        "minutes": 1
       }
     },
     {
@@ -230,9 +239,12 @@
       "created_at": "2026-11-11T11:49:53.017372+00:00",
       "commented": true,
       "stats": {
-        "views": 8,
+        "views": 18,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 9,
+        "avg_pct": 29.460000000000004,
+        "minutes": 0
       }
     },
     {
@@ -262,9 +274,12 @@
       "created_at": "2026-11-11T11:59:17.752302+00:00",
       "commented": true,
       "stats": {
-        "views": 20,
+        "views": 29,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 2,
+        "avg_pct": 7.26,
+        "minutes": 0
       }
     },
     {
@@ -294,9 +309,12 @@
       "created_at": "2026-11-11T12:07:59.512956+00:00",
       "commented": true,
       "stats": {
-        "views": 3,
+        "views": 6,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 16,
+        "avg_pct": 55.33,
+        "minutes": 0
       }
     },
     {
@@ -322,9 +340,12 @@
       "created_at": "2026-11-11T20:19:38.989182+00:00",
       "commented": true,
       "stats": {
-        "views": 9,
+        "views": 23,
         "likes": 1,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 5,
+        "avg_pct": 15.629999999999999,
+        "minutes": 0
       }
     },
     {
@@ -349,7 +370,7 @@
       "created_at": "2026-11-11T20:27:16.718777+00:00",
       "commented": true,
       "stats": {
-        "views": 5,
+        "views": 11,
         "likes": 0,
         "comments": 1
       }
@@ -379,9 +400,9 @@
       "deep_dive": "",
       "created_at": "2026-11-11T20:33:52.027932+00:00",
       "stats": {
-        "views": 0,
+        "views": 1,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -410,9 +431,9 @@
       "deep_dive": "",
       "created_at": "2026-11-11T20:43:08.039999+00:00",
       "stats": {
-        "views": 0,
+        "views": 1,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -437,7 +458,12 @@
       "question": "रउआ घर में केकर फूफा सबसे जल्दी रूसेलें? 😂",
       "deep_dive": "",
       "created_at": "2026-11-12T20:55:33.058315+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 10,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Chacha wants to speak English to impress a city guest and translates Bhojpuri sa",
@@ -459,7 +485,12 @@
       "question": "रउआ घर में अंग्रेजी के ज्ञान सबसे बेसी केकरा पास बा? 😂",
       "deep_dive": "",
       "created_at": "2026-11-12T21:04:07.063871+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 10,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Lallan pretends to be a film director after watching the trailer of a big new mo",
@@ -486,7 +517,12 @@
       "question": "रउआ घर में केकर एक्टिंग सबसे ज्यादा खतरनाक बा? 😂",
       "deep_dive": "",
       "created_at": "2026-11-12T21:11:53.635644+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 8,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Fufa Ji gets deeply offended when he receives the cheapest box of sweets for Diw",
@@ -513,7 +549,12 @@
       "question": "रउआ घर में दिवाली प सबसेज्यादा केकर मुँह फूले ला? 😂",
       "deep_dive": "",
       "created_at": "2026-11-12T21:18:29.986220+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "At the Chhath ghat, Bablu wants the perfect selfie with the sunset while Chachi ",
@@ -536,7 +577,12 @@
       "question": "रउआ घर में सेल्फी केहू के बा पागल? 😂",
       "deep_dive": "",
       "created_at": "2026-11-13T20:07:03.821745+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Fufa Ji counts the laddoos on every guest's plate and is offended he got one les",
@@ -557,7 +603,12 @@
       "part": 1,
       "question": "रउआ घर में केकर फूफा सबसे जल्दी रूसेलें? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-13T20:12:45.212329+00:00"
+      "created_at": "2026-11-13T20:12:45.212329+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Chacha and Chachi travel by train for the first time in years; Chacha argues wit",
@@ -578,7 +629,12 @@
       "part": 1,
       "question": "रउआ घर में केकर दिमाग ललन चाचा लेखा चलेला? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-13T20:19:48.574180+00:00"
+      "created_at": "2026-11-13T20:19:48.574180+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Bablu blasts a new viral song on maximum volume to record an influencer dance re",
@@ -604,7 +660,12 @@
       "part": 1,
       "question": "रउआ घर में कौनो रील बना के सबका माथा पिआइत बा का? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-13T20:26:36.282260+00:00"
+      "created_at": "2026-11-13T20:26:36.282260+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Fufa Ji counts the laddoos on every guest's plate and is offended he got one les",
@@ -627,9 +688,14 @@
       "part": 1,
       "question": "रउआ घर में फूफा जी केतना लड्डू पर रूसेला? 😂",
       "deep_dive": "",
-      "created_at": "2026-11-14T09:39:28.921503+00:00"
+      "created_at": "2026-11-14T09:39:28.921503+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 9.0
+  "channel_median_views": 8.5
 }
