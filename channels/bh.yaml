@@ -96,6 +96,13 @@ skit:
     big heads and big expressive eyes, soft warm lighting, vibrant saturated
     colours, high detail, centred composition, characters in the middle of the
     frame, no letterbox bars, no borders, no text, no letters, no subtitles, no watermark
+  # Added to every picture prompt now that pictures are drawn 9:16 (2026-11-14:
+  # square pictures left blurred bands over a quarter of the screen). Faces stay
+  # in the middle; the headline sits at the top and the captions near the bottom.
+  tall_style: >-
+    tall vertical 9:16 portrait composition, characters shown full body from head
+    to feet, faces in the middle of the frame, sky or wall in the top fifth and
+    ground in the bottom fifth
   characters:
     lallan:
       name: Lallan Chacha

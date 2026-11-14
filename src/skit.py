@@ -271,25 +271,57 @@ joke, the punchline and every other field:
 
 
 # --------------------------------------------------------------- pictures
-def _cloudflare(prompt: str, dest: Path) -> bool:
+# Models that draw a tall 9:16 picture, tried in order; the square FLUX
+# schnell is the last resort (it fills only the middle of the frame, with
+# blurred bands above and below). Overridden by skit.image_models.
+TALL_MODELS = [
+    {"model": "@cf/black-forest-labs/flux-2-klein-4b", "form": True},
+    {"model": "@cf/black-forest-labs/flux-2-dev", "form": True},
+    {"model": "@cf/leonardo/lucid-origin"},
+]
+TALL_W, TALL_H = 768, 1344
+_dead: set[str] = set()     # models that refused this run (no access, bad name)
+
+
+def _cloudflare(prompt: str, dest: Path, models: list[dict] | None = None) -> bool:
     account, token = env("CF_ACCOUNT_ID"), env("CF_API_TOKEN")
     if not (account and token):
         return False
-    for _ in range(3):
-        try:
-            r = requests.post(
-                f"https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/{IMAGE_MODEL}",
-                headers={"Authorization": f"Bearer {token}"},
-                json={"prompt": prompt[:2000]}, timeout=90)    # FLUX schnell: prompt only
-            if r.status_code >= 400:
-                log.warning("Cloudflare HTTP %s: %s", r.status_code, r.text[:200])
-                continue
-            image = (r.json().get("result") or {}).get("image")
-            if image:
-                dest.write_bytes(base64.b64decode(image))
-                return dest.stat().st_size > 10_000
-        except Exception as exc:  # noqa: BLE001
-            log.warning("Cloudflare image failed: %s", exc)
+    for m in [*(models or []), {"model": IMAGE_MODEL, "square": True}]:
+        name = m["model"]
+        if name in _dead:
+            continue
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/{name}"
+        size = {} if m.get("square") else {"width": TALL_W, "height": TALL_H}
+        body = {"prompt": prompt[:2000], **size}
+        for _ in range(2 if m.get("square") is None else 3):
+            try:
+                if m.get("form"):       # FLUX.2 takes multipart form fields
+                    r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
+                                      files={k: (None, str(v)) for k, v in body.items()},
+                                      timeout=120)
+                else:
+                    r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
+                                      json=body, timeout=120)
+                if r.status_code in (400, 403, 404) and not m.get("square"):
+                    log.warning("Image model %s unavailable (HTTP %s): %s", name,
+                                r.status_code, r.text[:160])
+                    _dead.add(name)
+                    break
+                if r.status_code >= 400:
+                    log.warning("Cloudflare %s HTTP %s: %s", name, r.status_code, r.text[:200])
+                    continue
+                if r.headers.get("content-type", "").startswith("image/"):
+                    data = r.content
+                else:
+                    image = (r.json().get("result") or {}).get("image")
+                    data = base64.b64decode(image) if image else b""
+                if len(data) > 10_000:
+                    dest.write_bytes(data)
+                    log.info("Picture from %s", name.split("/")[-1])
+                    return True
+            except Exception as exc:  # noqa: BLE001
+                log.warning("Cloudflare %s failed: %s", name, exc)
     return False
 
 
@@ -306,8 +338,11 @@ def tall_frame(src: Path, dest: Path) -> Path:
     if len(lit) and (lit[0] > 4 or lit[-1] < len(rows) - 5):
         img = img.crop((0, int(lit[0]), img.width, int(lit[-1]) + 1))
     w, h = img.size
-    if h / w > 1.6:                                  # already tall
-        img.resize((1080, int(1080 * h / w))).crop((0, 0, 1080, 1920)).save(dest, quality=94)
+    if h / w > 1.6:                                  # already tall: fill the frame
+        k = max(1080 / w, 1920 / h)
+        img = img.resize((round(w * k), round(h * k)), Image.LANCZOS)
+        left, top = (img.width - 1080) // 2, (img.height - 1920) // 2
+        img.crop((left, top, left + 1080, top + 1920)).save(dest, quality=94)
         return dest
     back = img.resize((int(1920 * w / h), 1920)).filter(ImageFilter.GaussianBlur(28))
     left = (back.width - 1080) // 2
@@ -326,13 +361,15 @@ def picture(cfg: Config, sk: dict, line: dict, i: int, workdir: Path) -> Path | 
     prompt = (f"{who.get('look', '').strip()}, {line.get('action', '')}"
               + (f", next to {other['look'].strip()}" if other else "")
               + f". Setting: {sk.get('setting', 'a village house in Bihar')}. "
-              + cfg.get_path("skit.style", "").strip())
+              + cfg.get_path("skit.style", "").strip()
+              + " " + cfg.get_path("skit.tall_style", "").strip())
     raw = workdir / "assets" / f"scene_{i:03d}_raw.png"
     raw.parent.mkdir(parents=True, exist_ok=True)
     # No keyless fallback: tested 2026-11-08, Pollinations ignored the prompt,
     # stamped a watermark and drew a face like a real politician. A line whose
     # picture fails keeps the previous line's picture instead.
-    if not _cloudflare(prompt, raw):
+    models = cfg.get_path("skit.image_models", None)
+    if not _cloudflare(prompt, raw, TALL_MODELS if models is None else models):
         return None
     return tall_frame(raw, raw.with_name(f"scene_{i:03d}.jpg"))
 
