@@ -274,10 +274,11 @@ joke, the punchline and every other field:
 # Models that draw a tall 9:16 picture, tried in order; the square FLUX
 # schnell is the last resort (it fills only the middle of the frame, with
 # blurred bands above and below). Overridden by skit.image_models.
+# Lucid Origin was dropped after the 2026-11-14 test: another art style, real-
+# looking crowds, and many times the neurons of a FLUX picture.
 TALL_MODELS = [
     {"model": "@cf/black-forest-labs/flux-2-klein-4b", "form": True},
     {"model": "@cf/black-forest-labs/flux-2-dev", "form": True},
-    {"model": "@cf/leonardo/lucid-origin"},
 ]
 TALL_W, TALL_H = 768, 1344
 _dead: set[str] = set()     # models that refused this run (no access, bad name)
@@ -303,6 +304,12 @@ def _cloudflare(prompt: str, dest: Path, models: list[dict] | None = None) -> bo
                 else:
                     r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
                                       json=body, timeout=120)
+                if r.status_code >= 400 and "flagged" in r.text:   # safety filter: this picture only
+                    log.info("%s flagged this picture; trying the next model", name)
+                    break
+                if r.status_code == 429 and "daily free allocation" in r.text:
+                    log.warning("Cloudflare daily image allowance used up")
+                    return False            # account-wide: no other model will answer
                 if r.status_code in (400, 403, 404) and not m.get("square"):
                     log.warning("Image model %s unavailable (HTTP %s): %s", name,
                                 r.status_code, r.text[:160])
@@ -400,22 +407,27 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
         encoding="utf-8")
     log.info("Skit: %s (%d lines)", sk.get("title"), len(sk["lines"]))
 
-    shots, last_pic = [], None
+    # Voice first, pictures after: a skit the voice check drops then costs no
+    # picture allowance (Cloudflare's free 10,000 neurons a day are shared with
+    # the English channel; test 2026-11-14 ran out mid-run).
+    shots = []
     audio_dir = workdir / "audio"
     audio_dir.mkdir(parents=True, exist_ok=True)
+    for i, line in enumerate(sk["lines"]):
+        # The character's voice, picked up by voice._indic_batch.
+        (audio_dir / f"shot_{i:03d}.desc").write_text(
+            chars[line["speaker"]]["voice"].strip(), encoding="utf-8")
+        shots.append({"index": i, "beat": "skit", "narration": str(line["text"]).strip(),
+                      "visual_type": "ai_still", "speaker": line["speaker"]})
+    shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
+    shots = fix_garbled(cfg, tall, sk, shots, workdir, yt_lang)
+    last_pic = None
     for i, line in enumerate(sk["lines"]):
         pic = picture(cfg, sk, line, i, workdir) or last_pic
         if pic is None:
             raise RuntimeError("No picture could be made for the first line")
         last_pic = pic
-        # The character's voice, picked up by voice._indic_batch.
-        (audio_dir / f"shot_{i:03d}.desc").write_text(
-            chars[line["speaker"]]["voice"].strip(), encoding="utf-8")
-        shots.append({"index": i, "beat": "skit", "narration": str(line["text"]).strip(),
-                      "visual_type": "ai_still", "asset": str(pic),
-                      "speaker": line["speaker"]})
-    shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
-    shots = fix_garbled(cfg, tall, sk, shots, workdir, yt_lang)
+        shots[i]["asset"] = str(pic)
     # Comic timing: a beat of silence before the punchline, and time after it
     # for the ba-dum-tss while the last picture holds.
     if punch > 0:
