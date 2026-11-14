@@ -93,6 +93,14 @@ long:
     keywords: [what does the federal reserve do, how do interest rates work, fed rate decision]
 
 shorts:
+  # Re-run of the 14 Nov Short that failed the trust gate (only the Oregon
+  # Journalism Project had the news). Reframed as the wider, well-reported trend.
+  - topic: "Why affordable apartments cost $1 million"
+    history: true
+    title: "Why Do 'Affordable' Apartments Cost $1 Million?"
+    angle: "Why does it now cost about $1 million to build one low-income apartment in states like Oregon and California?"
+    search_query: "affordable housing cost $1 million per unit"
+    keywords: [affordable housing cost, why is housing so expensive]
   - topic: "Is the AI bubble about to pop"
     title: "Is the AI Bubble About to Pop?"
     angle: "What would an AI crash mean for ordinary people?"
