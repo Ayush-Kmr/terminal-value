@@ -37,7 +37,7 @@ Last checked against the code: 2026-11-14 (commit 2c95955).
    - To clear a scheduled release, set `status.publishAt` to `None` explicitly. Leaving the field out does not clear it.
    - `videos.update` replaces the whole `status` part: keep `KEEP_STATUS` (see `upload.set_privacy`).
 7. **Comments in code explain why**, usually with a date and the evidence (audit, test run ID). Keep that style. Config values carry their reasons as comments; update the comment when you change a value.
-8. **After a change:** append a dated line to the memory file `terminal-value-youtube-project.md`. Update `PROJECT.md` §2/§7/§8 when the cadence, the numbers or the to-dos change.
+8. **After a change:** append a dated line to the memory file `terminal-value-youtube-project.md`. Update `PROJECT.md` §2/§7/§8 when the cadence, the numbers or the to-dos change. **Update this file in the same commit** when you change the architecture, a schedule, a key config value or an open item.
 
 ---
 
