@@ -130,7 +130,8 @@ def _clone_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None
         raw.unlink()
 
 
-def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> None:
+def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path,
+                 seed: int = 7) -> None:
     """Speak every missing shot in one run of scripts/indic_tts.py (its own
     virtualenv). Figures are spelled out in words first: the model reads
     words, not digits. A shot whose character has a voice of their own leaves
@@ -143,6 +144,7 @@ def _indic_batch(cfg: Config, todo: list[tuple[str, Path]], audio_dir: Path) -> 
     jobs = audio_dir / "indic_jobs.json"
     jobs.write_text(json.dumps({
         "description": cfg.get_path("voice.indic.description", ""),
+        "seed": seed,
         "items": [{"text": spoken(text, cfg.get_path("channel.language", "en")),
                    "out": str(raw),
                    "description": (path.with_suffix(".desc").read_text(encoding="utf-8")
@@ -191,11 +193,11 @@ def _kokoro_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | Non
 
 
 def _speak_batch(cfg: Config, todo: list[tuple[str, Path]], language: str | None,
-                 audio_dir: Path) -> None:
+                 audio_dir: Path, seed: int = 7) -> None:
     if cfg.get_path("voice.provider") == "kokoro":
         _kokoro_batch(cfg, todo, language, audio_dir)
     elif cfg.get_path("voice.provider") == "indic":
-        _indic_batch(cfg, todo, audio_dir)
+        _indic_batch(cfg, todo, audio_dir, seed)
     else:
         _clone_batch(cfg, todo, language, audio_dir)
 
@@ -247,6 +249,15 @@ def match(script_text: str, heard: str, language: str | None) -> float:
     return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
 
 
+_RETAKE_CALLS = [0]
+
+
+def _retakes() -> int:
+    """Counts check_takes runs, so the rewrite pass after a garbled line
+    (skit.fix_garbled) does not reuse the first pass's seeds."""
+    return _RETAKE_CALLS[0]
+
+
 def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
                 language: str | None, rounds: int = 2) -> dict[Path, dict]:
     """Listen to every take; re-speak the ones that do not say their line, and
@@ -256,21 +267,32 @@ def check_takes(cfg: Config, todo_text: dict[Path, str], audio_dir: Path,
     # Whisper hears Bhojpuri (as Hindi) less exactly than English, so the bar is set per
     # channel; a lower bar still catches a take that skips or garbles a line.
     match_ok = float(cfg.get_path("voice.match_ok", MATCH_OK))
+    _RETAKE_CALLS[0] += 1
     for path, text in todo_text.items():
         t = transcribe(path, language)
         if t is None:
             return heard            # no transcriber: nothing to check against
         heard[path], score[path] = t, match(text, t.get("text", ""), language)
 
-    for rnd in range(rounds):
-        bad = [p for p, sc in score.items() if sc < match_ok]
+    # After the normal rounds, a take still under skit.voice_floor (a garbled
+    # line, not just a loose one) gets voice.garbled_rounds more tries of its own.
+    floor = float(cfg.get_path("skit.voice_floor", 0) or 0)
+    extra = int(cfg.get_path("voice.garbled_rounds", 0) or 0) if rounds and floor else 0
+    for rnd in range(rounds + extra):
+        bar = match_ok if rnd < rounds else floor
+        bad = [p for p, sc in score.items() if sc < bar]
         if not bad:
+            if rnd < rounds:
+                continue            # nothing loose left; still check for garbled
             break
         log.info("Voice check round %d: re-speaking %d/%d takes (%s)", rnd + 1, len(bad),
                  len(score), ", ".join(f"{p.stem}={score[p]:.2f}" for p in bad[:8]))
         for p in bad:
             shutil.move(p, p.with_suffix(".prev.mp3"))
-        _speak_batch(cfg, [(todo_text[p], p) for p in bad], language, audio_dir)
+        # A fresh seed each round: the Indic voice samples from a fixed seed, so a
+        # line spoken alone twice with the same one comes back the same take.
+        _speak_batch(cfg, [(todo_text[p], p) for p in bad], language, audio_dir,
+                     seed=7 + 101 * (rnd + 1) + 13 * _retakes())
         for p in bad:
             prev = p.with_suffix(".prev.mp3")
             t = transcribe(p, language)

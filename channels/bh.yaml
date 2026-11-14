@@ -175,6 +175,10 @@ voice:
   # take scores lower than in English. The bar still catches a dropped line.
   match_ok: 0.45
   check_rounds: 1
+  # A take still under skit.voice_floor after that gets this many more tries,
+  # each with a fresh seed, before the line is rewritten (2026-11-14: about
+  # half the skits had a line still garbled after one retake).
+  garbled_rounds: 3
   tempo: 1.1
   indic:
     description: >-
