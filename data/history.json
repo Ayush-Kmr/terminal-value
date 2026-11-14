@@ -1554,7 +1554,26 @@
         "views": 16,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "Nvidia CEO Departure and AI Stock Sell-Off",
+      "angle": "What does Jensen Huang's exit from Nvidia mean for the future valuation of the entire AI sector?",
+      "title": "Can Nvidia survive without Jensen Huang? #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "E7GGA4qvIpw",
+      "kind": "short",
+      "day": "2026-11-14",
+      "warnings": [],
+      "question": "Do you think a company needs its original founder to stay competitive?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/ckjUthYMbq8",
+      "hook": "One trillion dollars, gone in one day.",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-14T10:56:29.802425+00:00"
     }
   ],
   "rejected_topics": [],
