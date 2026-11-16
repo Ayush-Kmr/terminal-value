@@ -140,7 +140,9 @@ jobs:
           retention-days: 7
 
       - name: Commit history
-        if: success()
+        # always(): a run that uploads some videos and then fails must still
+        # record them, or the next run makes them again (13 Nov: 7 Shorts).
+        if: always()
         run: |
           git config user.name "terminal-value-bot"
           git config user.email "noreply@users.noreply.github.com"

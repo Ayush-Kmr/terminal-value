@@ -9,7 +9,7 @@ long:
   # 20 Feb 2026; this week's news is the fight over the refunds. Goes ahead of
   # the best-Short pick until 15 Nov only.
   - topic: "IEEPA tariff refunds"
-    ahead_of_best_short: "2026-11-15"
+    ahead_of_best_short: "2026-11-16"   # 15 Nov run failed (shot numbers); remade 16 Nov
     title: "Who Gets the $166 Billion Tariff Refund?"
     angle: >-
       The Supreme Court ruled 6-3 on 20 February 2026 that the emergency-powers

@@ -95,13 +95,15 @@ def is_long_day(cfg: Config, day=None) -> bool:
 
 
 def day_slot(cfg: Config, kind: str, day, taken: list | tuple = (),
-             min_lead_minutes: int = 20) -> datetime | None:
-    """The earliest free publish slot of this format on `day`, never another
-    day, so a late run cannot push Saturday's Shorts into Sunday. None when
-    every slot that day has gone: the caller then publishes at once."""
+             min_lead_minutes: int = 20, latest: bool = False) -> datetime | None:
+    """The earliest free publish slot of this format on `day` (the latest with
+    `latest`), never another day, so a late run cannot push Saturday's Shorts
+    into Sunday. None when every slot that day has gone: the caller then
+    publishes at once."""
     tz = ZoneInfo(cfg.get_path("channel.timezone", "Asia/Kolkata"))
     soon = datetime.now(tz) + timedelta(minutes=min_lead_minutes)
-    for hhmm in sorted(cfg.get_path(f"format.{kind}.publish_times") or ["19:00"]):
+    for hhmm in sorted(cfg.get_path(f"format.{kind}.publish_times") or ["19:00"],
+                       reverse=latest):
         hh, mm = hhmm.split(":")[:2]
         cand = datetime(day.year, day.month, day.day, int(hh), int(mm), tzinfo=tz)
         if cand > soon and cand not in taken:

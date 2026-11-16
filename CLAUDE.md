@@ -3,7 +3,7 @@
 Claude Code loads this file on every prompt. It sets the working rules and
 the architecture. History and the reasons behind decisions are in
 `PROJECT.md`. Where the two differ, the code and config win, then this file.
-Last checked against the code: 2026-11-14 (commit 2c95955).
+Last checked against the code: 2026-11-16.
 
 ---
 
@@ -74,7 +74,7 @@ Both workflows cron at `30 3 * * *` UTC. GitHub often starts them hours late (ar
 
 | Day | English | Bhojpuri |
 |---|---|---|
-| Mon–Sat | **2 Shorts** at 12:00 and 20:00 ET (`format.short.per_day: 2`, since 2026-11-13). The 2nd is a "How X makes money" Short (`format.short.second: money`, from `data/money.yaml`). | **2 skits** at 12:30 and 19:30 IST (`skit.per_day: 2`). One is from India's trending chart (`skit.trending.per_day: 1`). |
+| Mon–Sat | **2 Shorts** at 12:00 and 20:00 ET (`format.short.per_day: 2`, since 2026-11-13). Today's news story takes **20:00** (the latest free slot, `day_slot(latest=True)`). The "How X makes money" Short (`format.short.second: money`, from `data/money.yaml`) takes 12:00. | **2 skits** at 12:30 and 19:30 IST (`skit.per_day: 2`). One is from India's trending chart (`skit.trending.per_day: 1`). |
 | Sunday | **1 long video**, about 10 min (at least 8), public 11:00 ET, no Shorts (`format.long.days: [sunday]`, `with_shorts: 0`) | **1 long weekly compilation** at 18:00 IST (`skit.weekly`), no skits |
 
 Timing logic (`src/upload.py`):
@@ -126,7 +126,7 @@ Timing logic (`src/upload.py`):
    3. `script.write`: beat by beat (`structure.beats`), with lengthening retries to reach `min_minutes`.
    4. `factcheck`
    5. `quick_opening`: the cold open is split into shots of `opening_shot_words: 6`.
-   6. `add_long_ctas`: spoken follow asks at minutes 1 and 4.
+   6. `add_long_ctas`: spoken follow asks at minutes 1 and 4. Shots are then **renumbered**: both steps reuse shot numbers, and two shots with one number share one voice file (the 15 Nov long video failed on this).
    7. voice, visuals, render
    8. titles (max 90 characters; the "How It Collapsed" series suffix for history), description, chapters, tags
    9. `thumbnail.generate` plus 2 spare thumbnails for Studio's Test & Compare
@@ -263,7 +263,7 @@ Timing logic (`src/upload.py`):
 
 | Workflow | When | Does |
 |---|---|---|
-| `episode.yml` | daily 03:30 UTC, or by hand | English. Inputs: `topic`, `region` (US/MARKETS), `kind` (auto/long/shorts), `publish` (slot/now), `count`, `no_upload`. Artifact `episode-N`. Commits `data/history.json`. |
+| `episode.yml` | daily 03:30 UTC, or by hand | English. Inputs: `topic`, `region` (US/MARKETS), `kind` (auto/long/shorts), `publish` (slot/now), `count`, `no_upload`. Artifact `episode-N`. Commits `data/history.json` **even when the run fails** (`if: always()`, both workflows). |
 | `bhojpuri.yml` | daily 03:30 UTC, or by hand | Bhojpuri. Inputs: `premise`, `publish`, `count`, `no_upload`. Artifact `bhojpuri-N` (short.mp4, metadata, script, scene jpgs). Commits `data/history.bh.json`. |
 | `watchdog.yml` | 13:00 and 20:00 UTC | `scripts/watchdog.py` restarts a channel's workflow if it uploaded nothing in 20 h. `scripts/health.py` sends the evening Telegram report. |
 | `reach.yml` | Mon 03:15 UTC | `main.py --reach` for both channels. |
@@ -340,6 +340,7 @@ CHANNEL=bh .venv/bin/python main.py --skit --topic "<premise>" --no-upload
 
 **General:**
 - A slot that has already gone means publish now, never tomorrow.
+- History is committed even on a failed run: a run that uploaded 3 Shorts and then failed lost them from history, so later runs made more (7 public on 13 Nov) and the best-Short pick could not see the winners. 14 entries were backfilled on 16 Nov (`backfilled` field).
 - One failed item gives way to a spare, so the day's count is kept.
 
 ---

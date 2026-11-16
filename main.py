@@ -123,6 +123,11 @@ def produce(cfg, story: dict, workdir: Path) -> dict:
     shot_list = script_mod.all_shots(sc, int(cfg.get_path("format.long.max_shot_words", 20)))
     shot_list = quick_opening(cfg, sc, shot_list)
     shot_list = add_long_ctas(cfg, shot_list)
+    # Both steps above reuse shot numbers (the opening is renumbered from 0, a
+    # follow ask copies its shot), and two shots with one number share one
+    # voice file: the Sunday 15 Nov long video failed three times on it.
+    for i, shot in enumerate(shot_list):
+        shot["index"] = i
 
     # ---- narration (sets real shot durations) ---------------------------
     shot_list = voice.narrate_shots(cfg, shot_list, workdir, region, language)
@@ -658,7 +663,13 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
             if args.no_upload:
                 done.append(f"{company} (built, not uploaded)")
                 continue
-            when = None if args.publish == "now" else upload.day_slot(cfg, "short", day, taken)
+            # Today's news story takes the latest free slot (20:00 ET): since 11 Nov the
+            # evening Shorts got 28-945 views (middle ~240), the noon ones 20-155
+            # (/youtube audit 2026-11-15). Search-driven money and question Shorts
+            # take the earliest.
+            lead = not str(story.get("queue", "")).startswith(("money-short:", "evergreen-short:"))
+            when = None if args.publish == "now" else upload.day_slot(cfg, "short", day, taken,
+                                                                         latest=lead)
             now = when is None          # every slot today has gone: public at once
             taken.append(when)
             sid = upload.upload(cfg, Path(short["path"]),
