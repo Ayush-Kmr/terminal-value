@@ -105,12 +105,12 @@
       "warnings": [],
       "created_at": "2026-10-14T15:32:54.507639+00:00",
       "stats": {
-        "views": 380,
+        "views": 381,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 16,
-        "avg_pct": 59.38,
-        "minutes": 3
+        "avg_duration_s": 15,
+        "avg_pct": 57.60000000000001,
+        "minutes": 1
       }
     },
     {
@@ -151,9 +151,9 @@
         "views": 113,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 16,
-        "avg_pct": 60.04999999999999,
-        "minutes": 5
+        "avg_duration_s": 15,
+        "avg_pct": 56.43,
+        "minutes": 0
       }
     },
     {
@@ -170,9 +170,9 @@
         "views": 44,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 13,
-        "avg_pct": 53.36,
-        "minutes": 2
+        "avg_duration_s": 3,
+        "avg_pct": 15.6,
+        "minutes": 0
       }
     },
     {
@@ -193,10 +193,7 @@
       "stats": {
         "views": 2,
         "likes": 0,
-        "comments": 0,
-        "avg_duration_s": 5,
-        "avg_pct": 1.92,
-        "minutes": 0
+        "comments": 0
       }
     },
     {
@@ -213,8 +210,8 @@
         "views": 13,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 14,
-        "avg_pct": 40.65,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
         "minutes": 0
       }
     },
@@ -232,9 +229,9 @@
         "views": 17,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 14,
-        "avg_pct": 56.67,
-        "minutes": 1
+        "avg_duration_s": 24,
+        "avg_pct": 94.37,
+        "minutes": 0
       }
     },
     {
@@ -331,7 +328,7 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 339,
+        "views": 344,
         "likes": 2,
         "comments": 0,
         "avg_duration_s": 105,
@@ -350,7 +347,7 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 117,
+        "views": 119,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
@@ -429,12 +426,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:22:56.859675+00:00",
       "stats": {
-        "views": 49,
+        "views": 54,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 170,
-        "avg_pct": 32.14,
-        "minutes": 108
+        "avg_duration_s": 195,
+        "avg_pct": 36.85,
+        "minutes": 143
       }
     },
     {
@@ -448,7 +445,7 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 116,
+        "views": 117,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
@@ -467,7 +464,7 @@
       "warnings": [],
       "created_at": "2026-10-24T10:41:44.348592+00:00",
       "stats": {
-        "views": 94,
+        "views": 95,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 10,
@@ -548,11 +545,11 @@
       "warnings": [],
       "created_at": "2026-10-26T11:44:47.545945+00:00",
       "stats": {
-        "views": 417,
+        "views": 419,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 29,
-        "avg_pct": 78.56,
+        "avg_pct": 77.75,
         "minutes": 69
       }
     },
@@ -594,9 +591,9 @@
         "views": 13,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 28,
-        "avg_pct": 6.18,
-        "minutes": 1
+        "avg_duration_s": 60,
+        "avg_pct": 13.07,
+        "minutes": 10
       }
     },
     {
@@ -629,12 +626,12 @@
       "warnings": [],
       "created_at": "2026-10-28T12:02:05.990792+00:00",
       "stats": {
-        "views": 131,
+        "views": 132,
         "likes": 3,
         "comments": 0,
-        "avg_duration_s": 19,
-        "avg_pct": 50.13000000000001,
-        "minutes": 16
+        "avg_duration_s": 20,
+        "avg_pct": 51.45000000000001,
+        "minutes": 17
       }
     },
     {
@@ -648,12 +645,12 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 325,
+        "views": 421,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 26,
-        "avg_pct": 77.84,
-        "minutes": 40
+        "avg_pct": 76.74,
+        "minutes": 42
       }
     },
     {
@@ -692,9 +689,9 @@
         "views": 52,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 149,
-        "avg_pct": 23.63,
-        "minutes": 33
+        "avg_duration_s": 140,
+        "avg_pct": 22.23,
+        "minutes": 34
       }
     },
     {
@@ -746,7 +743,7 @@
       "warnings": [],
       "created_at": "2026-10-31T10:06:27.130994+00:00",
       "stats": {
-        "views": 232,
+        "views": 233,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 30,
@@ -791,9 +788,9 @@
         "views": 21,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 202,
-        "avg_pct": 37.34,
-        "minutes": 47
+        "avg_duration_s": 191,
+        "avg_pct": 35.31,
+        "minutes": 48
       },
       "commented": true
     },
@@ -913,12 +910,12 @@
       ],
       "created_at": "2026-11-03T12:05:52.640499+00:00",
       "stats": {
-        "views": 29,
+        "views": 40,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 82,
-        "avg_pct": 17.86,
-        "minutes": 16
+        "avg_duration_s": 105,
+        "avg_pct": 22.93,
+        "minutes": 42
       },
       "commented": true
     },
@@ -937,7 +934,7 @@
       "queue": "",
       "created_at": "2026-11-03T12:09:05.062483+00:00",
       "stats": {
-        "views": 47,
+        "views": 49,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 18,
@@ -1014,7 +1011,7 @@
       ],
       "created_at": "2026-11-04T06:45:27.312371+00:00",
       "stats": {
-        "views": 4,
+        "views": 14,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 0,
@@ -1038,11 +1035,11 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 386,
+        "views": 390,
         "likes": 0,
         "comments": 2,
         "avg_duration_s": 21,
-        "avg_pct": 93.57,
+        "avg_pct": 93.69,
         "minutes": 46
       },
       "commented": true
@@ -1186,7 +1183,7 @@
       "created_at": "2026-11-06T12:05:39.005033+00:00",
       "commented": true,
       "stats": {
-        "views": 40,
+        "views": 42,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 35,
@@ -1258,7 +1255,7 @@
       "created_at": "2026-11-07T10:47:19.470358+00:00",
       "commented": true,
       "stats": {
-        "views": 621,
+        "views": 622,
         "likes": 7,
         "comments": 1,
         "avg_duration_s": 16,
@@ -1330,12 +1327,12 @@
       "created_at": "2026-11-09T12:05:12.434161+00:00",
       "commented": true,
       "stats": {
-        "views": 95,
+        "views": 96,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 14,
-        "avg_pct": 64.82,
-        "minutes": 8
+        "avg_pct": 63.93,
+        "minutes": 9
       }
     },
     {
@@ -1380,11 +1377,11 @@
       "warnings": [],
       "created_at": "2026-11-10T12:11:03.355175+00:00",
       "stats": {
-        "views": 6,
+        "views": 8,
         "likes": 0,
         "comments": 3,
-        "avg_duration_s": 29,
-        "avg_pct": 9.53,
+        "avg_duration_s": 24,
+        "avg_pct": 8.07,
         "minutes": 2
       },
       "commented": true
@@ -1408,8 +1405,8 @@
         "likes": 3,
         "comments": 3,
         "avg_duration_s": 15,
-        "avg_pct": 70.68,
-        "minutes": 32
+        "avg_pct": 71.04,
+        "minutes": 33
       },
       "commented": true
     },
@@ -1428,11 +1425,11 @@
       "queue": "evergreen-short:Recession",
       "created_at": "2026-11-10T12:16:34.080875+00:00",
       "stats": {
-        "views": 124,
+        "views": 125,
         "likes": 0,
         "comments": 3,
-        "avg_duration_s": 18,
-        "avg_pct": 66.34,
+        "avg_duration_s": 17,
+        "avg_pct": 63.54,
         "minutes": 16
       },
       "commented": true
@@ -1448,7 +1445,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-11T13:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 54,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 26,
+        "avg_pct": 97.99,
+        "minutes": 7
+      }
     },
     {
       "company": "Why is Wall Street Suddenly Buying Toothpaste over Tech?",
@@ -1461,7 +1466,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-11T17:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 24,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 20,
+        "avg_pct": 76.91,
+        "minutes": 3
+      }
     },
     {
       "company": "Oil Prices Rise Amid Middle East Risks",
@@ -1474,7 +1487,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-11T20:22:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 72,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 9,
+        "avg_pct": 43.12,
+        "minutes": 4
+      }
     },
     {
       "company": "Are Middle East Oil Supplies Really Returning to Normal?",
@@ -1487,7 +1508,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-11T21:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 87,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 13,
+        "avg_pct": 43.34,
+        "minutes": 2
+      }
     },
     {
       "company": "CoreWeave News: Why Shares Jumped 26%",
@@ -1500,7 +1529,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-11T21:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 35,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 26,
+        "avg_pct": 81.6,
+        "minutes": 4
+      }
     },
     {
       "company": "Micron Technology Stock Rebound Facts",
@@ -1513,7 +1550,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-12T01:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 154,
+        "likes": 1,
+        "comments": 0,
+        "avg_duration_s": 30,
+        "avg_pct": 118.04999999999998,
+        "minutes": 30
+      }
     },
     {
       "company": "AI Stocks Rebound After Market Sell-Off",
@@ -1533,9 +1578,12 @@
       "queue": "",
       "created_at": "2026-11-12T01:58:21.724514+00:00",
       "stats": {
-        "views": 5,
+        "views": 6,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1557,9 +1605,12 @@
       "queue": "",
       "created_at": "2026-11-12T02:01:40.576915+00:00",
       "stats": {
-        "views": 19,
+        "views": 24,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 23,
+        "avg_pct": 102.61,
+        "minutes": 1
       },
       "commented": true
     },
@@ -1583,7 +1634,10 @@
       "stats": {
         "views": 9,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 15,
+        "avg_pct": 55.87,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1605,9 +1659,12 @@
       "queue": "",
       "created_at": "2026-11-12T02:08:24.879070+00:00",
       "stats": {
-        "views": 28,
+        "views": 27,
         "likes": 0,
-        "comments": 4
+        "comments": 4,
+        "avg_duration_s": 19,
+        "avg_pct": 80.28,
+        "minutes": 2
       },
       "commented": true
     },
@@ -1622,7 +1679,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-13T13:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 463,
+        "likes": 2,
+        "comments": 1,
+        "avg_duration_s": 23,
+        "avg_pct": 88.14,
+        "minutes": 32
+      }
     },
     {
       "company": "Trump Iran Oil Blockade Impact on Prices",
@@ -1635,7 +1700,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-13T17:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 185,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 16,
+        "avg_pct": 59.45,
+        "minutes": 10
+      }
     },
     {
       "company": "US Producer Price Index 6.5% Rise: Meaning for Rates",
@@ -1648,7 +1721,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-13T21:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 63,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 13,
+        "avg_pct": 44.01,
+        "minutes": 2
+      }
     },
     {
       "company": "Elon Musk Business Facing 48% Drop",
@@ -1661,7 +1742,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-13T21:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 47,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 7,
+        "avg_pct": 27.72,
+        "minutes": 0
+      }
     },
     {
       "company": "Did AI Cuts Break the Microsoft Cloud?",
@@ -1674,7 +1763,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-14T00:54:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 254,
+        "likes": 0,
+        "comments": 0,
+        "avg_duration_s": 17,
+        "avg_pct": 55.03,
+        "minutes": 17
+      }
     },
     {
       "company": "Nvidia Stock Clash in White House Room",
@@ -1687,7 +1784,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-14T00:56:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 953,
+        "likes": 9,
+        "comments": 0,
+        "avg_duration_s": 18,
+        "avg_pct": 63.04,
+        "minutes": 45
+      }
     },
     {
       "company": "Nationwide FAA Ground Stop Halts 13,000 U.S. Flights",
@@ -1700,7 +1805,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-14T00:59:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 1026,
+        "likes": 12,
+        "comments": 1,
+        "avg_duration_s": 27,
+        "avg_pct": 84.38,
+        "minutes": 180
+      }
     },
     {
       "company": "Kevin Hassett Departure Rumors Explained",
@@ -1713,7 +1826,15 @@
       "queue": "",
       "hook": "",
       "created_at": "2026-11-14T01:00:00+00:00",
-      "backfilled": "2026-11-16: uploaded by a run that failed before saving history"
+      "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
+      "stats": {
+        "views": 574,
+        "likes": 6,
+        "comments": 0,
+        "avg_duration_s": 17,
+        "avg_pct": 63.95000000000001,
+        "minutes": 17
+      }
     },
     {
       "company": "Why affordable apartments cost $1 million",
@@ -1733,9 +1854,9 @@
       "queue": "shorts:Why affordable apartments cost $1 million",
       "created_at": "2026-11-14T08:44:45.198834+00:00",
       "stats": {
-        "views": 16,
+        "views": 50,
         "likes": 0,
-        "comments": 0
+        "comments": 1
       },
       "commented": true
     },
@@ -1756,7 +1877,12 @@
       "title_style": "curious",
       "queue": "",
       "created_at": "2026-11-14T10:56:29.802425+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 302,
+        "likes": 3,
+        "comments": 4
+      }
     },
     {
       "company": "IEEPA tariff refunds",
@@ -1775,9 +1901,14 @@
       "history": "",
       "runtime": "8:23",
       "warnings": [],
-      "created_at": "2026-11-16T05:47:23.682893+00:00"
+      "created_at": "2026-11-16T05:47:23.682893+00:00",
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 52.0
+  "channel_median_views": 59.0
 }
