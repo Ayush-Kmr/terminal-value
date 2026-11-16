@@ -178,7 +178,7 @@ Timing logic (`src/upload.py`):
      - lines whose Whisper match is below `skit.voice_floor: 0.4` are rewritten through `PLAIN` and spoken again;
      - if still below the floor, it raises.
 4. **Pictures:** `picture()` uses Cloudflare.
-   - The prompt is the character's `look` + the line's `action` + the setting + `skit.style` + `skit.tall_style`.
+   - The prompt is the character's `look` + the line's `action` + a head count ("exactly one/two people … no other people, no children, no crowd"; added 16 Nov after stray people appeared) + the setting + `skit.style` + `skit.tall_style`.
    - **Models tried in order:**
      1. `TALL_MODELS`: FLUX.2 klein-4b, then FLUX.2 dev. Both use multipart form fields at 768×1344.
      2. Last resort: square `flux-1-schnell`. It goes over blurred bands in `tall_frame`; a tall picture (h/w > 1.6) is cover-cropped to 1080×1920 instead.

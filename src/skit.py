@@ -365,8 +365,14 @@ def picture(cfg: Config, sk: dict, line: dict, i: int, workdir: Path) -> Path | 
     chars = cfg.get_path("skit.characters", {})
     who = chars.get(line.get("speaker"), {})
     other = chars.get(line.get("with")) if line.get("with") != line.get("speaker") else None
+    # The model adds people nobody asked for (16 Nov: a stray boy, a group of
+    # children), so the head count is said outright, early in the prompt,
+    # where the 2,000-character cut never reaches.
+    count = ("Exactly two people in the picture, these two only" if other
+             else "Exactly one person in the picture, this character alone")
     prompt = (f"{who.get('look', '').strip()}, {line.get('action', '')}"
               + (f", next to {other['look'].strip()}" if other else "")
+              + f". {count}: no other people, no children, no crowd in the background"
               + f". Setting: {sk.get('setting', 'a village house in Bihar')}. "
               + cfg.get_path("skit.style", "").strip()
               + " " + cfg.get_path("skit.tall_style", "").strip())
