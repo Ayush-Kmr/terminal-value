@@ -1906,7 +1906,44 @@
         "views": 4,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "Morgan Stanley Max Overweight Global Stocks on AI Cycle",
+      "angle": "Why is Wall Street doubling down on the AI cycle despite growing market bubble fears?",
+      "title": "Morgan Stanley Latest News: Why Global Stocks Are a Max Overweight #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "HGmzVJCiluQ",
+      "kind": "short",
+      "day": "2026-11-16",
+      "warnings": [],
+      "question": "Have you seen artificial intelligence improve productivity in your job?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "1.7 trillion dollars is funding the AI buildout.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-16T12:00:50.391799+00:00"
+    },
+    {
+      "company": "Fed Rate Hike Risks Extending Into 2027",
+      "angle": "What economic pressures are forcing Wall Street to price in potential Federal Reserve rate hikes well into 2027?",
+      "title": "Fed Rate Hike Expectations Shift to 2027 #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "HMCEM5DuSpM",
+      "kind": "short",
+      "day": "2026-11-16",
+      "warnings": [],
+      "question": "Do you expect your bank to raise interest rates on savings soon?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Rate hikes until 2027.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-16T12:05:24.419269+00:00"
     }
   ],
   "rejected_topics": [],
