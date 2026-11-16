@@ -140,11 +140,15 @@ format:
     second: money
     max_shot_words: 12
     # Spoken just before the last sentence of every Short (main.add_follow_line).
+    # A promise, not a plea (/youtube analyze 2026-11-16: about 1 subscriber
+    # per 1,000 Short views; the old lines gave no reason to follow). Keep
+    # them true to the schedule: 2 Shorts Mon-Sat, the news one in the evening,
+    # a deep dive every Sunday.
     follow_lines:
-      - "Follow, so you catch the next big market move."
-      - "Follow for the money story behind tomorrow's headline."
-      - "Follow, so you understand the next one before everyone else."
-      - "Follow for one money story like this every few hours."
+      - "Follow: every day, the market's biggest story, explained in thirty seconds."
+      - "Follow for the story behind the day's biggest market move, every evening."
+      - "Follow: two money stories a day, and a deep dive every Sunday."
+      - "Follow, and you'll understand the next big market story before everyone else."
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     # ET. Midday and evening. A slot that has already gone when the (often

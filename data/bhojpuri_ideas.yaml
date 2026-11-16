@@ -5,6 +5,51 @@
 #   this week's festival skits (docs/BHOJPURI-WEEK-PLAN.md).
 # cast: who is in it (keys of skit.characters in channels/bh.yaml).
 ideas:
+  # ---- Food chaos, Chacha already caught (/youtube analyze 2026-11-16) ----
+  # The only skit that held viewers (88% watched, jI0neNIF7II) opened with
+  # Chacha already in trouble over sweets he hid. These copy that opening:
+  # food, Chacha mid-crime in line 1, the family closing in. months: put them
+  # ahead of the unseasonal ideas this month.
+  - id: food-litti-guests
+    premise: Chacha has secretly eaten all the litti chokha cooked for the guests, the guests are already at the door, and he blames the goat.
+    cast: [lallan, phoolmati, bablu]
+    lead: lallan
+    months: [11, 12]
+  - id: food-pickle-jar
+    premise: Chacha's hand is stuck inside Chachi's mango pickle jar at the exact moment she walks into the kitchen.
+    cast: [lallan, phoolmati]
+    lead: lallan
+    months: [11, 12]
+  - id: food-samosa-count
+    premise: Chacha has secretly eaten three samosas from the guests' box, and Chachi starts counting them out loud in front of everyone.
+    cast: [lallan, phoolmati, fufa]
+    lead: lallan
+    months: [11, 12]
+  - id: food-salty-kheer
+    premise: Chacha made kheer for Chachi's birthday with salt instead of sugar, and the whole family is already lifting the first spoon.
+    cast: [lallan, phoolmati, bablu]
+    lead: lallan
+    months: [11, 12]
+  - id: food-thekua-mice
+    premise: After Chhath, Chacha hid the thekua in the rice drum "for safety", and he opens it to find the mice got there first.
+    cast: [lallan, phoolmati]
+    lead: lallan
+    months: [11]
+  - id: food-midnight-jalebi
+    premise: The doctor put Chacha on a strict diet, and Chachi switches the light on at midnight to find him with a jalebi in each hand.
+    cast: [lallan, phoolmati]
+    lead: lallan
+    months: [11, 12]
+  - id: food-biscuit-samdhi
+    premise: Chacha's biscuit breaks into his tea in front of the visiting in-laws, and he tries to fish it out without losing his dignity.
+    cast: [lallan, fufa, phoolmati]
+    lead: lallan
+    months: [11, 12]
+  - id: food-fridge-lock
+    premise: Chachi has locked the fridge to stop Chacha's midnight snacking, and Chacha is caught trying to open it with Bablu's phone.
+    cast: [lallan, phoolmati, bablu]
+    lead: lallan
+    months: [11, 12]
   # ---- Fufa Ji series (added 2026-11-10): the easily offended brother-in-law ----
   # lead: who speaks first, so the skit joins that character's numbered series.
   - id: fufa-wedding-sulk

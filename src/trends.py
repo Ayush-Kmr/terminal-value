@@ -119,6 +119,14 @@ US_RULES = """- Choose American and global business stories: markets, big tech a
   with a big number (a $2.5T AI sell-off: 619 views, a 5.5% market fall),
   the AI bubble and AI money, and giant deals or rulings that hit a famous
   company (Reliance, SpaceX, IDBI: 170-540 views). Rank these first.
+- Shorts 4-13 Nov (/youtube analyze 2026-11-16): the winners were Nvidia and
+  AI stories with a named leader or a big number (Nvidia in the White House:
+  952 views; Jensen Huang: 463), Washington power stories (Kevin Hassett: 574)
+  and national disruptions that hit ordinary Americans (FAA ground stop,
+  13,000 flights: 1,025 views, 84% watched). Rank these first.
+- Rank last: oil and Middle East supply stories (72-87 views, 43% watched),
+  a lesser-known single company's stock move (Arista: 67), and small index
+  moves told as a recap (Nasdaq down 2.9%: 61).
 - Everyday price explainers ("why is X so expensive") did worst (27-95
   views): choose one only when that price is itself today's big news.
 - Frame the story around the size of the money and what happens next. A big

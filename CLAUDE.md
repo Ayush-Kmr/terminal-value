@@ -320,12 +320,15 @@ CHANNEL=bh .venv/bin/python main.py --skit --topic "<premise>" --no-upload
 - Shorts of 21–28 s held 60–110% of viewers; 42–44 s ones held 30%. Keep them short, with a hook of at most 8–10 words and a loop ending.
 - Standalone Shorts beat cuts from long videos about 5 to 1.
 - Winning topics: market shocks with big numbers, the AI bubble, AI money, and money Shorts (Kalshi held 91%). Price explainers did worst.
+- 4–13 Nov: Nvidia/AI with a named leader, Washington power stories and national disruptions won (463–1,025 views); oil/Middle East and lesser-known single stocks lost (61–87 views, 43–48% watched). In `US_RULES`.
+- About 1 subscriber per 1,000 Short views: the follow lines now state a promise (daily market story, Sunday deep dive) instead of a plea.
 
 **English long videos:**
 - They lose most viewers in the first tenth. Hence the 30–40-word cold open, cuts within 3 s, and follow asks at minutes 1 and 4.
 
 **Bhojpuri skits:**
 - Skits of 16–21 s were too short; aim for 30–40 s with a hook of at most 8 words.
+- The only skit that held viewers (88%, `jI0neNIF7II`) opened with Chacha already in trouble over food. 8 `food-*` ideas copy that opening (`months: [11, 12]`, so they go first).
 - Numbered "भाग N" (Part N) series got 0–20 views, so they are off.
 - Imperfect drafts and garbled voice lines used to ship and were the most-skipped skits. Both are now hard drops.
 
