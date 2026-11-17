@@ -356,5 +356,6 @@ CHANNEL=bh .venv/bin/python main.py --skit --topic "<premise>" --no-upload
   - how many skits the voice gate drops.
 - [ ] **17 Nov:** check the Sunday tariff-refund long video's retention. If more than 20% of viewers leave in the first 15 s, rebuild the opening.
 - [ ] **About 21 Nov:** check the 8 English videos retitled on 14 Nov.
+- [ ] **18–21 Nov: GTA 6 launch-week Shorts** (queued 17 Nov in `data/queue.yaml`, one a day at 20:00 ET: day-one sales forecast, Take-Two revenue, the $79.99 price, first sales figures). Business angle only; Ayush chose this over a new gaming channel. Check their views on 24 Nov: 1,000+ each would justify a dedicated channel.
 - [ ] `OPENAI_API_KEY` is still missing: the research fallback when Gemini's search allowance runs out.
 - [ ] Deleting the old Tamil videos needs Ayush's OK.

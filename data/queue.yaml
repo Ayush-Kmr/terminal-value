@@ -93,6 +93,52 @@ long:
     keywords: [what does the federal reserve do, how do interest rates work, fed rate decision]
 
 shorts:
+  # GTA 6 launch week (launch 19 Nov 2026; /youtube ideate + hook + metadata,
+  # 2026-11-17). Owner chose Terminal Value over a new gaming channel: only the
+  # business side (sales, revenue, price), never gameplay help like unlock times.
+  # One per day from 18 Nov, so each takes the 20:00 ET slot that the big-event
+  # Shorts win (FAA 1,026 views, Nvidia 953). Searched in the business press,
+  # which covers Take-Two, so the trusted-source gate can pass. Rockstar art,
+  # logos, characters and trailer frames stay out of the pictures.
+  - topic: "GTA 6 day one sales"
+    not_before: 2026-11-18
+    title: "GTA 6 Sales: 25 Million on Day One?"
+    angle: >-
+      Analysts forecast GTA 6 could sell up to 25 million copies on its first
+      day, against GTA 5's 11 million in 24 hours in 2013. Open on that jump
+      (11 million then, maybe 25 million now). Always call the figures
+      forecasts, not sales; name who made them (Newzoo, analysts, Take-Two's
+      own guidance). It launches 19 November at $79.99.
+    search_query: "GTA 6 sales forecast Take-Two"
+    keywords: [gta 6 sales, gta 6 day one sales, gta 6 sales forecast, gta 6 vs gta 5 sales]
+  - topic: "Take-Two GTA 6 revenue"
+    not_before: 2026-11-19
+    title: "How Much Will GTA 6 Make Take-Two?"
+    angle: >-
+      GTA 6 launches today. How much money does Take-Two, the company behind
+      Rockstar, expect from it, going by its own guidance filed with the SEC
+      and analysts' launch-week estimates; and what it means for Take-Two's
+      stock. Forecasts only, never investing advice.
+    search_query: "Take-Two GTA 6 revenue launch stock"
+    keywords: [take two gta 6, gta 6 revenue, take two stock, how much will gta 6 make]
+  - topic: "GTA 6 price"
+    not_before: 2026-11-20
+    title: "GTA 6 Is $79.99. Is That a Record?"
+    angle: >-
+      GTA 5 cost $59.99 in 2013; GTA 6 costs $79.99, with a $99.99 Ultimate
+      edition. Why are big games getting pricier, and where does the extra $20
+      go? Tell it as the business of game prices, not a buying guide.
+    search_query: "GTA 6 price $80 video game prices"
+    keywords: [gta 6 price, why is gta 6 80 dollars, video game prices, gta 6 cost]
+  - topic: "GTA 6 first sales figures"
+    not_before: 2026-11-21
+    angle: >-
+      The first reported GTA 6 sales or launch-record figures after its 19
+      November launch, set against the analysts' forecasts and GTA 5's launch.
+      Only figures that Take-Two, Rockstar or the business press reported; if
+      none are out yet, say so rather than repeat forecasts as sales.
+    search_query: "GTA 6 sales record launch Take-Two"
+    keywords: [gta 6 sales, gta 6 sales record, gta 6 launch sales]
   # Re-run of the 14 Nov Short that failed the trust gate (only the Oregon
   # Journalism Project had the news). Reframed as the wider, well-reported trend.
   - topic: "Why affordable apartments cost $1 million"
