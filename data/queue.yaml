@@ -101,6 +101,10 @@ shorts:
   # which covers Take-Two, so the trusted-source gate can pass. Rockstar art,
   # logos, characters and trailer frames stay out of the pictures.
   - topic: "GTA 6 day one sales"
+    # history: the forecasts and GTA 5's 2013 launch are weeks to years old, so
+    # the 3-day news window and the 2-outlet gate failed the test run
+    # 44129850632 (1 trusted source; Gemini search was also out of quota).
+    history: true
     not_before: 2026-11-18
     title: "GTA 6 Sales: 25 Million on Day One?"
     angle: >-
@@ -122,6 +126,7 @@ shorts:
     search_query: "Take-Two GTA 6 revenue launch stock"
     keywords: [take two gta 6, gta 6 revenue, take two stock, how much will gta 6 make]
   - topic: "GTA 6 price"
+    history: true                    # game-price history, not this week's news
     not_before: 2026-11-20
     title: "GTA 6 Is $79.99. Is That a Record?"
     angle: >-
