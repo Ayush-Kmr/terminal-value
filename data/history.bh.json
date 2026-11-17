@@ -810,7 +810,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     }
   ],
   "rejected_topics": [],
