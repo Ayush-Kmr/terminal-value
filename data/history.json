@@ -1925,7 +1925,8 @@
       "hook": "1.7 trillion dollars is funding the AI buildout.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-16T12:00:50.391799+00:00"
+      "created_at": "2026-11-16T12:00:50.391799+00:00",
+      "commented": true
     },
     {
       "company": "Fed Rate Hike Risks Extending Into 2027",
@@ -1943,7 +1944,44 @@
       "hook": "Rate hikes until 2027.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-16T12:05:24.419269+00:00"
+      "created_at": "2026-11-16T12:05:24.419269+00:00",
+      "commented": true
+    },
+    {
+      "company": "Disney Q4 Earnings and $3 Billion Cost-Cutting Plan",
+      "angle": "How will Disney achieve its new $3 billion cost-cutting target while streaming profitability and Marvel films drive Q4 earnings?",
+      "title": "How Disney Plans to Save Billions #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "OJRaUPw27ws",
+      "kind": "short",
+      "day": "2026-11-17",
+      "warnings": [],
+      "question": "Which corporate cost-cutting methods do you find most unfair to workers?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Disney just posted $25.95 billion in revenue.",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-17T12:26:25.848788+00:00"
+    },
+    {
+      "company": "Home Depot Names Richard McPhail CEO",
+      "angle": "What changes will new CEO Richard McPhail bring to Home Depot after beating Q3 earnings expectations?",
+      "title": "Home Depot CEO Change Explained #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "89Yv1aLrXCo",
+      "kind": "short",
+      "day": "2026-11-17",
+      "warnings": [],
+      "question": "Have you noticed higher prices on your recent home projects?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Forty-three billion dollars, earned in three months.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-17T12:31:35.751249+00:00"
     }
   ],
   "rejected_topics": [],
