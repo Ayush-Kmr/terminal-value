@@ -1963,7 +1963,8 @@
       "hook": "Disney just posted $25.95 billion in revenue.",
       "title_style": "curious",
       "queue": "",
-      "created_at": "2026-11-17T12:26:25.848788+00:00"
+      "created_at": "2026-11-17T12:26:25.848788+00:00",
+      "commented": true
     },
     {
       "company": "Home Depot Names Richard McPhail CEO",
@@ -1981,7 +1982,44 @@
       "hook": "Forty-three billion dollars, earned in three months.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-17T12:31:35.751249+00:00"
+      "created_at": "2026-11-17T12:31:35.751249+00:00",
+      "commented": true
+    },
+    {
+      "company": "GTA 6 day one sales",
+      "angle": "Analysts forecast GTA 6 could sell up to 25 million copies on its first day, against GTA 5's 11 million in 24 hours in 2013. Open on that jump (11 million then, maybe 25 million now). Always call the figures forecasts, not sales; name who made them (Newzoo, analysts, Take-Two's own guidance). It launches 19 November at $79.99.",
+      "title": "GTA 6 Sales: 25 Million on Day One? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "4oJ2PwBg448",
+      "kind": "short",
+      "day": "2026-11-18",
+      "warnings": [],
+      "question": "Do you think entertainment can keep raising prices without limits?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Twenty-five million copies could sell on day one.",
+      "title_style": "curious",
+      "queue": "shorts:GTA 6 day one sales",
+      "created_at": "2026-11-18T12:13:34.257637+00:00"
+    },
+    {
+      "company": "Target Q3 Sales and Guidance",
+      "angle": "How did Target post its strongest sales growth in five years right before the holiday season?",
+      "title": "Target Sales Surge 7.1% On Strong Online Growth #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "YMGRKleGVc8",
+      "kind": "short",
+      "day": "2026-11-18",
+      "warnings": [],
+      "question": "Have you noticed changes in store prices recently?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Target sales jumped 7.1 percent in the third quarter.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-18T12:17:11.079896+00:00"
     }
   ],
   "rejected_topics": [],
