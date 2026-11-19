@@ -2001,7 +2001,8 @@
       "hook": "Twenty-five million copies could sell on day one.",
       "title_style": "curious",
       "queue": "shorts:GTA 6 day one sales",
-      "created_at": "2026-11-18T12:13:34.257637+00:00"
+      "created_at": "2026-11-18T12:13:34.257637+00:00",
+      "commented": true
     },
     {
       "company": "Target Q3 Sales and Guidance",
@@ -2019,7 +2020,48 @@
       "hook": "Target sales jumped 7.1 percent in the third quarter.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-18T12:17:11.079896+00:00"
+      "created_at": "2026-11-18T12:17:11.079896+00:00",
+      "commented": true
+    },
+    {
+      "company": "Take-Two GTA 6 revenue",
+      "angle": "GTA 6 launches today. How much money does Take-Two, the company behind Rockstar, expect from it, going by its own guidance filed with the SEC and analysts' launch-week estimates; and what it means for Take-Two's stock. Forecasts only, never investing advice.",
+      "title": "How Much Will GTA 6 Make Take-Two? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "na2evJ3o2xo",
+      "kind": "short",
+      "day": "2026-11-19",
+      "warnings": [
+        "Fact check removed 1 unsupported line(s)"
+      ],
+      "question": "Does a ten out of ten rating make you more likely to buy?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Sixty-five million copies.",
+      "title_style": "search",
+      "queue": "shorts:Take-Two GTA 6 revenue",
+      "created_at": "2026-11-19T12:06:41.422277+00:00"
+    },
+    {
+      "company": "Mortgage Demand Housing Cliff",
+      "angle": "How is the sudden housing cliff and 51% drop in mortgage lock demand affecting the broader real estate market and consumer borrowing?",
+      "title": "Housing Cliff Changes Mortgage Market #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "XE5d-pvwH5c",
+      "kind": "short",
+      "day": "2026-11-19",
+      "warnings": [
+        "Only 2 news sources (minimum 3)."
+      ],
+      "question": "Would you lock in a higher mortgage rate today or wait for cuts?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "A 51% drop in mortgage lock demand just hit the housing market.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-19T12:09:23.784118+00:00"
     }
   ],
   "rejected_topics": [],
