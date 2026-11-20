@@ -2185,6 +2185,24 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-20T15:37:49.858483+00:00"
+    },
+    {
+      "company": "Visa, Mastercard, and JPMorgan Cyberattack",
+      "angle": "How did hackers breach third-party vendor systems used by financial giants like Visa, Mastercard, and JPMorgan, and what are the risks to customer data?",
+      "title": "Visa Mastercard Explained Marketing Data #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "FZ2eHlM7E3Y",
+      "kind": "short",
+      "day": "2026-11-20",
+      "warnings": [],
+      "question": "Do you think ransomware groups are responsible for most data leaks?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "A limited amount of marketing data, such as names",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-20T16:12:28.209815+00:00"
     }
   ],
   "rejected_topics": [],
