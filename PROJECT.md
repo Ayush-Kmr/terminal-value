@@ -31,7 +31,7 @@ This one repo runs two YouTube channels automatically from GitHub Actions. There
 | Day | English | Bhojpuri |
 |---|---|---|
 | **Sunday** | **1 long video and no Shorts.** About 10 minutes (at least 8), public at 11:00 ET. Topic: a deep dive on **the week's most-viewed Short** (≥100 views, `best_short_story`). | **1 long video and no Shorts.** Public at 18:00 IST. It is a 16:9 compilation of the week's skits, most-viewed first, with chapters (`skit.weekly`). |
-| **Mon–Sat** | **4 Shorts**, at 08:00, 12:00, 16:00 and 20:00 ET, on trending US stories. | **4 skits**, at 12:30, 16:30, 19:30 and 21:30 IST. 2 of the 4 come from the India trending chart. |
+| **Mon–Sat** | **4 Shorts**, at 12:00, 16:00, 18:00 and 20:00 ET, all on trending US stories (`format.short.second: none`; set 2026-11-20). | **2 skits**, at 12:30 and 19:30 IST (1 from the India trending chart; since 2026-11-13). |
 
 How the timing works (`src/upload.py`):
 - **`publish_day`:** "today" means channel time now + 4 h. The 03:30 UTC cron really starts at about 11:30 UTC, roughly 8 hours late.
@@ -181,4 +181,5 @@ CHANNEL=bh .venv/bin/python main.py --skit --no-upload
 | 2026-10-20 | Overhaul: English first, real-article research, Whisper QA, burned-in captions, slot schedule. |
 | 2026-11-04 | Long videos on Tue and Fri; the Tamil channel picked its own stories; competitor analysis. |
 | 2026-11-08 | **The Tamil channel became Bhojpuri AI Comedy** (cartoon skits). |
+| 2026-11-20 | Audit: English back to 4 trending Shorts/day (2/day + money Short fell to median ~10 views); picker ranks earnings recaps, game business, generic AI-trade recaps last; Bhojpuri cuts a garbled middle line instead of dropping the skit (`294983a`, `02e563b`). |
 | 2026-11-10 | **New cadence: Sunday 1 long video, Mon–Sat 4 Shorts, on both channels.** Audit fixes, Fufa Ji, series, hook work (`de761fa` … `4942e88`). |
