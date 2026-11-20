@@ -2167,6 +2167,24 @@
         "likes": 0,
         "comments": 0
       }
+    },
+    {
+      "company": "Anthropic IPO and AI Stock Sell-Off",
+      "angle": "Why did Anthropic's high-profile IPO fail to steady the broader tech sector as a massive AI sell-off grips Wall Street?",
+      "title": "Anthropic AI Valuation Reaches Trillions #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "ZXKusiYTujc",
+      "kind": "short",
+      "day": "2026-11-20",
+      "warnings": [],
+      "question": "What is the largest company valuation you think is justified today?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Anthropic just raised $107.3 billion.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-20T15:37:49.858483+00:00"
     }
   ],
   "rejected_topics": [],
