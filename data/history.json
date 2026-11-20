@@ -69,10 +69,7 @@
       "stats": {
         "views": 170,
         "likes": 1,
-        "comments": 0,
-        "avg_duration_s": 20,
-        "avg_pct": 91.82,
-        "minutes": 0
+        "comments": 0
       }
     },
     {
@@ -108,8 +105,8 @@
         "views": 381,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 15,
-        "avg_pct": 57.60000000000001,
+        "avg_duration_s": 11,
+        "avg_pct": 44.05,
         "minutes": 1
       }
     },
@@ -132,8 +129,8 @@
         "views": 11,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 13,
-        "avg_pct": 7.89,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
         "minutes": 0
       }
     },
@@ -150,10 +147,7 @@
       "stats": {
         "views": 113,
         "likes": 0,
-        "comments": 0,
-        "avg_duration_s": 15,
-        "avg_pct": 56.43,
-        "minutes": 0
+        "comments": 0
       }
     },
     {
@@ -170,8 +164,8 @@
         "views": 44,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 3,
-        "avg_pct": 15.6,
+        "avg_duration_s": 6,
+        "avg_pct": 27.6,
         "minutes": 0
       }
     },
@@ -229,8 +223,8 @@
         "views": 17,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 24,
-        "avg_pct": 94.37,
+        "avg_duration_s": 46,
+        "avg_pct": 179.23,
         "minutes": 0
       }
     },
@@ -250,12 +244,12 @@
       "warnings": [],
       "created_at": "2026-10-19T17:34:24.707133+00:00",
       "stats": {
-        "views": 131,
+        "views": 133,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 52,
-        "avg_pct": 35.39,
-        "minutes": 36
+        "avg_duration_s": 55,
+        "avg_pct": 37.06,
+        "minutes": 11
       }
     },
     {
@@ -272,9 +266,9 @@
         "views": 51,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 18,
-        "avg_pct": 58.19,
-        "minutes": 4
+        "avg_duration_s": 8,
+        "avg_pct": 26.94,
+        "minutes": 0
       }
     },
     {
@@ -291,9 +285,9 @@
         "views": 152,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 20,
-        "avg_pct": 54.36,
-        "minutes": 24
+        "avg_duration_s": 10,
+        "avg_pct": 27.839999999999996,
+        "minutes": 0
       }
     },
     {
@@ -310,9 +304,9 @@
         "views": 53,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 16,
-        "avg_pct": 47.37,
-        "minutes": 5
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       }
     },
     {
@@ -328,12 +322,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:35:51.616114+00:00",
       "stats": {
-        "views": 344,
+        "views": 345,
         "likes": 2,
         "comments": 0,
-        "avg_duration_s": 105,
-        "avg_pct": 20.7,
-        "minutes": 322
+        "avg_duration_s": 99,
+        "avg_pct": 19.53,
+        "minutes": 281
       }
     },
     {
@@ -347,12 +341,12 @@
       "warnings": [],
       "created_at": "2026-10-22T10:44:11.032044+00:00",
       "stats": {
-        "views": 119,
+        "views": 124,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
-        "avg_pct": 63.51,
-        "minutes": 20
+        "avg_pct": 64.43,
+        "minutes": 14
       }
     },
     {
@@ -370,8 +364,8 @@
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 21,
-        "avg_pct": 66.63,
-        "minutes": 6
+        "avg_pct": 67.31,
+        "minutes": 2
       }
     },
     {
@@ -426,12 +420,12 @@
       "warnings": [],
       "created_at": "2026-10-24T10:22:56.859675+00:00",
       "stats": {
-        "views": 54,
+        "views": 58,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 195,
-        "avg_pct": 36.85,
-        "minutes": 143
+        "avg_duration_s": 208,
+        "avg_pct": 39.25,
+        "minutes": 167
       }
     },
     {
@@ -445,7 +439,7 @@
       "warnings": [],
       "created_at": "2026-10-24T10:35:17.850189+00:00",
       "stats": {
-        "views": 117,
+        "views": 118,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 22,
@@ -483,7 +477,7 @@
       "warnings": [],
       "created_at": "2026-10-25T09:07:09.640911+00:00",
       "stats": {
-        "views": 59,
+        "views": 60,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 22,
@@ -502,7 +496,7 @@
       "warnings": [],
       "created_at": "2026-10-25T09:32:35.580675+00:00",
       "stats": {
-        "views": 9,
+        "views": 10,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 22,
@@ -549,8 +543,8 @@
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 29,
-        "avg_pct": 77.75,
-        "minutes": 69
+        "avg_pct": 77.91,
+        "minutes": 70
       }
     },
     {
@@ -629,8 +623,8 @@
         "views": 132,
         "likes": 3,
         "comments": 0,
-        "avg_duration_s": 20,
-        "avg_pct": 51.45000000000001,
+        "avg_duration_s": 19,
+        "avg_pct": 50.91,
         "minutes": 17
       }
     },
@@ -645,12 +639,12 @@
       "warnings": [],
       "created_at": "2026-10-29T10:30:27.753186+00:00",
       "stats": {
-        "views": 421,
+        "views": 429,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 26,
-        "avg_pct": 76.74,
-        "minutes": 42
+        "avg_duration_s": 27,
+        "avg_pct": 80.52,
+        "minutes": 59
       }
     },
     {
@@ -686,12 +680,12 @@
       "warnings": [],
       "created_at": "2026-10-30T12:23:32.688274+00:00",
       "stats": {
-        "views": 52,
+        "views": 54,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 140,
-        "avg_pct": 22.23,
-        "minutes": 34
+        "avg_duration_s": 143,
+        "avg_pct": 22.63,
+        "minutes": 39
       }
     },
     {
@@ -724,7 +718,7 @@
       "warnings": [],
       "created_at": "2026-10-30T13:00:19.902734+00:00",
       "stats": {
-        "views": 539,
+        "views": 540,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 31,
@@ -858,7 +852,7 @@
       "created_at": "2026-11-02T15:59:18.703616+00:00",
       "commented": true,
       "stats": {
-        "views": 101,
+        "views": 102,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 84,
@@ -913,9 +907,9 @@
         "views": 40,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 105,
-        "avg_pct": 22.93,
-        "minutes": 42
+        "avg_duration_s": 83,
+        "avg_pct": 18.2,
+        "minutes": 48
       },
       "commented": true
     },
@@ -934,12 +928,12 @@
       "queue": "",
       "created_at": "2026-11-03T12:09:05.062483+00:00",
       "stats": {
-        "views": 49,
+        "views": 51,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 18,
-        "avg_pct": 67.05,
-        "minutes": 5
+        "avg_duration_s": 17,
+        "avg_pct": 64.93,
+        "minutes": 6
       },
       "commented": true
     },
@@ -1011,12 +1005,12 @@
       ],
       "created_at": "2026-11-04T06:45:27.312371+00:00",
       "stats": {
-        "views": 14,
+        "views": 19,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 0,
-        "avg_pct": 0,
-        "minutes": 0
+        "avg_duration_s": 36,
+        "avg_pct": 12.78,
+        "minutes": 6
       },
       "commented": true
     },
@@ -1035,12 +1029,12 @@
       "queue": "shorts:Kalshi",
       "created_at": "2026-11-04T06:47:48.531315+00:00",
       "stats": {
-        "views": 390,
+        "views": 410,
         "likes": 0,
         "comments": 2,
         "avg_duration_s": 21,
-        "avg_pct": 93.69,
-        "minutes": 46
+        "avg_pct": 93.38,
+        "minutes": 48
       },
       "commented": true
     },
@@ -1159,7 +1153,7 @@
       "created_at": "2026-11-06T12:02:03.059033+00:00",
       "commented": true,
       "stats": {
-        "views": 3,
+        "views": 4,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 83,
@@ -1236,7 +1230,7 @@
         "comments": 1,
         "avg_duration_s": 13,
         "avg_pct": 68.51,
-        "minutes": 4
+        "minutes": 3
       }
     },
     {
@@ -1260,7 +1254,7 @@
         "comments": 1,
         "avg_duration_s": 16,
         "avg_pct": 70.25,
-        "minutes": 79
+        "minutes": 78
       }
     },
     {
@@ -1283,7 +1277,7 @@
         "comments": 1,
         "avg_duration_s": 19,
         "avg_pct": 85.8,
-        "minutes": 21
+        "minutes": 20
       },
       "commented": true
     },
@@ -1302,7 +1296,7 @@
       "queue": "evergreen-short:The Fed",
       "created_at": "2026-11-08T10:48:55.917547+00:00",
       "stats": {
-        "views": 40,
+        "views": 45,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 18,
@@ -1327,11 +1321,11 @@
       "created_at": "2026-11-09T12:05:12.434161+00:00",
       "commented": true,
       "stats": {
-        "views": 96,
+        "views": 97,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 14,
-        "avg_pct": 63.93,
+        "avg_pct": 62.36999999999999,
         "minutes": 9
       }
     },
@@ -1377,11 +1371,11 @@
       "warnings": [],
       "created_at": "2026-11-10T12:11:03.355175+00:00",
       "stats": {
-        "views": 8,
+        "views": 11,
         "likes": 0,
         "comments": 3,
-        "avg_duration_s": 24,
-        "avg_pct": 8.07,
+        "avg_duration_s": 23,
+        "avg_pct": 7.71,
         "minutes": 2
       },
       "commented": true
@@ -1401,12 +1395,12 @@
       "queue": "",
       "created_at": "2026-11-10T12:13:28.229684+00:00",
       "stats": {
-        "views": 281,
+        "views": 283,
         "likes": 3,
         "comments": 3,
         "avg_duration_s": 15,
-        "avg_pct": 71.04,
-        "minutes": 33
+        "avg_pct": 71.21,
+        "minutes": 34
       },
       "commented": true
     },
@@ -1425,7 +1419,7 @@
       "queue": "evergreen-short:Recession",
       "created_at": "2026-11-10T12:16:34.080875+00:00",
       "stats": {
-        "views": 125,
+        "views": 127,
         "likes": 0,
         "comments": 3,
         "avg_duration_s": 17,
@@ -1447,7 +1441,7 @@
       "created_at": "2026-11-11T13:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 54,
+        "views": 55,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 26,
@@ -1552,7 +1546,7 @@
       "created_at": "2026-11-12T01:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 154,
+        "views": 156,
         "likes": 1,
         "comments": 0,
         "avg_duration_s": 30,
@@ -1605,11 +1599,11 @@
       "queue": "",
       "created_at": "2026-11-12T02:01:40.576915+00:00",
       "stats": {
-        "views": 24,
+        "views": 25,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 23,
-        "avg_pct": 102.61,
+        "avg_duration_s": 19,
+        "avg_pct": 83.41,
         "minutes": 1
       },
       "commented": true
@@ -1659,7 +1653,7 @@
       "queue": "",
       "created_at": "2026-11-12T02:08:24.879070+00:00",
       "stats": {
-        "views": 27,
+        "views": 29,
         "likes": 0,
         "comments": 4,
         "avg_duration_s": 19,
@@ -1681,12 +1675,12 @@
       "created_at": "2026-11-13T13:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 463,
+        "views": 459,
         "likes": 2,
         "comments": 1,
-        "avg_duration_s": 23,
-        "avg_pct": 88.14,
-        "minutes": 32
+        "avg_duration_s": 21,
+        "avg_pct": 80.11,
+        "minutes": 54
       }
     },
     {
@@ -1702,12 +1696,12 @@
       "created_at": "2026-11-13T17:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 185,
+        "views": 178,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 16,
-        "avg_pct": 59.45,
-        "minutes": 10
+        "avg_duration_s": 15,
+        "avg_pct": 55.36,
+        "minutes": 12
       }
     },
     {
@@ -1723,12 +1717,12 @@
       "created_at": "2026-11-13T21:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 63,
+        "views": 59,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 13,
-        "avg_pct": 44.01,
-        "minutes": 2
+        "avg_duration_s": 11,
+        "avg_pct": 36.7,
+        "minutes": 3
       }
     },
     {
@@ -1747,9 +1741,9 @@
         "views": 47,
         "likes": 0,
         "comments": 0,
-        "avg_duration_s": 7,
-        "avg_pct": 27.72,
-        "minutes": 0
+        "avg_duration_s": 9,
+        "avg_pct": 37,
+        "minutes": 2
       }
     },
     {
@@ -1765,12 +1759,12 @@
       "created_at": "2026-11-14T00:54:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 254,
+        "views": 255,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 17,
-        "avg_pct": 55.03,
-        "minutes": 17
+        "avg_pct": 54,
+        "minutes": 31
       }
     },
     {
@@ -1786,12 +1780,12 @@
       "created_at": "2026-11-14T00:56:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 953,
+        "views": 942,
         "likes": 9,
         "comments": 0,
         "avg_duration_s": 18,
-        "avg_pct": 63.04,
-        "minutes": 45
+        "avg_pct": 61.24000000000001,
+        "minutes": 127
       }
     },
     {
@@ -1807,12 +1801,12 @@
       "created_at": "2026-11-14T00:59:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 1026,
+        "views": 1017,
         "likes": 12,
         "comments": 1,
-        "avg_duration_s": 27,
-        "avg_pct": 84.38,
-        "minutes": 180
+        "avg_duration_s": 26,
+        "avg_pct": 83.68,
+        "minutes": 199
       }
     },
     {
@@ -1828,12 +1822,12 @@
       "created_at": "2026-11-14T01:00:00+00:00",
       "backfilled": "2026-11-16: uploaded by a run that failed before saving history",
       "stats": {
-        "views": 574,
+        "views": 567,
         "likes": 6,
         "comments": 0,
-        "avg_duration_s": 17,
-        "avg_pct": 63.95000000000001,
-        "minutes": 17
+        "avg_duration_s": 15,
+        "avg_pct": 58.43000000000001,
+        "minutes": 79
       }
     },
     {
@@ -1854,9 +1848,12 @@
       "queue": "shorts:Why affordable apartments cost $1 million",
       "created_at": "2026-11-14T08:44:45.198834+00:00",
       "stats": {
-        "views": 50,
+        "views": 51,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 17,
+        "avg_pct": 68.94,
+        "minutes": 4
       },
       "commented": true
     },
@@ -1879,9 +1876,12 @@
       "created_at": "2026-11-14T10:56:29.802425+00:00",
       "commented": true,
       "stats": {
-        "views": 302,
+        "views": 329,
         "likes": 3,
-        "comments": 4
+        "comments": 4,
+        "avg_duration_s": 42,
+        "avg_pct": 141.56,
+        "minutes": 76
       }
     },
     {
@@ -1903,9 +1903,12 @@
       "warnings": [],
       "created_at": "2026-11-16T05:47:23.682893+00:00",
       "stats": {
-        "views": 4,
+        "views": 7,
         "likes": 0,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 138,
+        "avg_pct": 27.399999999999995,
+        "minutes": 14
       },
       "commented": true
     },
@@ -1926,7 +1929,15 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-16T12:00:50.391799+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 41,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 20,
+        "avg_pct": 73.1,
+        "minutes": 4
+      }
     },
     {
       "company": "Fed Rate Hike Risks Extending Into 2027",
@@ -1945,7 +1956,15 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-16T12:05:24.419269+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 50,
+        "likes": 1,
+        "comments": 1,
+        "avg_duration_s": 20,
+        "avg_pct": 69.67,
+        "minutes": 4
+      }
     },
     {
       "company": "Disney Q4 Earnings and $3 Billion Cost-Cutting Plan",
@@ -1964,7 +1983,15 @@
       "title_style": "curious",
       "queue": "",
       "created_at": "2026-11-17T12:26:25.848788+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 9,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
+      }
     },
     {
       "company": "Home Depot Names Richard McPhail CEO",
@@ -1983,7 +2010,15 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-17T12:31:35.751249+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 36,
+        "likes": 0,
+        "comments": 1,
+        "avg_duration_s": 12,
+        "avg_pct": 44.86,
+        "minutes": 2
+      }
     },
     {
       "company": "GTA 6 day one sales",
@@ -2002,7 +2037,12 @@
       "title_style": "curious",
       "queue": "shorts:GTA 6 day one sales",
       "created_at": "2026-11-18T12:13:34.257637+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 15,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Target Q3 Sales and Guidance",
@@ -2021,7 +2061,12 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-18T12:17:11.079896+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 1,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Take-Two GTA 6 revenue",
@@ -2042,7 +2087,12 @@
       "title_style": "search",
       "queue": "shorts:Take-Two GTA 6 revenue",
       "created_at": "2026-11-19T12:06:41.422277+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "Mortgage Demand Housing Cliff",
@@ -2063,7 +2113,12 @@
       "title_style": "search",
       "queue": "",
       "created_at": "2026-11-19T12:09:23.784118+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 4,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "GTA 6 price",
@@ -2081,7 +2136,12 @@
       "hook": "Eighty dollars for a video game.",
       "title_style": "search",
       "queue": "shorts:GTA 6 price",
-      "created_at": "2026-11-20T12:11:25.775785+00:00"
+      "created_at": "2026-11-20T12:11:25.775785+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "AI Trade Cracks as Stocks Hit Worst Run Since 2023",
@@ -2101,9 +2161,14 @@
       "hook": "Fourteen hundred points erased in hours.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-20T12:15:01.676297+00:00"
+      "created_at": "2026-11-20T12:15:01.676297+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 59.0
+  "channel_median_views": 53.0
 }
