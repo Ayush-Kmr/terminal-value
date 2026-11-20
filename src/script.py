@@ -141,8 +141,16 @@ def write(cfg: Config, factbase: Any, hook_text: str, language: str = "en",
         note = str(cfg.get_path("script.local_note", "") or "").strip()
         if note:
             prompt += f"\n- For this channel's viewers: {note}"
-        result = llm.json_call(prompt, temperature=0.8)
-        if not isinstance(result, dict) or not result.get("shots"):
+        # The fallback models (Gemini's free 20/day gone) sometimes wrap the
+        # shots or drop them: unwrap, then ask again cooler before giving up
+        # (run 44764009708, 2026-11-20, lost 2 Shorts this way).
+        result = None
+        for temp in (0.8, 0.5, 0.3):
+            result = _with_shots(llm.json_call(prompt, temperature=temp))
+            if result:
+                break
+            log.warning("Beat %s came back without shots; asking again", bid)
+        if not result:
             raise RuntimeError(f"Beat {bid} came back without shots")
         # Models write short (Groq, used when Gemini's quota runs out, most of
         # all): a beat well under its length is asked for again, up to twice.
@@ -320,3 +328,18 @@ def all_shots(script: dict, max_words: int = 0) -> list[dict[str, Any]]:
         _no_blank_numbers(s)
         s["index"] = i
     return flat
+
+
+def _with_shots(result):
+    """The beat reply as {"shots": [...], ...}, unwrapping a bare list or one
+    nesting level; None when there are no shots."""
+    if isinstance(result, list) and result and all(isinstance(x, dict) for x in result):
+        result = {"shots": result} if any("narration" in x for x in result) else result[0]
+    if not isinstance(result, dict):
+        return None
+    if result.get("shots"):
+        return result
+    for v in result.values():
+        if isinstance(v, dict) and v.get("shots"):
+            return v
+    return None
