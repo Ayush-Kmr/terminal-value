@@ -111,6 +111,25 @@ def day_slot(cfg: Config, kind: str, day, taken: list | tuple = (),
     return None
 
 
+def slots_taken(video_ids: list) -> list[datetime]:
+    """The scheduled publish times of these videos that are still waiting
+    (privacy private with a publishAt), so a later run picks another slot."""
+    ids = [v for v in video_ids if v]
+    if not ids:
+        return []
+    try:
+        items = client().videos().list(part="status", id=",".join(ids[:50])).execute().get("items", [])
+    except Exception as e:      # never lose a day's Shorts over this lookup
+        log.warning("Could not read today's scheduled slots: %s", e)
+        return []
+    out = []
+    for it in items:
+        when = it.get("status", {}).get("publishAt")
+        if when:
+            out.append(datetime.fromisoformat(when.replace("Z", "+00:00")))
+    return out
+
+
 def made_on(episodes: list[dict], day, kind: str) -> int:
     """How many videos of this kind were already uploaded for `day`, so a
     restarted run tops the day up instead of doubling it."""

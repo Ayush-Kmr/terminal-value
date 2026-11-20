@@ -641,9 +641,13 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
     fails is replaced by the next spare, so one bad story does not lose a Short."""
     n = len(stories)
     day = upload.publish_day(cfg)
-    taken: list = []
     queue = [*stories, *(spares or [])]
     st = state.load()
+    # Slots already given to today's Shorts by an earlier run: a top-up run
+    # once stacked three Shorts on 20:00 ET (2026-11-20).
+    taken: list = [] if args.no_upload else upload.slots_taken(
+        [e.get("video_id") for e in st.get("episodes", [])
+         if e.get("day") == day.isoformat() and e.get("kind") == "short"])
     done, failures = [], []
 
     # Every Short points at the latest long video (audit 2026-11-10: long
@@ -684,6 +688,7 @@ def make_shorts(cfg, args, stories: list[dict], spares: list[dict] | None = None
                 "company": company, "angle": short["angle"], "title": short["title"],
                 "region": short["region"], "language": short["language"],
                 "video_id": sid, "kind": "short", "day": day.isoformat(),
+                "publish_at": when.isoformat() if when else "",
                 "warnings": short["warnings"],
                 "question": short["question"], "parent_url": short["parent_url"],
                 "deep_dive": story.get("deep_dive", ""), "hook": short.get("hook", ""),

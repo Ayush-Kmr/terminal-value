@@ -731,8 +731,11 @@ def run(cfg: Config, publish: str = "slot", no_upload: bool = False, count: int 
     trend = [] if topic else trending(cfg, min(n, int(cfg.get_path("skit.trending.per_day", 1))))
     bank = pick_ideas(cfg, n - len(trend) + 2, topic)
     queue = [*bank[: n - len(trend)], *trend, *bank[n - len(trend):]]
-    taken: list = []
     st = state.load()
+    # Slots an earlier run today already gave out (main.make_shorts, 2026-11-20).
+    taken: list = [] if no_upload else upload.slots_taken(
+        [e.get("video_id") for e in st.get("episodes", [])
+         if e.get("day") == day.isoformat() and e.get("kind") == "short"])
     done, failures = [], []
     while queue and len(done) < n:
         idea, i = queue.pop(0), len(done)
