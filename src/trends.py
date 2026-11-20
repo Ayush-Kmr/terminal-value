@@ -127,6 +127,12 @@ US_RULES = """- Choose American and global business stories: markets, big tech a
 - Rank last: oil and Middle East supply stories (72-87 views, 43% watched),
   a lesser-known single company's stock move (Arista: 67), and small index
   moves told as a recap (Nasdaq down 2.9%: 61).
+- Audit 2026-11-20, rank last as well: routine earnings recaps of a
+  familiar retailer or media company (Target 1 view, Disney 9, Home Depot
+  36), video-game business stories (GTA 6 sales and price: 0-15 views),
+  and a generic "AI trade" or market-mood recap without one named trigger
+  (0-41 views). A single dramatic event with a named person, company or
+  agency and a big number is what this audience watches.
 - Everyday price explainers ("why is X so expensive") did worst (27-95
   views): choose one only when that price is itself today's big news.
 - Frame the story around the size of the money and what happens next. A big

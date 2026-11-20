@@ -401,7 +401,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     lead = sk["lines"][0]["speaker"]
     series = str(cfg.get_path(f"skit.series.{lead}", "") or "")
     part = 1 + sum(1 for e in state.load().get("episodes", []) if series and e.get("series") == series)
-    punch = len(sk["lines"]) - 1
+    punch = sk["punch"] = len(sk["lines"]) - 1
     follow = cfg.get_path("skit.follow_lines", []) or []
     if follow:
         sk["lines"].append({
@@ -427,6 +427,7 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
                       "visual_type": "ai_still", "speaker": line["speaker"]})
     shots = voice.narrate_shots(tall, shots, workdir, None, yt_lang)
     shots = fix_garbled(cfg, tall, sk, shots, workdir, yt_lang)
+    punch = sk["punch"]
     last_pic = None
     for i, line in enumerate(sk["lines"]):
         pic = picture(cfg, sk, line, i, workdir) or last_pic
@@ -514,10 +515,27 @@ def fix_garbled(cfg: Config, tall: Config, sk: dict, shots: list[dict], workdir:
         sk["lines"][s["index"]]["text"] = text
         (audio / f"shot_{s['index']:03d}.mp3").unlink(missing_ok=True)
     shots = voice.narrate_shots(tall, shots, workdir, None, lang)
-    still = [f"{s['index']}={s['match']:.2f}" for s in shots
-             if s.get("match") is not None and s["match"] < floor]
-    if still:
-        raise RuntimeError(f"Voice still garbles line(s) {', '.join(still)} after a rewrite")
+    bad = [s for s in shots if s.get("match") is not None and s["match"] < floor]
+    if not bad:
+        return shots
+    still = ", ".join(f"{s['index']}={s['match']:.2f}" for s in bad)
+    # A garbled middle line is cut rather than losing the whole skit (audit
+    # 2026-11-20: the voice gate dropped about half of all skits, usually
+    # over one line). The hook, the punchline and the follow line are never
+    # cut, and the skit keeps at least skit.min_lines lines.
+    punch = int(sk.get("punch", len(sk["lines"]) - 1))
+    keep_min = int(cfg.get_path("skit.min_lines", 5))
+    cut = {s["index"] for s in bad}
+    spoken = [i for i, ln in enumerate(sk["lines"]) if not ln.get("follow")]
+    if (0 in cut or punch in cut or any(sk["lines"][i].get("follow") for i in cut)
+            or len(spoken) - len(cut) < keep_min):
+        raise RuntimeError(f"Voice still garbles line(s) {still} after a rewrite")
+    log.warning("Cutting garbled middle line(s) %s", still)
+    sk["lines"] = [ln for i, ln in enumerate(sk["lines"]) if i not in cut]
+    shots = [s for s in shots if s["index"] not in cut]
+    sk["punch"] = punch - sum(1 for i in cut if i < punch)
+    for i, s in enumerate(shots):
+        s["index"] = i
     return shots
 
 

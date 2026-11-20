@@ -129,7 +129,11 @@ format:
     # Strategy 2026-11-13: two a day, down from four. YouTube notifies
     # subscribers of at most 3 uploads a day, and half the volume at higher
     # quality is the defence against the "inauthentic content" policy.
-    per_day: 2                  # standalone Shorts Mon-Sat (none on Sunday).
+    # Audit 2026-11-20: back to four, all trending. The 4-8 trending Shorts a
+    # day of 11-13 Nov made 8 of the channel's top 10 (median ~250 views,
+    # FAA ground stop 1,017); the 2-a-day weeks with a money/queue second
+    # Short got a median of ~50 (5-10 Nov) and ~10 (16-20 Nov).
+    per_day: 4                  # standalone Shorts Mon-Sat (none on Sunday).
                                 # Standalone Shorts outperformed cuts ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
@@ -137,23 +141,23 @@ format:
     # (strategy 2026-11-13: Kalshi held 91%) | none = both from today's
     # trending stories | question (data/evergreen.yaml; the "why is X so
     # expensive" ones got 27-95 views, 2026-11-10) | stock.
-    second: money
+    second: none
     max_shot_words: 12
     # Spoken just before the last sentence of every Short (main.add_follow_line).
     # A promise, not a plea (/youtube analyze 2026-11-16: about 1 subscriber
     # per 1,000 Short views; the old lines gave no reason to follow). Keep
-    # them true to the schedule: 2 Shorts Mon-Sat, the news one in the evening,
+    # them true to the schedule: 4 Shorts Mon-Sat, the news ones in the evening,
     # a deep dive every Sunday.
     follow_lines:
       - "Follow: every day, the market's biggest story, explained in thirty seconds."
       - "Follow for the story behind the day's biggest market move, every evening."
-      - "Follow: two money stories a day, and a deep dive every Sunday."
+      - "Follow: the day's biggest money stories, and a deep dive every Sunday."
       - "Follow, and you'll understand the next big market story before everyone else."
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     # ET. Midday and evening. A slot that has already gone when the (often
     # late) run gets there goes public at once, never the next day.
-    publish_times: ["12:00", "20:00"]
+    publish_times: ["12:00", "16:00", "18:00", "20:00"]
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.

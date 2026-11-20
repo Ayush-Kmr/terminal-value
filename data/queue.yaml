@@ -135,15 +135,6 @@ shorts:
       go? Tell it as the business of game prices, not a buying guide.
     search_query: "GTA 6 price $80 video game prices"
     keywords: [gta 6 price, why is gta 6 80 dollars, video game prices, gta 6 cost]
-  - topic: "GTA 6 first sales figures"
-    not_before: 2026-11-21
-    angle: >-
-      The first reported GTA 6 sales or launch-record figures after its 19
-      November launch, set against the analysts' forecasts and GTA 5's launch.
-      Only figures that Take-Two, Rockstar or the business press reported; if
-      none are out yet, say so rather than repeat forecasts as sales.
-    search_query: "GTA 6 sales record launch Take-Two"
-    keywords: [gta 6 sales, gta 6 sales record, gta 6 launch sales]
   # Re-run of the 14 Nov Short that failed the trust gate (only the Oregon
   # Journalism Project had the news). Reframed as the wider, well-reported trend.
   - topic: "Why affordable apartments cost $1 million"
