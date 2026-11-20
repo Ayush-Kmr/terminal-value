@@ -2041,7 +2041,8 @@
       "hook": "Sixty-five million copies.",
       "title_style": "search",
       "queue": "shorts:Take-Two GTA 6 revenue",
-      "created_at": "2026-11-19T12:06:41.422277+00:00"
+      "created_at": "2026-11-19T12:06:41.422277+00:00",
+      "commented": true
     },
     {
       "company": "Mortgage Demand Housing Cliff",
@@ -2061,7 +2062,46 @@
       "hook": "A 51% drop in mortgage lock demand just hit the housing market.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-19T12:09:23.784118+00:00"
+      "created_at": "2026-11-19T12:09:23.784118+00:00",
+      "commented": true
+    },
+    {
+      "company": "GTA 6 price",
+      "angle": "GTA 5 cost $59.99 in 2013; GTA 6 costs $79.99, with a $99.99 Ultimate edition. Why are big games getting pricier, and where does the extra $20 go? Tell it as the business of game prices, not a buying guide.",
+      "title": "GTA 6 Is $79.99. Is That a Record? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "_SPvvR-i68k",
+      "kind": "short",
+      "day": "2026-11-20",
+      "warnings": [],
+      "question": "Has a software price rise changed which entertainment you buy?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Eighty dollars for a video game.",
+      "title_style": "search",
+      "queue": "shorts:GTA 6 price",
+      "created_at": "2026-11-20T12:11:25.775785+00:00"
+    },
+    {
+      "company": "AI Trade Cracks as Stocks Hit Worst Run Since 2023",
+      "angle": "Why is the massive AI trade fracturing and triggering the worst stock market losing streak since 2023?",
+      "title": "Ai trade Sinks With 2.3 Trillion Loss #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "DGk97VmPMWQ",
+      "kind": "short",
+      "day": "2026-11-20",
+      "warnings": [
+        "Only 2 news sources (minimum 3)."
+      ],
+      "question": "How do major market crashes affect your retirement savings?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Fourteen hundred points erased in hours.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-20T12:15:01.676297+00:00"
     }
   ],
   "rejected_topics": [],
