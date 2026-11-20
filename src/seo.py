@@ -143,8 +143,9 @@ def headline_case(title: str) -> str:
     alpha = [w for w in words if w[:1].isalpha()]
     if not title.isascii() or not alpha:
         return title
-    if sum(w[0].isupper() for w in alpha) * 2 >= len(alpha):
-        return title[:1].upper() + title[1:]
+    # A mostly cased title still gets its acronyms and stray lower-case words
+    # fixed ("Ai trade Sinks With..." shipped on 2026-11-20).
+    cased = sum(w[0].isupper() for w in alpha) * 2 >= len(alpha)
 
     def fix(word: str, first: bool) -> str:
         if word.startswith("#"):
@@ -155,7 +156,7 @@ def headline_case(title: str) -> str:
         rest = core[len(low):] if core.lower().startswith(low) else ""
         if low in SPELLED:
             core = SPELLED[low] + rest
-        elif low in ACRONYMS:
+        elif low in ACRONYMS and not (cased and low == "ups"):
             core = low.upper() + rest
         elif core.islower() and (first or core not in SMALL_WORDS):
             core = core[:1].upper() + core[1:]
