@@ -890,7 +890,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Chacha made kheer for Chachi's birthday with salt instead of sugar, and the whol",
@@ -917,7 +918,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     }
   ],
   "rejected_topics": [],
