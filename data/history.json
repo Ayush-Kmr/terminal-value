@@ -2141,7 +2141,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "AI Trade Cracks as Stocks Hit Worst Run Since 2023",
@@ -2166,7 +2167,8 @@
         "views": 0,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Anthropic IPO and AI Stock Sell-Off",
@@ -2184,7 +2186,8 @@
       "hook": "Anthropic just raised $107.3 billion.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-20T15:37:49.858483+00:00"
+      "created_at": "2026-11-20T15:37:49.858483+00:00",
+      "commented": true
     },
     {
       "company": "Visa, Mastercard, and JPMorgan Cyberattack",
@@ -2202,7 +2205,46 @@
       "hook": "A limited amount of marketing data, such as names",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-20T16:12:28.209815+00:00"
+      "created_at": "2026-11-20T16:12:28.209815+00:00",
+      "commented": true
+    },
+    {
+      "company": "US Stocks Enter Correction Territory Amid AI Tech Rout",
+      "angle": "Why is the AI stock market rout worsening and what does the plunge into correction territory mean for investor portfolios?",
+      "title": "Are Big Tech Stocks Losing Their Grip? #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "AUFz3t-kI9Q",
+      "kind": "short",
+      "day": "2026-11-21",
+      "publish_at": "2026-11-21T20:00:00-05:00",
+      "warnings": [],
+      "question": "Do you prefer investing in large technology companies or smaller businesses?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Nine trillion dollars vanished in a massive global tech rout.",
+      "title_style": "curious",
+      "queue": "",
+      "created_at": "2026-11-21T11:47:01.810562+00:00"
+    },
+    {
+      "company": "Trump Threatens Penalties for US Tech Firms Building Datacenters Abroad",
+      "angle": "What economic and corporate fallout will result from President Trump's threat of tremendous penalties on U.S. tech firms building AI datacenters overseas?",
+      "title": "Trump Data Center Ban Threatens Tech #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "PhaifcsuCe8",
+      "kind": "short",
+      "day": "2026-11-21",
+      "publish_at": "2026-11-21T18:00:00-05:00",
+      "warnings": [],
+      "question": "Should tech companies be fined for building infrastructure overseas instead of at home?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/6N6VDWNYC6k",
+      "hook": "Sixteen billion dollars in overseas tech investments face new penalties.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-21T11:50:18.890007+00:00"
     }
   ],
   "rejected_topics": [],
