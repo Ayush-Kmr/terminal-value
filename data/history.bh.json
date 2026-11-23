@@ -99,11 +99,11 @@
       "runtime": 22.1,
       "created_at": "2026-11-09T12:23:45.398213+00:00",
       "stats": {
-        "views": 36,
+        "views": 38,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 7,
-        "avg_pct": 34.67,
+        "avg_pct": 31.89,
         "minutes": 2
       }
     },
@@ -211,8 +211,8 @@
         "views": 46,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 6,
-        "avg_pct": 20.3,
+        "avg_duration_s": 5,
+        "avg_pct": 19.93,
         "minutes": 2
       }
     },
@@ -239,11 +239,11 @@
       "created_at": "2026-11-11T11:49:53.017372+00:00",
       "commented": true,
       "stats": {
-        "views": 24,
+        "views": 25,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 6,
-        "avg_pct": 19.04,
+        "avg_duration_s": 7,
+        "avg_pct": 22.35,
         "minutes": 1
       }
     },
@@ -343,9 +343,9 @@
         "views": 33,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 6,
-        "avg_pct": 20.35,
-        "minutes": 1
+        "avg_duration_s": 5,
+        "avg_pct": 18.44,
+        "minutes": 2
       }
     },
     {
@@ -472,8 +472,8 @@
         "views": 27,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 6,
-        "avg_pct": 21.11,
+        "avg_duration_s": 7,
+        "avg_pct": 23.35,
         "minutes": 1
       }
     },
@@ -499,11 +499,11 @@
       "created_at": "2026-11-12T21:04:07.063871+00:00",
       "commented": true,
       "stats": {
-        "views": 30,
+        "views": 34,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 11,
-        "avg_pct": 38.3,
+        "avg_duration_s": 10,
+        "avg_pct": 33.97,
         "minutes": 2
       }
     },
@@ -534,7 +534,7 @@
       "created_at": "2026-11-12T21:11:53.635644+00:00",
       "commented": true,
       "stats": {
-        "views": 24,
+        "views": 26,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 15,
@@ -569,7 +569,7 @@
       "created_at": "2026-11-12T21:18:29.986220+00:00",
       "commented": true,
       "stats": {
-        "views": 25,
+        "views": 26,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 4,
@@ -600,7 +600,7 @@
       "created_at": "2026-11-13T20:07:03.821745+00:00",
       "commented": true,
       "stats": {
-        "views": 21,
+        "views": 24,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 4,
@@ -655,11 +655,11 @@
       "deep_dive": "",
       "created_at": "2026-11-13T20:19:48.574180+00:00",
       "stats": {
-        "views": 20,
+        "views": 23,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 9,
-        "avg_pct": 43.36,
+        "avg_duration_s": 7,
+        "avg_pct": 37.02,
         "minutes": 1
       },
       "commented": true
@@ -690,7 +690,7 @@
       "deep_dive": "",
       "created_at": "2026-11-13T20:26:36.282260+00:00",
       "stats": {
-        "views": 10,
+        "views": 11,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 3,
@@ -722,11 +722,11 @@
       "deep_dive": "",
       "created_at": "2026-11-14T09:39:28.921503+00:00",
       "stats": {
-        "views": 9,
+        "views": 10,
         "likes": 1,
         "comments": 1,
-        "avg_duration_s": 9,
-        "avg_pct": 30,
+        "avg_duration_s": 6,
+        "avg_pct": 20.44,
         "minutes": 0
       },
       "commented": true
@@ -798,9 +798,9 @@
         "views": 39,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 11,
-        "avg_pct": 40.15,
-        "minutes": 4
+        "avg_duration_s": 10,
+        "avg_pct": 36.68,
+        "minutes": 5
       },
       "commented": true
     },
@@ -857,11 +857,11 @@
       "created_at": "2026-11-17T12:31:50.104879+00:00",
       "commented": true,
       "stats": {
-        "views": 20,
+        "views": 24,
         "likes": 1,
         "comments": 3,
-        "avg_duration_s": 7,
-        "avg_pct": 29.969999999999995,
+        "avg_duration_s": 6,
+        "avg_pct": 24.62,
         "minutes": 1
       }
     },
@@ -887,9 +887,12 @@
       "deep_dive": "https://youtu.be/UHtqXvvKZNs",
       "created_at": "2026-11-20T12:18:45.401952+00:00",
       "stats": {
-        "views": 0,
+        "views": 6,
         "likes": 0,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 5,
+        "avg_pct": 16.45,
+        "minutes": 0
       },
       "commented": true
     },
@@ -915,9 +918,12 @@
       "deep_dive": "https://youtu.be/UHtqXvvKZNs",
       "created_at": "2026-11-20T12:42:41.301150+00:00",
       "stats": {
-        "views": 0,
+        "views": 2,
         "likes": 0,
-        "comments": 0
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       },
       "commented": true
     },
@@ -941,7 +947,12 @@
       ],
       "question": "एह हफ्ता के कवन कॉमेडी सबसे मजेदार लागल? नंबर कमेंट में लिखीं! 😂",
       "created_at": "2026-11-21T20:05:34.691667+00:00",
-      "commented": true
+      "commented": true,
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 1
+      }
     },
     {
       "company": "After Chhath, Chacha hid the thekua in the rice drum \"for safety\", and he opens ",
@@ -962,9 +973,14 @@
       "part": 1,
       "question": "रउआ घरे छठ के ठेकुआ केकरा से छुपा के राखे के पड़ेला? 😂",
       "deep_dive": "https://youtu.be/oCfL1b0NOvg",
-      "created_at": "2026-11-22T20:54:20.181711+00:00"
+      "created_at": "2026-11-22T20:54:20.181711+00:00",
+      "stats": {
+        "views": 1,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 15.5
+  "channel_median_views": 11.0
 }
