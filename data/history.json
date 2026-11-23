@@ -2308,7 +2308,27 @@
         "views": 1,
         "likes": 1,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "CrowdStrike Q3 Earnings",
+      "angle": "How are CrowdStrike's financials holding up following previous high-profile tech disruptions as they report third-quarter results?",
+      "title": "CrowdStrike Earnings: Cash Flow $665M #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "nHBtk1ahHLA",
+      "kind": "short",
+      "day": "2026-11-23",
+      "publish_at": "2026-11-23T20:00:00-05:00",
+      "warnings": [],
+      "question": "Will Falcon Guardian become the new standard for AI protection?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "CrowdStrike posted $1.58 billion revenue.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-23T13:39:59.315927+00:00"
     }
   ],
   "rejected_topics": [],
