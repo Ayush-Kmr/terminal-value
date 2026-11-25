@@ -1033,7 +1033,8 @@
         "views": 2,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Lallan Chacha claims he is getting a role in the new season of Panchayat, while ",
@@ -1064,7 +1065,8 @@
         "views": 4,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     }
   ],
   "rejected_topics": [],
