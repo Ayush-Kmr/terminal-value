@@ -2367,7 +2367,8 @@
         "views": 1,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Nvidia and AI Chip Stocks Cool After Rally",
@@ -2391,7 +2392,46 @@
         "views": 2,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "New Trump Targeted Tariffs",
+      "angle": "How will the incoming round of targeted US tariffs on global trading partners impact American supply chains and stock markets?",
+      "title": "New Trump Adds 20% China Tariff, Impact? #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "fWeXUD9ec-o",
+      "kind": "short",
+      "day": "2026-11-25",
+      "publish_at": "2026-11-25T20:00:00-05:00",
+      "warnings": [],
+      "question": "Has a 20% duty made your products more expensive?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "20% extra tariff on Chinese goods.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-25T13:31:39.727166+00:00"
+    },
+    {
+      "company": "Nvidia Stock Slide and AI Rally Fizzle",
+      "angle": "Why are Nvidia and other leading AI chipmakers continuing to slide as investor confidence weakens?",
+      "title": "Nvidia Stock Price: 5.9% Fall vs 9% #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "213S0-AYhwo",
+      "kind": "short",
+      "day": "2026-11-25",
+      "publish_at": "2026-11-25T18:00:00-05:00",
+      "warnings": [],
+      "question": "What caused such a rapid swing in Nvidia's share price?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Nvidia fell 5.9% to $155.38.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-25T13:36:27.010301+00:00"
     }
   ],
   "rejected_topics": [],
