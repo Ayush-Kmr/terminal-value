@@ -20,11 +20,11 @@ channel:
   # The About box. Applied by scripts/brand_channel.py. The first two lines
   # are what search shows, so they carry the keywords.
   about: |
-    US business and markets news, explained properly. The story behind the headline: what happened at America's biggest companies, how we got here, and what it means for your money, your job and the economy.
+    Today's Number: the day's biggest AI and Big Tech money move, explained in under 30 seconds. One number, the company behind it, and why it matters for your money.
 
-    We follow the stories Americans are searching for, from earnings and layoffs to the Fed, tariffs and AI deals, read the coverage, and explain each one in plain English with the numbers, the dates and the people involved.
+    Nvidia, the AI trade, data centres, the Fed and tariffs: we read the coverage and explain each story in plain English with the numbers, the dates and the people involved.
 
-    A new deep-dive explainer every Sunday at 11 AM ET. Four new Shorts every day, Monday to Saturday.
+    Three new Shorts every day at 12:30, 4:15 and 7:30 PM ET, and a deep dive every other Sunday at 11 AM ET.
 
     Every video lists its sources in the description. Scripts and narration are produced with AI from published news reporting. Nothing here is financial advice. If we get something wrong, tell us in the comments and we will correct it.
   # What Americans search for. Check against YouTube search suggestions.
