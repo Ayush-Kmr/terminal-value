@@ -227,6 +227,14 @@ def titles(cfg: Config, company: str, angle: str, best_fact: str,
         if not _names_subject(o["title"], company):
             adj -= 30
             issues.append("subject not named in the first 40 characters")
+        # "Today's Number" (strategy 2026-11-27): a Short title carries the
+        # story's number when the research has one. The no-upload test of
+        # 2026-11-26 shipped "AI Stock Plunge and Fed Rate Pressures" while the
+        # script opened on "12 percent".
+        if maxlen <= SHORT_TITLE_MAX and not re.search(r"\d", o["title"]) \
+                and re.search(r"\d", " ".join(facts)):
+            adj -= 15
+            issues.append("no number, though the research has one")
         made_up = _unsupported_numbers(o["title"], evidence)
         if made_up:
             adj -= 60
