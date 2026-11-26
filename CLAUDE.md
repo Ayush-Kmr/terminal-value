@@ -74,14 +74,14 @@ Both workflows cron at `30 3 * * *` UTC. GitHub often starts them hours late (ar
 
 | Day | English | Bhojpuri |
 |---|---|---|
-| Mon–Sat | **2 Shorts** at 12:00 and 20:00 ET (`format.short.per_day: 2`, since 2026-11-13). Today's news story takes **20:00** (the latest free slot, `day_slot(latest=True)`). The "How X makes money" Short (`format.short.second: money`, from `data/money.yaml`) takes 12:00. | **2 skits** at 12:30 and 19:30 IST (`skit.per_day: 2`). One is from India's trending chart (`skit.trending.per_day: 1`). |
-| Sunday | **1 long video**, about 10 min (at least 8), public 11:00 ET, no Shorts (`format.long.days: [sunday]`, `with_shorts: 0`) | **1 long weekly compilation** at 18:00 IST (`skit.weekly`), no skits |
+| Every day but a long Sunday | **3 "Today's Number" Shorts** at 12:30, 16:15 and 19:30 ET (`format.short.per_day: 3`, strategy 2026-11-27). News stories take the latest free slots (`day_slot(latest=True)`). On weekends one is a "How X makes money" Short (`second: money`, `second_days: [saturday, sunday]`, from `data/money.yaml`), which takes 12:30. | **2 skits** at 12:30 and 19:30 IST, every day including Sunday (`skit.per_day: 2`), all from the idea bank (`skit.trending.per_day: 0`). |
+| Every other Sunday | **1 long video**, public 11:00 ET, no Shorts (`format.long.days: [sunday]`, `every_weeks: 2`, `week_anchor: 2026-12-13`, `with_shorts: 0`). Story: a ≥300-view Short of the week, else the next queued long entry. | No long video (`format.long.days: []` in `channels/bh.yaml`); `skit.weekly` only by hand |
 
 Timing logic (`src/upload.py`):
 - **`publish_day`:** "today" means channel time now + 4 h.
 - **`day_slot`:** the earliest free slot that day, at least 20 min from now. If every slot has gone, it returns `None` and the video goes **public at once**. It never spills into the next day.
 - **`made_on`:** counts the day's uploads, so a restarted run tops the day up instead of doubling it.
-- **`is_long_day`:** whether today is in `format.long.days`.
+- **`is_long_day`:** whether today is in `format.long.days` and, with `every_weeks`, a whole number of `every_weeks` weeks from `week_anchor`.
 
 ---
 
@@ -195,7 +195,7 @@ Timing logic (`src/upload.py`):
    - `talking_clips`: `animate.talking_clip`, a loudness-driven bounce plus a name tag. Lip-sync is WIP only.
    - `concat_with_audio`, then `add_sfx`: up to 3 script sound effects (boing, pop, ding, gasp, whoosh) plus a rimshot. They come from `assets/sfx`, made by `scripts/make_sfx.py`.
    - `shorts.finish` adds the headline and captions in Baloo 2 (Devanagari).
-7. **Title:** `"<जब … title> 😂 | <keyword> | <search phrase>"`.
+7. **Title:** `"<जब … title> 😂 | <search phrase>"` (two parts since 2026-11-25; the keyword goes only into the tags). Hashtags `#bhojpuricomedy #lallanchacha #bhojpurifunnyvideo #shorts`.
    - Titles start with "जब" plus the lead's name.
    - Numbered series are off (`skit.series: {}`).
 8. **Upload, then `archive()`:** the finished file is uploaded to the GitHub release **`skit-archive`** as `<day>_<videoId>.mp4`. This needs `GH_TOKEN`.

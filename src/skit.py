@@ -454,10 +454,13 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
     phrase = phrases[len(state.load().get("episodes", [])) % len(phrases)]
     head = str(sk["title"]).strip()
     tag = f"{series} भाग {part}" if series else ""
-    bits = [f"{head} 😂", tag, str(idea.get("keyword") or ""), phrase]
+    # Two parts at most (audit 2026-11-25): the 82-93 character titles with a
+    # raw lower-case keyword ("| new movie trailer |") pushed the Latin search
+    # phrase past the ~45 characters mobile shows. The keyword stays in tags.
+    bits = [f"{head} 😂", tag, phrase]
     title = " | ".join(b for b in bits if b)
-    if len(title) > 95:
-        title = " | ".join(b for b in [f"{head[:45]} 😂", tag, phrase] if b)
+    if len(title) > 70:
+        title = " | ".join(b for b in [f"{head[:45]} 😂", phrase] if b)
     names = ", ".join(f"{chars[c]['name_bho']} ({chars[c]['name']})" for c in in_skit)
     tags = list(dict.fromkeys([*([str(idea["keyword"]), f"{idea['keyword']} comedy"]
                                  if idea.get("keyword") else []),
@@ -465,7 +468,9 @@ def build(cfg: Config, idea: dict, workdir: Path) -> dict:
                                *[p.lower() for p in phrases],
                                *(chars[c]["name"].lower() for c in in_skit),
                                "funny video", "comedy shorts", "bhojpuri"]))[:20]
-    hashtags = "#bhojpuricomedy #comedy #funny #shorts"
+    # The first three show above the title; #comedy #funny said nothing about
+    # this channel (audit 2026-11-25). Lallan leads every skit.
+    hashtags = "#bhojpuricomedy #lallanchacha #bhojpurifunnyvideo #shorts"
     weekly = state.latest_long_url(state.load())
     description = "\n\n".join(p for p in [
         str(sk.get("summary", "")).strip(),
@@ -921,8 +926,12 @@ def weekly(cfg: Config, publish: str = "slot", no_upload: bool = False) -> int:
 
     chars = cfg.get_path("skit.characters", {})
     cast = " ".join(c["name"] for c in chars.values())
-    title = (f"ललन चाचा, फूलमती चाची आ बबलू के हफ्ता भर के बवाल 😂 | "
-             f"Bhojpuri Comedy Video {int(minutes)} Minute")[:100]
+    # A different title each week, led by the week's most viewed skit: the two
+    # identical "... Bhojpuri Comedy Video N Minute" titles got 0 views each,
+    # and "3 Minute" undersold it (audit 2026-11-25).
+    best = re.split(r"\s*😂|\s*\|", titles.get(order[0][1], ""))[0].strip() if order else ""
+    title = (f"{best or 'ललन चाचा के हफ्ता भर के बवाल'} 😂 | "
+             f"{len(parts)} कॉमेडी एके वीडियो में | Bhojpuri Comedy")[:100]
     description = "\n\n".join(p for p in [
         "पूरा हफ्ता के सबसे मजेदार भोजपुरी कॉमेडी एके वीडियो में! ललन चाचा, फूलमती चाची "
         "आ बबलू के गाँव के बवाल, एक के बाद एक।",

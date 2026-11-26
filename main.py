@@ -233,9 +233,13 @@ SHORT_BEAT = {
     "label": "Short",
     "share": 1.0,
     "intent": ("A complete {seconds}-second explainer of this one story for someone who has "
-               "not heard of it. FIRST SENTENCE: at most 8 words, spoken in the first 3 seconds: "
-               "the story's biggest number or sharpest conflict, so a scrolling viewer needs "
-               "the rest (e.g. 'Boeing just lost its biggest order.'). Use everyday words, "
+               "not heard of it. FIRST SENTENCE: at most 8 words, spoken in the first 3 seconds, "
+               "and it OPENS WITH the story's biggest number, so the number is the first thing "
+               "heard (e.g. 'Two and a half trillion dollars. Gone.'); only a story with no "
+               "number at all opens on its sharpest conflict. SECOND SENTENCE: the twist, what "
+               "the headline gets wrong or the surprising cause (e.g. 'And nobody missed "
+               "their numbers.'). This is the channel's 'Today's Number' series "
+               "(/youtube hook 2026-11-27). Use everyday words, "
                "never jargon like 'free cash flow'. Then what happened, "
                "then why it matters to the viewer. 6-9 shots of ONE sentence each, under 12 "
                "words, so the picture changes every few seconds. Stay on one subject, with a "
@@ -368,7 +372,14 @@ def produce_short(cfg, story: dict, workdir: Path) -> dict:
                                        " ".join(s.get("narration", "") for s in shot_list))
     if story.get("stock") and "stock" not in best["title"].lower():
         full = f"{story['stock']} Stock: {best['title']}"
-        best["title"] = full if len(full) <= seo.SHORT_TITLE_MAX else f"Why {story['stock']} Stock Moved"
+        # The old "Why X Stock Moved" fallback said nothing (Arista: 67 views,
+        # audit 2026-11-25): a title too long with the prefix keeps its own words.
+        if len(full) <= seo.SHORT_TITLE_MAX:
+            best["title"] = full
+    # Never the same title twice: "Why Google Stock Fell After a $51 Billion
+    # Spending Spree" went up twice (audit 2026-11-25, 4 views each).
+    best["title"] = seo.unused_title(best["title"], [o["title"] for o in options],
+                                     [e.get("title", "") for e in state.load().get("episodes", [])])
     headline = latin_only(best["title"]) or best.get("thumb_text") or company
     short = shorts.standalone(cfg, video, shot_list, workdir,
                               headline, best["title"], language,
@@ -592,6 +603,11 @@ def with_stock(cfg, args, stories: list[dict]) -> list[dict]:
 
     second = cfg.get_path("format.short.second", "question")
     if args.topic or second == "none":
+        return stories
+    # Strategy 2026-11-27: only on format.short.second_days (weekends, when
+    # there is little market news); other days are all trending stories.
+    only = [d.lower() for d in cfg.get_path("format.short.second_days", []) or []]
+    if only and upload.publish_day(cfg).strftime("%A").lower() not in only:
         return stories
     if second == "stock":
         move = trends.stock_move(cfg)

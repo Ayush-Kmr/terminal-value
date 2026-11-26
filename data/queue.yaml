@@ -45,6 +45,30 @@ long:
     search_query: "Bernie Madoff Ponzi scheme"
     wiki_title: "Madoff investment scandal"
     keywords: [madoff scheme, bernie madoff explained, madoff documentary]
+  # Calendar 2026-11-27 (long videos every other Sunday from 13 Dec). Black
+  # Friday deals dropped: price explainers did worst. A week's best Short with
+  # 300+ views still goes ahead of these (main.best_short_story).
+  - topic: "Fed and Broadcom AI day"
+    not_before: 2026-12-10        # long Sunday 13 Dec; FOMC + Broadcom results 9 Dec
+    angle: >-
+      On 9 December 2026 the Federal Reserve announced its rate decision and new
+      economic projections, and hours later Broadcom reported its quarterly AI
+      revenue. What did each number say about AI spending going into 2027, and
+      did the AI trade get stronger or weaker that day? Open on the bigger of
+      the two numbers. Never investing advice.
+    search_query: "Federal Reserve December 9 decision Broadcom earnings AI revenue"
+    keywords: [fed rate decision december 2026, broadcom earnings, broadcom ai revenue, ai stocks]
+  - topic: "Stock market 2026 year in review"
+    not_before: 2026-12-26        # long Sunday 27 Dec
+    history: true                 # a year of reporting, not one 3-day news window
+    angle: >-
+      The five numbers that explain the stock market in 2026, mostly AI and Big
+      Tech: the year's biggest AI sell-off, Nvidia, the data-centre spending
+      boom, the Fed, and tariffs. One chapter per number, in order, ending on
+      what to watch in January 2027. Never investing advice.
+    search_query: "stock market 2026 year in review AI stocks Nvidia"
+    keywords: [stock market 2026 year in review, ai stocks 2026, stock market 2026, nvidia 2026]
+
   - topic: "Enron"
     history: true
     title: "Enron Scandal Explained: The Biggest Fraud in American Business"
@@ -79,20 +103,20 @@ long:
     angle: "Are more Americans falling behind on car payments, and what does that signal?"
     search_query: "auto loan delinquencies US"
     keywords: [car loan crisis, car loans explained]
-  - topic: "Black Friday deals"
-    not_before: 2026-11-22
-    title: "Are Black Friday Deals Actually Real?"
-    angle: "Are Black Friday discounts real savings, and how do retailers set those prices?"
-    search_query: "Black Friday deals real discounts retailers"
-    keywords: [are black friday deals real, black friday deals, black friday explained]
-  - topic: "Federal Reserve interest rates"
-    not_before: 2026-12-03
-    title: "How Do Interest Rates Work? What the Fed's Decision Means for You"
-    angle: "How does a Federal Reserve rate decision reach your mortgage, car loan and savings?"
-    search_query: "Federal Reserve December meeting interest rates"
-    keywords: [what does the federal reserve do, how do interest rates work, fed rate decision]
-
 shorts:
+  # Calendar 2026-11-27: earnings previews the trading day before each report.
+  - topic: "How Broadcom makes money"
+    not_before: 2026-12-07        # results after the close on Wed 9 Dec
+    title: "How Does Broadcom Actually Make Money?"
+    angle: "How does Broadcom make money from custom AI chips and networking, ahead of its 9 December results?"
+    search_query: "Broadcom AI revenue custom chips business"
+    keywords: [how does broadcom make money, broadcom ai revenue, broadcom earnings]
+  - topic: "How Micron makes money"
+    not_before: 2026-12-14        # results expected Thu 17 Dec (unconfirmed)
+    title: "How Does Micron Actually Make Money?"
+    angle: "How does Micron make money from the memory chips AI servers need, ahead of its December results?"
+    search_query: "Micron memory AI demand business"
+    keywords: [how does micron make money, micron hbm memory, micron earnings]
   # GTA 6 launch week (launch 19 Nov 2026; /youtube ideate + hook + metadata,
   # 2026-11-17). Owner chose Terminal Value over a new gaming channel: only the
   # business side (sales, revenue, price), never gameplay help like unlock times.

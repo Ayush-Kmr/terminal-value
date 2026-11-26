@@ -135,6 +135,11 @@ US_RULES = """- Choose American and global business stories: markets, big tech a
   agency and a big number is what this audience watches.
 - Everyday price explainers ("why is X so expensive") did worst (27-95
   views): choose one only when that price is itself today's big news.
+- Strategy 2026-11-27: the channel is one daily series, "Today's Number",
+  about the day's biggest AI and Big Tech money move (Nvidia, the AI
+  sell-off, data centres, Fed and tariff shocks hitting US markets). Among
+  stories of similar size, the one inside that niche wins. Every pick needs
+  a named company, person or agency AND one big number for the first line.
 - Frame the story around the size of the money and what happens next. A big
   open question beats a recap."""
 

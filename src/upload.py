@@ -91,7 +91,18 @@ def is_long_day(cfg: Config, day=None) -> bool:
     (Sunday), and on that day nothing else; Shorts on every other day."""
     day = day or publish_day(cfg)
     days = [d.lower() for d in cfg.get_path("format.long.days", []) or []]
-    return bool(days) and day.strftime("%A").lower() in days
+    if not (days and day.strftime("%A").lower() in days):
+        return False
+    # Strategy 2026-11-27: every other Sunday. Weeks are counted from
+    # format.long.week_anchor (a long day); the weeks between are Shorts days.
+    every = int(cfg.get_path("format.long.every_weeks", 1) or 1)
+    anchor = cfg.get_path("format.long.week_anchor")
+    if every <= 1 or not anchor:
+        return True
+    from datetime import date as _date
+    start = _date.fromisoformat(str(anchor))
+    d = day.date() if hasattr(day, "date") and callable(day.date) else day
+    return ((d - start).days // 7) % every == 0
 
 
 def day_slot(cfg: Config, kind: str, day, taken: list | tuple = (),

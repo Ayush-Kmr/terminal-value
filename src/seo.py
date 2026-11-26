@@ -121,7 +121,24 @@ def _lint(title: str, maxlen: int = TITLE_MAX) -> tuple[int, list[str]]:
         issues.append("exclamation mark")
     if re.search(r"\d", title):
         score += 8
+    # Long-video titles under 60 characters miss search words (70-100 rank
+    # better, SEO playbook): "Why Trump Tariffs Are Unstoppable Right Now"
+    # (43 chars) got 1 view (audit 2026-11-25).
+    if maxlen >= TITLE_MAX and len(title) < 60:
+        score -= 10
+        issues.append(f"{len(title)} chars, short for a long video")
     return score, issues
+
+
+def unused_title(title: str, options: list[str], used: list[str]) -> str:
+    """The first of title, then options, never used before on this channel
+    (case and a trailing #shorts ignored); the title itself if all were."""
+    norm = lambda t: re.sub(r"\s*#shorts\s*$", "", str(t), flags=re.I).strip().lower()
+    seen = {norm(t) for t in used if t}
+    for t in [title, *options]:
+        if t and norm(t) not in seen:
+            return t
+    return title
 
 
 SMALL_WORDS = {"a", "an", "and", "as", "at", "but", "by", "for", "in", "of", "on", "or",
@@ -276,7 +293,11 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
     keywords = [k for k in keywords if not re.search(r"\d", k)] or keywords
     # The first short phrase, the subject; long ones make unreadable tags.
     for k in [k for k in keywords if len(k.split()) <= 3][:1] or keywords[:1]:
-        word = re.sub(r"[^0-9A-Za-zऀ-ॿ]", "", k.title() if k.isascii() else k)
+        # headline_case, not str.title(): .title() made #RbiRepoRateDecision
+        # and #AiStocks (audit 2026-11-25).
+        word = re.sub(r"[^0-9A-Za-zऀ-ॿ]", "",
+                      " ".join(w[:1].upper() + w[1:] for w in headline_case(k).split())
+                      if k.isascii() else k)
         if word and f"#{word}" not in tags:
             tags.append(f"#{word}")
     names = cfg.get_path("upload.hashtags", {}) or {}
@@ -284,7 +305,10 @@ def hashtags(cfg: Config, keywords: list[str], language: str, text: str = "") ->
                   if n in names), cfg.get_path("upload.hashtag_default", "#business"))
     if topic not in tags:
         tags.append(topic)
-    tags.append({"hi": "#hindinews"}.get(language, "#businessnews"))
+    # The third tag says what the channel is; upload.hashtag_channel overrides
+    # the generic #businessnews (audit 2026-11-25).
+    tags.append({"hi": "#hindinews"}.get(
+        language, cfg.get_path("upload.hashtag_channel", "#businessnews")))
     return " ".join(tags)
 
 

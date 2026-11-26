@@ -26,18 +26,18 @@ This one repo runs two YouTube channels automatically from GitHub Actions. There
 - GitHub `main` is the source of truth. Run `git pull` before working.
 - `~/terminal-value` (without git) is an old copy. **Do not edit it.**
 
-## 2. The weekly plan (set by Ayush on 2026-11-10; it replaces every earlier cadence)
+## 2. The weekly plan (strategy 2026-11-27; it replaces every earlier cadence)
 
 | Day | English | Bhojpuri |
 |---|---|---|
-| **Sunday** | **1 long video and no Shorts.** About 10 minutes (at least 8), public at 11:00 ET. Topic: a deep dive on **the week's most-viewed Short** (≥100 views, `best_short_story`). | **1 long video and no Shorts.** Public at 18:00 IST. It is a 16:9 compilation of the week's skits, most-viewed first, with chapters (`skit.weekly`). |
-| **Mon–Sat** | **4 Shorts**, at 12:00, 16:00, 18:00 and 20:00 ET, all on trending US stories (`format.short.second: none`; set 2026-11-20). | **2 skits**, at 12:30 and 19:30 IST (1 from the India trending chart; since 2026-11-13). |
+| **Every other Sunday** (13 Dec, 27 Dec, … ; `format.long.every_weeks: 2`, `week_anchor: 2026-12-13`, so 29 Nov too) | **1 long video and no Shorts.** Public at 11:00 ET. Topic: the week's most-viewed Short if it has **≥300 views**, else the next `data/queue.yaml` long entry (Fed + Broadcom for 13 Dec, 2026 year in review for 27 Dec). | No long video any more (`days: []` in `channels/bh.yaml`; both compilations got 0 views). |
+| **Every other day** | **3 "Today's Number" Shorts** at 12:30, 16:15 and 19:30 ET. Weekdays: all trending (AI and Big Tech money first). Weekends: one is a "How Does X Actually Make Money?" Short from `data/money.yaml` (`second: money`, `second_days: [saturday, sunday]`). | **2 skits** every day at 12:30 and 19:30 IST, all from the idea bank (trending-chart skits off, `skit.trending.per_day: 0`). |
 
 How the timing works (`src/upload.py`):
 - **`publish_day`:** "today" means channel time now + 4 h. The 03:30 UTC cron really starts at about 11:30 UTC, roughly 8 hours late.
 - **`day_slot`:** gives the earliest free slot **on that day only**. If every slot that day has passed, the video goes **public at once**. It never spills into the next day.
 - **`made_on`:** counts what was already uploaded for the day, so a restarted run tops the day up instead of doubling it.
-- **`is_long_day`:** reads `format.long.days: [sunday]`. On that day `format.long.with_shorts: 0`.
+- **`is_long_day`:** reads `format.long.days: [sunday]`, then `every_weeks` counted from `week_anchor`. On that day `format.long.with_shorts: 0`.
 
 ## 3. Workflows (`.github/workflows/`)
 
@@ -152,7 +152,16 @@ CHANNEL=bh .venv/bin/python main.py --skit --no-upload
 - Use the Shock/Contradiction hook.
 - Only these facts are verified: S&P 500 −4.4%, Dow −1,833 points (−3.4%), Nasdaq −5.5% and 11.9% below its high, about $2.5T wiped off Nasdaq Composite value, and worries over AI infrastructure and data-centre power.
 
+### Audit 2026-11-25 and strategy 2026-11-27
+- **English:** 114 videos, 14 subscribers, median 51 views, 10,063 views in 28 days (71% Shorts feed, 23% search, 2% suggested), 50% US. Long videos: median ~20 views, 6-15% left at half-way, 12 of 4,000 watch hours. Grades: SEO C, performance C-, strategy D+, monetisation F; overall **D**.
+- **Bhojpuri:** 55 videos, 2 subscribers, median 10 views, skits ~20% watched; unlisted Tamil Shorts out-viewed the comedy. Overall **F**. Minimum-effort trial to ~25 Dec: pause if the skit median is still under 30.
+- **Shipped:** 3 Shorts a day at 12:30/16:15/19:30 ET, long every other Sunday from a ≥300-view Short, number-first "Today's Number" opening, weekend money Shorts, AI/Big Tech priority in the picker, no "Why X Stock Moved" fallback, duplicate-title guard, hashtag casing and `#stocks`, long titles under 60 characters penalised; Bhojpuri 2-part titles, channel hashtags, a different weekly title, no trending-chart skits, no long day.
+- **Targets for 25 Dec:** English Short median 60+, 25+ subscribers in 28 days; Bhojpuri skit median 30+.
+
 ## 8. Open items and to-dos
+
+- [ ] **Newsletter:** set up a Substack (Ayush, by hand) and add its signup link to `channel.links` in `config.yaml` and to a pinned comment. `src/newsletter.py` already drafts it weekly.
+- [ ] **Micron's December results date is unconfirmed** (17 Dec expected); the Micron money Short is queued for 14 Dec.
 
 - [ ] **Lip-sync work in progress (SadTalker, CPU) is not committed.** It lives only in the working tree, with a backup in `git stash` "lipsync-wip".
   - Files: `scripts/lipsync.py`, `requirements-lipsync.txt`, and changes to `episode.yml`, `.gitignore`, `channels/bh.yaml`, `src/animate.py`, `src/skit.py`.
@@ -182,4 +191,5 @@ CHANNEL=bh .venv/bin/python main.py --skit --no-upload
 | 2026-11-04 | Long videos on Tue and Fri; the Tamil channel picked its own stories; competitor analysis. |
 | 2026-11-08 | **The Tamil channel became Bhojpuri AI Comedy** (cartoon skits). |
 | 2026-11-20 | Audit: English back to 4 trending Shorts/day (2/day + money Short fell to median ~10 views); picker ranks earnings recaps, game business, generic AI-trade recaps last; Bhojpuri cuts a garbled middle line instead of dropping the skit (`294983a`, `02e563b`). |
+| 2026-11-27 | **Strategy: "Today's Number", 3 Shorts a day, long every other Sunday; Bhojpuri 2 skits daily, no long day.** From the 2026-11-25 audit (/youtube audit, strategy, calendar, hook). |
 | 2026-11-10 | **New cadence: Sunday 1 long video, Mon–Sat 4 Shorts, on both channels.** Audit fixes, Fufa Ji, series, hook work (`de761fa` … `4942e88`). |

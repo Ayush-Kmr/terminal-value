@@ -6,8 +6,8 @@ name: Episode
 
 on:
   schedule:
-    # Every day 03:30 UTC. Sunday: one long video per channel and no Shorts;
-    # Monday-Saturday: four Shorts per channel. Uploads are scheduled for the
+    # Every day 03:30 UTC. Every other Sunday: one long video and no Shorts;
+    # every other day: three Shorts (strategy 2026-11-27). Uploads are scheduled for the
     # day's fixed slots (format.*.publish_times); GitHub often starts this
     # hours late, and a slot already gone then means public at once.
     - cron: "30 3 * * *"
@@ -22,7 +22,7 @@ on:
         options: [US, MARKETS]
         default: US
       kind:
-        description: "auto = follow config.yaml (long video on Sundays only, four Shorts Mon-Sat)"
+        description: "auto = follow config.yaml (long video every other Sunday, three Shorts on other days)"
         type: choice
         options: [auto, long, shorts]
         default: auto

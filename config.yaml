@@ -51,9 +51,12 @@ channel:
   links:
     - "Subscribe for the story behind the headline: https://www.youtube.com/@terminalvaluedoc?sub_confirmation=1"
   # Closes every description, before the sources.
+  # Strategy 2026-11-27: three Shorts a day ("Today's Number") and a deep dive
+  # every other Sunday. Keep this true to format.short / format.long.
   cta: >-
-    A new deep dive every Sunday at 11 AM ET, and four Shorts a day Monday to Saturday.
-    Subscribe so you never miss the story behind the headline.
+    Today's Number: the day's biggest money move in under 30 seconds, three
+    Shorts a day, plus a deep dive every other Sunday at 11 AM ET. Subscribe so
+    you never miss the story behind the headline.
   disclosure: >-
     This video was produced with AI: the script was written and the narration
     synthesised by AI from the published news reports listed above. Corrections
@@ -73,7 +76,9 @@ trending:
   # categories YouTube restricts ads on.
   # Checked in code after the model picks: a story using any of these words is
   # thrown out, whatever the model thought of it. Whole words, any case.
-  block_words: [election, elections, midterm, midterms, candidate, candidates, congressional race, senate race, governor race, ballot, ballots, exit poll, voters, primary election, nfl, nba, mlb, nhl, ufc, ipl, super bowl, world series, playoffs, draft pick]
+  block_words: [election, elections, midterm, midterms, candidate, candidates, congressional race, senate race, governor race, ballot, ballots, exit poll, voters, primary election, nfl, nba, mlb, nhl, ufc, ipl, super bowl, world series, playoffs, draft pick, gta, grand theft auto, earthquake, cyclone, megaquake]
+  # gta..megaquake added by the 2026-11-25 audit: GTA 6 Shorts got 2-23 views, quakes
+  # and cyclones drew India-only viewers off the channel's US/AI niche.
   avoid:
     - Deaths, accidents, disasters, attacks or crimes where victims are still being counted or named
     - Accusations against a named individual that no court or regulator has ruled on
@@ -91,15 +96,20 @@ trending:
 format:
   kind: "news explainer video"     # how prompts describe the video
   long:
-    # Weekly plan (Ayush, 2026-11-10): ONE long video every Sunday and no
-    # Shorts that day; Monday-Saturday four Shorts a day. The long video
-    # alone carries Sunday, so it is not split with Shorts for the audience.
+    # Weekly plan (Ayush, 2026-11-10): the long video on Sunday and no Shorts
+    # that day. Strategy 2026-11-27: every OTHER Sunday (every_weeks, counted
+    # from week_anchor); the off Sundays are ordinary Shorts days. 14 long
+    # videos had a median of 20 views and lost 85-94% of viewers by half-way,
+    # so fewer, better ones built on a proven Short.
     days: [sunday]
+    every_weeks: 2
+    week_anchor: "2026-12-13"   # a long Sunday: 13 Dec, 27 Dec, 10 Jan...
     with_shorts: 0              # Shorts made on the long day: none
-    # The Sunday video goes deep on the week's most watched Short (needs 100+
-    # views); otherwise the usual rotation below.
+    # The Sunday video goes deep on the week's most watched Short (needs 300+
+    # views since the 2026-11-27 strategy: only a story viewers already chose
+    # earns 6-8 minutes); otherwise the usual rotation below.
     from_best_short: true
-    best_short_min_views: 100
+    best_short_min_views: 300
     # After the queue, long videos run in fours: explainer (data/evergreen.yaml),
     # history (src/viral.py), explainer, then today's news. See long_slot in main.py.
     # A video that ends up under min_minutes is reported in Telegram.
@@ -133,7 +143,10 @@ format:
     # day of 11-13 Nov made 8 of the channel's top 10 (median ~250 views,
     # FAA ground stop 1,017); the 2-a-day weeks with a money/queue second
     # Short got a median of ~50 (5-10 Nov) and ~10 (16-20 Nov).
-    per_day: 4                  # standalone Shorts Mon-Sat (none on Sunday).
+    # Strategy 2026-11-27: three, every day but a long Sunday. YouTube notifies
+    # subscribers of at most 3 uploads in 24 h, and 4 a day kept landing as 1-2
+    # (Gemini allowance, failed runs): 3 the pipeline makes reliably beats 4.
+    per_day: 3
                                 # Standalone Shorts outperformed cuts ~5x.
     # Under 30 s: the Shorts that held 75-89% of viewers ran 22-35 s, and
     # 30-45 s is the length where completion drops most (Shorts playbook).
@@ -141,23 +154,27 @@ format:
     # (strategy 2026-11-13: Kalshi held 91%) | none = both from today's
     # trending stories | question (data/evergreen.yaml; the "why is X so
     # expensive" ones got 27-95 views, 2026-11-10) | stock.
-    second: none
+    second: money
+    # Strategy 2026-11-27: the money Short only on weekends, when there is no
+    # market news; weekdays are all trending stories.
+    second_days: [saturday, sunday]
     max_shot_words: 12
     # Spoken just before the last sentence of every Short (main.add_follow_line).
     # A promise, not a plea (/youtube analyze 2026-11-16: about 1 subscriber
     # per 1,000 Short views; the old lines gave no reason to follow). Keep
-    # them true to the schedule: 4 Shorts Mon-Sat, the news ones in the evening,
-    # a deep dive every Sunday.
+    # them true to the schedule. Strategy 2026-11-27: one series, "Today's
+    # Number", three a day; the line names it so a viewer knows what comes next.
     follow_lines:
-      - "Follow: every day, the market's biggest story, explained in thirty seconds."
-      - "Follow for the story behind the day's biggest market move, every evening."
-      - "Follow: the day's biggest money stories, and a deep dive every Sunday."
-      - "Follow, and you'll understand the next big market story before everyone else."
+      - "Follow: the day's biggest money number, every day."
+      - "Follow for today's number: the biggest money move, explained in thirty seconds."
+      - "Follow, and you'll know tomorrow's biggest money number before everyone else."
     target_seconds: 25          # 21-28 s Shorts held 60-110% viewed, 42-44 s ones 30%
     shot_seconds: [2.5, 5]      # a new picture about every 3 s keeps thumbs still
     # ET. Midday and evening. A slot that has already gone when the (often
     # late) run gets there goes public at once, never the next day.
-    publish_times: ["12:00", "16:00", "18:00", "20:00"]
+    # Strategy 2026-11-27: lunch (12:30), straight after the US close (16:15,
+    # the day's market story) and the evening peak (19:30).
+    publish_times: ["12:30", "16:15", "19:30"]
 
 # ---------- the explainer spine ----------
 # Each video follows this structure but never the same phrasing.
@@ -449,6 +466,9 @@ upload:
   # Topic playlists: a video joins every playlist one of whose words appears
   # in its subject, title or tags (whole words, any case). Keeps viewers
   # watching the next video on the same subject.
+  # Third hashtag on every Short: what the channel is (strategy 2026-11-27:
+  # US markets and AI money). Was the generic #businessnews.
+  hashtag_channel: "#stocks"
   # Category hashtag for each topic playlist.
   hashtags:
     "Stock Market & Companies": "#stockmarket"

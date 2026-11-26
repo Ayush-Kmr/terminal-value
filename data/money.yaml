@@ -14,6 +14,32 @@
 # Nov), Cyber Monday (30 Nov), the Fed meeting (8-9 Dec). Keep new topics
 # at the bottom unless they are timed to a date.
 topics:
+  # Strategy 2026-11-27: AI and Big Tech companies first (the channel's niche;
+  # the Help pillar runs on weekends only, format.short.second_days).
+  - topic: "CoreWeave"
+    title: "How Does CoreWeave Actually Make Money?"
+    angle: "How does CoreWeave make money renting Nvidia chips to AI companies, and who are its biggest customers?"
+    search: [how does coreweave make money, coreweave business model]
+  - topic: "Palantir"
+    title: "How Does Palantir Actually Make Money?"
+    angle: "How does Palantir make money, and how much of it comes from governments?"
+    search: [how does palantir make money, palantir business model]
+  - topic: "Oracle"
+    title: "How Does Oracle Actually Make Money?"
+    angle: "How does Oracle make money, and why did it bet so heavily on AI data centres?"
+    search: [how does oracle make money, oracle cloud ai]
+  - topic: "Arm"
+    title: "How Arm Makes Money Without Making Chips"
+    angle: "How does Arm make money from chips it never manufactures?"
+    search: [how does arm make money, arm royalties]
+  - topic: "Nebius"
+    title: "How Does Nebius Actually Make Money?"
+    angle: "How does Nebius, a little-known AI cloud company, make money?"
+    search: [how does nebius make money, nebius ai cloud]
+  - topic: "Super Micro"
+    title: "How Does Super Micro Make Money?"
+    angle: "How does Super Micro Computer make money building the servers that run AI?"
+    search: [how does super micro make money, supermicro ai servers]
   - topic: "Polymarket"
     title: "How Does Polymarket Actually Make Money?"
     angle: "How does Polymarket actually make money when it charges almost no trading fees?"
