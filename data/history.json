@@ -2458,7 +2458,8 @@
         "views": 152,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Trump Administration New Global Tariffs",
@@ -2482,7 +2483,8 @@
         "views": 159,
         "likes": 1,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Thanksgiving Nor'easter Holiday Travel Disruption",
@@ -2506,7 +2508,8 @@
         "views": 121,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "FCC First Amendment Free Speech Ruling",
@@ -2530,7 +2533,65 @@
         "views": 50,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
+    },
+    {
+      "company": "US Air Force Cloud One Hack",
+      "angle": "How did hackers breach the US Air Force's flagship Cloud One computing platform and what are the security fallout consequences?",
+      "title": "US Air Force Explained Platform Hack #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "K4WYXx9ykP4",
+      "kind": "short",
+      "day": "2026-11-27",
+      "publish_at": "2026-11-27T19:30:00-05:00",
+      "warnings": [],
+      "question": "How worried are you about software vulnerabilities in critical public infrastructure?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Cloud One.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-27T13:04:35.637213+00:00"
+    },
+    {
+      "company": "Apple Memory Cost Pressure and Gross Margins",
+      "angle": "Why is a global memory chip shortage driving up component costs and forcing Apple to lower its gross margin guidance to 45%-46%?",
+      "title": "Apple Memory Costs Squeeze Profit #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "zA_H7888gVk",
+      "kind": "short",
+      "day": "2026-11-27",
+      "publish_at": "2026-11-27T16:15:00-05:00",
+      "warnings": [],
+      "question": "How much extra would you pay for a phone with more memory?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "45% to 46%.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-27T13:06:46.259055+00:00"
+    },
+    {
+      "company": "China Stocks Surge on Beijing Market Support",
+      "angle": "Why did Chinese stocks surge by the most in two years after Beijing's Cabinet issued a rare midday statement vowing stronger market support?",
+      "title": "China Stock Market News: State Support Pushes Bounce #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "Gl8iQuv2jqE",
+      "kind": "short",
+      "day": "2026-11-27",
+      "publish_at": "2026-11-27T12:30:00-05:00",
+      "warnings": [],
+      "question": "Can government intervention fix a slowing economy?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Two years.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-27T13:08:41.729138+00:00"
     }
   ],
   "rejected_topics": [],
