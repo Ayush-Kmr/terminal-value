@@ -1107,7 +1107,8 @@
         "views": 1,
         "likes": 0,
         "comments": 0
-      }
+      },
+      "commented": true
     },
     {
       "company": "Chachi has locked the fridge to stop Chacha's midnight snacking, and Chacha is c",
