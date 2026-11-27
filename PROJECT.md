@@ -192,5 +192,6 @@ CHANNEL=bh .venv/bin/python main.py --skit --no-upload
 | 2026-11-08 | **The Tamil channel became Bhojpuri AI Comedy** (cartoon skits). |
 | 2026-11-20 | Audit: English back to 4 trending Shorts/day (2/day + money Short fell to median ~10 views); picker ranks earnings recaps, game business, generic AI-trade recaps last; Bhojpuri cuts a garbled middle line instead of dropping the skit (`294983a`, `02e563b`). |
 | 2026-11-27 | **Strategy: "Today's Number", 3 Shorts a day, long every other Sunday; Bhojpuri 2 skits daily, no long day.** From the 2026-11-25 audit (/youtube audit, strategy, calendar, hook). |
+| 2026-11-27 | **Story picker asks for 3 spare stories (was 1)**: runs on 21, 23-25 Nov lost 1-3 Shorts each to the 2-trusted-source check with no spare left. `trending.spares`. |
 | 2026-11-27 | **Event Shorts queued: Fed decision + Broadcom results (10 Dec), November CPI (11 Dec).** No fixed titles (the title must carry the real figure); new queue field `not_after` drops them if their day is missed. |
 | 2026-11-10 | **New cadence: Sunday 1 long video, Mon–Sat 4 Shorts, on both channels.** Audit fixes, Fufa Ji, series, hook work (`de761fa` … `4942e88`). |

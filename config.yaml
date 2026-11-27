@@ -64,6 +64,7 @@ channel:
 
 # ---------- trending topic selection ----------
 trending:
+  spares: 3              # extra stories asked for, as stand-ins when one fails research (main.candidates_for)
   cooldown_days: 10                # do not repeat a story within this window
   # weight = priority. trends_geo = Google Trends country (not available for
   # China). news = Google News edition, or a search query for that region.

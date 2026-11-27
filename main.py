@@ -435,7 +435,10 @@ def candidates_for(cfg, args, n: int) -> list[dict]:
         return [manual_story(cfg, args)]
     if cfg.get_path("mode", "trending") == "trending":
         from src import trends
-        return trends.pick(cfg, n=max(n, 4))
+        # Spares: about 1 story in 3 fails the 2-trusted-source check (audit
+        # 2026-11-27: runs on 21, 23, 24, 25 Nov lost 1-3 Shorts each with only
+        # one spare), so ask for three more than needed.
+        return trends.pick(cfg, n=max(n + int(cfg.get_path("trending.spares", 3)), 4))
     candidates = topics_or_die(cfg)
     for c in candidates:
         c.setdefault("topic", c.get("company"))
