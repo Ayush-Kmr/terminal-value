@@ -510,8 +510,10 @@ def queued(args, kind: str, n: int) -> list[dict]:
     out = []
     for item in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get(kind, []):
         key = f"{kind}:{item['topic']}"
-        if key in used or str(item.get("not_before", "")) > datetime.now().date().isoformat():
-            continue
+        today = datetime.now().date().isoformat()
+        if key in used or str(item.get("not_before", "")) > today \
+                or str(item.get("not_after") or "9999") < today:
+            continue        # not_after: an event Short that missed its day is dropped
         story = {"company": item["topic"], "region": "US", "language": "en", "wiki_title": "",
                  **item, "queue": key}
         story["history"] = item["topic"] if item.get("history") else ""

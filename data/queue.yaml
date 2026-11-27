@@ -2,7 +2,8 @@
 # queue once it has been uploaded (tracked in data/history.json); then the
 # automatic picks carry on. Add stories at the bottom, or move them up.
 # A title is used only if every figure in it is in the research.
-# not_before holds a story back until that date, for anything timed to an event.
+# not_before holds a story back until that date, for anything timed to an event;
+# not_after drops it once its day has passed (news Shorts that would be stale).
 long:
   # One-off for Sunday 15 Nov (/youtube hook, 2026-11-14): the week's best Short
   # said the Supreme Court "just" struck down the tariffs, but the ruling was on
@@ -104,6 +105,38 @@ long:
     search_query: "auto loan delinquencies US"
     keywords: [car loan crisis, car loans explained]
 shorts:
+  # /youtube metadata 2026-11-27: event-day Shorts (calendar). No fixed title:
+  # the figure is not known yet, and Short titles must carry the real number,
+  # so the title comes from the research. Runs start 22:30 ET the evening before
+  # the publish day, so each Short is built after its event.
+  - topic: "Fed December rate decision"
+    not_before: 2026-12-10        # FOMC decision 2 pm ET Wed 9 Dec
+    not_after: 2026-12-10
+    angle: >-
+      What did the Federal Reserve decide on 9 December 2026, and what does the
+      new dot plot say about rate cuts in 2027? Open on the single biggest number
+      (the rate, the cut size, or the cuts the Fed now expects), then the twist:
+      what it means for mortgages, savings and AI stocks. Never investing advice.
+    search_query: "Federal Reserve December 9 2026 rate decision dot plot"
+    keywords: [fed rate decision, fed meeting december 2026, interest rates, fed rate cut, dot plot]
+  - topic: "Broadcom December results"
+    not_before: 2026-12-10        # results after the close Wed 9 Dec
+    not_after: 2026-12-10
+    angle: >-
+      Broadcom reported its quarterly results after the close on 9 December 2026.
+      Open on its AI revenue figure, then the twist: did the stock rise or fall
+      after hours, and what did it guide for next quarter? Never investing advice.
+    search_query: "Broadcom fourth quarter fiscal 2026 results AI revenue"
+    keywords: [broadcom earnings, broadcom ai revenue, avgo stock, ai chip stocks]
+  - topic: "November CPI inflation"
+    not_before: 2026-12-11        # CPI 8:30 am ET Thu 10 Dec; built that evening
+    not_after: 2026-12-11
+    angle: >-
+      What did the November 2026 consumer price index, released 10 December,
+      show? Open on the yearly inflation rate, then the twist: which prices rose
+      most, and what it means for the Fed's next move. Never investing advice.
+    search_query: "November 2026 CPI inflation report"
+    keywords: [cpi report, inflation november 2026, cpi inflation, consumer prices]
   # Calendar 2026-11-27: earnings previews the trading day before each report.
   - topic: "How Broadcom makes money"
     not_before: 2026-12-07        # results after the close on Wed 9 Dec

@@ -287,7 +287,7 @@ Timing logic (`src/upload.py`):
 ## 7. Data and content files
 
 - **`data/queue.yaml`**: stories that go ahead of the automatic picks, under `long:` and `shorts:`.
-  - Fields: `topic`, `title`, `angle`, `search_query`, `keywords`, `history`, `wiki_title`, `collapse`, `not_before`, `ahead_of_best_short`, `proven_hook`, `proven_views`, `thumb_text`, `thumb_figure`, `thumb_entity`.
+  - Fields: `topic`, `title`, `angle`, `search_query`, `keywords`, `history`, `wiki_title`, `collapse`, `not_before`, `not_after` (drops a missed event Short), `ahead_of_best_short`, `proven_hook`, `proven_views`, `thumb_text`, `thumb_figure`, `thumb_entity`.
   - An entry leaves the queue once its `"<kind>:<topic>"` key is in history.
 - **`data/money.yaml`**: "How X makes money" Shorts (fixed titles of at most 40 characters). **`data/evergreen.yaml`**: explainer topics for long videos and question Shorts. Both are tracked by `queue` keys (`money-short:`, `evergreen-short:`).
 - **`data/bhojpuri_ideas.yaml`**: skit premises (§4).
