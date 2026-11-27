@@ -46,7 +46,7 @@
       "runtime": 25.1,
       "created_at": "2026-11-08T15:17:31.397556+00:00",
       "stats": {
-        "views": 69,
+        "views": 70,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 9,
@@ -99,7 +99,7 @@
       "runtime": 22.1,
       "created_at": "2026-11-09T12:23:45.398213+00:00",
       "stats": {
-        "views": 39,
+        "views": 40,
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 7,
@@ -128,7 +128,7 @@
         "likes": 0,
         "comments": 0,
         "avg_duration_s": 18,
-        "avg_pct": 87.4,
+        "avg_pct": 86.46,
         "minutes": 5
       }
     },
@@ -370,7 +370,7 @@
       "created_at": "2026-11-11T20:27:16.718777+00:00",
       "commented": true,
       "stats": {
-        "views": 11,
+        "views": 12,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 10,
@@ -469,11 +469,11 @@
       "created_at": "2026-11-12T20:55:33.058315+00:00",
       "commented": true,
       "stats": {
-        "views": 29,
+        "views": 30,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 7,
-        "avg_pct": 23.35,
+        "avg_pct": 23.67,
         "minutes": 1
       }
     },
@@ -499,7 +499,7 @@
       "created_at": "2026-11-12T21:04:07.063871+00:00",
       "commented": true,
       "stats": {
-        "views": 34,
+        "views": 37,
         "likes": 1,
         "comments": 1,
         "avg_duration_s": 9,
@@ -655,12 +655,12 @@
       "deep_dive": "",
       "created_at": "2026-11-13T20:19:48.574180+00:00",
       "stats": {
-        "views": 28,
+        "views": 31,
         "likes": 0,
         "comments": 1,
-        "avg_duration_s": 7,
-        "avg_pct": 35.39,
-        "minutes": 1
+        "avg_duration_s": 8,
+        "avg_pct": 41.89,
+        "minutes": 2
       },
       "commented": true
     },
@@ -861,7 +861,7 @@
         "likes": 1,
         "comments": 3,
         "avg_duration_s": 5,
-        "avg_pct": 22.73,
+        "avg_pct": 22.34,
         "minutes": 1
       }
     },
@@ -887,7 +887,7 @@
       "deep_dive": "https://youtu.be/UHtqXvvKZNs",
       "created_at": "2026-11-20T12:18:45.401952+00:00",
       "stats": {
-        "views": 7,
+        "views": 19,
         "likes": 0,
         "comments": 1,
         "avg_duration_s": 5,
@@ -951,7 +951,10 @@
       "stats": {
         "views": 0,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       }
     },
     {
@@ -975,9 +978,12 @@
       "deep_dive": "https://youtu.be/oCfL1b0NOvg",
       "created_at": "2026-11-22T20:54:20.181711+00:00",
       "stats": {
-        "views": 9,
+        "views": 13,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 4,
+        "avg_pct": 20.67,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1004,9 +1010,12 @@
       "created_at": "2026-11-23T13:49:25.627966+00:00",
       "commented": true,
       "stats": {
-        "views": 2,
+        "views": 5,
         "likes": 0,
-        "comments": 1
+        "comments": 1,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       }
     },
     {
@@ -1032,7 +1041,10 @@
       "stats": {
         "views": 2,
         "likes": 0,
-        "comments": 0
+        "comments": 2,
+        "avg_duration_s": 6,
+        "avg_pct": 20.67,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1062,9 +1074,12 @@
       "deep_dive": "https://youtu.be/oCfL1b0NOvg",
       "created_at": "2026-11-24T14:36:22.636294+00:00",
       "stats": {
-        "views": 4,
+        "views": 6,
         "likes": 0,
-        "comments": 0
+        "comments": 2,
+        "avg_duration_s": 0,
+        "avg_pct": 0,
+        "minutes": 0
       },
       "commented": true
     },
@@ -1087,7 +1102,12 @@
       "part": 1,
       "question": "रउआ घर में बिना पाइनल केहू अइसन कांड केलें बा का? 😂",
       "deep_dive": "https://youtu.be/oCfL1b0NOvg",
-      "created_at": "2026-11-27T02:59:46.698793+00:00"
+      "created_at": "2026-11-27T02:59:46.698793+00:00",
+      "stats": {
+        "views": 1,
+        "likes": 0,
+        "comments": 0
+      }
     },
     {
       "company": "Chachi has locked the fridge to stop Chacha's midnight snacking, and Chacha is c",
@@ -1109,9 +1129,14 @@
       "part": 1,
       "question": "रउआ घर में रात के भूख केकर लागेला? 😂",
       "deep_dive": "https://youtu.be/oCfL1b0NOvg",
-      "created_at": "2026-11-27T03:09:50.116167+00:00"
+      "created_at": "2026-11-27T03:09:50.116167+00:00",
+      "stats": {
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
     }
   ],
   "rejected_topics": [],
-  "channel_median_views": 10.0
+  "channel_median_views": 11.0
 }
