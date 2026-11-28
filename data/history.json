@@ -2553,7 +2553,8 @@
       "hook": "Cloud One.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-27T13:04:35.637213+00:00"
+      "created_at": "2026-11-27T13:04:35.637213+00:00",
+      "commented": true
     },
     {
       "company": "Apple Memory Cost Pressure and Gross Margins",
@@ -2572,7 +2573,8 @@
       "hook": "45% to 46%.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-27T13:06:46.259055+00:00"
+      "created_at": "2026-11-27T13:06:46.259055+00:00",
+      "commented": true
     },
     {
       "company": "China Stocks Surge on Beijing Market Support",
@@ -2591,7 +2593,65 @@
       "hook": "Two years.",
       "title_style": "search",
       "queue": "",
-      "created_at": "2026-11-27T13:08:41.729138+00:00"
+      "created_at": "2026-11-27T13:08:41.729138+00:00",
+      "commented": true
+    },
+    {
+      "company": "Jensen Huang Reappointed Nvidia CEO",
+      "angle": "Why has Jensen Huang been reinstated as Nvidia CEO amid the ongoing AI stock roller coaster?",
+      "title": "Jensen Huang Nvidia Story 2026 #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "DC9fdq-oRwI",
+      "kind": "short",
+      "day": "2026-11-28",
+      "publish_at": "2026-11-28T19:30:00-05:00",
+      "warnings": [],
+      "question": "Can personal misconduct be separated from executive performance in major companies?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Thirty-three percent lost in eleven days.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-28T12:18:52.138199+00:00"
+    },
+    {
+      "company": "CoreWeave",
+      "angle": "How does CoreWeave make money renting Nvidia chips to AI companies, and who are its biggest customers?",
+      "title": "Inside CoreWeave And Its $66 Billion Debt #shorts",
+      "region": "US",
+      "language": "en",
+      "video_id": "FbsC9ZMw2GQ",
+      "kind": "short",
+      "day": "2026-11-28",
+      "publish_at": "2026-11-28T12:30:00-05:00",
+      "warnings": [],
+      "question": "Have you ever seen a fast-growing startup take on too much financial risk?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Sixty-six billion dollars.",
+      "title_style": "curious",
+      "queue": "money-short:CoreWeave",
+      "created_at": "2026-11-28T12:22:30.236662+00:00"
+    },
+    {
+      "company": "Steve Eisman AI Bubble Warning",
+      "angle": "Is the massive AI infrastructure trade actually an overhyped bubble, according to Big Short investor Steve Eisman?",
+      "title": "Steve Eisman AI Bubble Warning #shorts",
+      "region": "MARKETS",
+      "language": "en",
+      "video_id": "FOb7_zOPnaY",
+      "kind": "short",
+      "day": "2026-11-28",
+      "publish_at": "2026-11-28T16:15:00-05:00",
+      "warnings": [],
+      "question": "Do you think artificial intelligence spending has gone too far?",
+      "parent_url": "",
+      "deep_dive": "https://youtu.be/PAnQrq8xIIo",
+      "hook": "Seventy percent.",
+      "title_style": "search",
+      "queue": "",
+      "created_at": "2026-11-28T12:26:08.260148+00:00"
     }
   ],
   "rejected_topics": [],
